@@ -107,7 +107,13 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background:
 
 # ── Google Sheets ─────────────────────────────────────────────────────────────
 escopos = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-credenciais = Credentials.from_service_account_file("credenciais.json", scopes=escopos)
+import json
+if "gcp_service_account" in st.secrets:
+    credenciais = Credentials.from_service_account_info(
+        dict(st.secrets["gcp_service_account"]), scopes=escopos
+    )
+else:
+    credenciais = Credentials.from_service_account_file("credenciais.json", scopes=escopos)
 cliente = gspread.authorize(credenciais)
 planilha = cliente.open("JurisBank")
 aba_candidatos = planilha.sheet1
