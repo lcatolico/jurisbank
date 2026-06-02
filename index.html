@@ -161,11 +161,11 @@ nav{
 
 /* Hero card */
 .hero-card{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.1);
+  background:#ffffff;
+  border:none;
   border-radius:20px;
   padding:28px;
-  backdrop-filter:blur(10px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);
 }
 .hero-card-header{
   display:flex;align-items:center;gap:12px;
@@ -178,24 +178,24 @@ nav{
   display:flex;align-items:center;justify-content:center;
   font-size:15px;font-weight:700;color:white;
 }
-.hero-card-name{font-size:15px;font-weight:700;color:var(--branco)}
-.hero-card-sub{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+.hero-card-name{font-size:15px;font-weight:700;color:#0d1f4e}
+.hero-card-sub{font-size:12px;color:#6080c0;margin-top:2px}
 .hero-card-selos{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .selo-mini{
   font-size:10px;font-weight:700;padding:3px 10px;
   border-radius:99px;display:inline-block;
 }
-.s-v{background:rgba(232,239,254,0.15);color:#a8c5ff;border:1px solid rgba(176,197,245,0.2)}
-.s-r{background:rgba(230,244,234,0.15);color:#7ed99b;border:1px solid rgba(176,223,192,0.2)}
-.s-d{background:rgba(255,248,230,0.15);color:#f0c040;border:1px solid rgba(253,230,138,0.2)}
+.s-v{background:#e8effe;color:#1a3a8f;border:1px solid #b0c5f5}
+.s-r{background:#e6f4ea;color:#15803d;border:1px solid #b0dfc0}
+.s-d{background:#fff8e6;color:#b45309;border:1px solid #fde68a}
 .hero-card-disc{
   background:rgba(220,252,231,0.1);
   border:1px solid rgba(220,252,231,0.2);
   border-radius:10px;padding:10px 14px;
   display:flex;align-items:center;gap:8px;margin-bottom:12px;
 }
-.disc-letter{font-size:20px;font-weight:800;color:#7ed99b}
-.disc-desc{font-size:11px;color:rgba(255,255,255,0.6);line-height:1.4}
+.disc-letter{font-size:20px;font-weight:800;color:#166534}
+.disc-desc{font-size:11px;color:#6080c0;line-height:1.4}
 .hero-card-footer{
   display:flex;align-items:center;justify-content:space-between;
 }
@@ -445,8 +445,8 @@ footer{
     <a href="#para-quem">Para quem</a>
   </div>
   <div class="nav-actions">
-    <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank" class="btn-ghost">Entrar</a>
-    <a href="https://jurisbank.streamlit.app/?p=cadastro" target="_blank" class="btn-dourado">Cadastrar currículo</a>
+    <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank" class="btn-ghost">Área do Recrutador</a>
+    <a href="https://jurisbank.streamlit.app/?p=cadastro" target="_blank" class="btn-dourado">Área do Candidato</a>
   </div>
 </nav>
 
@@ -455,8 +455,8 @@ footer{
   <div class="hero-inner">
     <div>
       <div class="hero-badge fade-up fade-up-1">ius indicandum</div>
-      <h1 class="fade-up fade-up-2">A indicação que você precisava, <em>agora certificada.</em></h1>
-      <p class="hero-sub fade-up fade-up-3">Conectamos profissionais do Direito a Tribunais, Ministérios Públicos, Defensorias e Procuradorias — com selos de certificação, perfil comportamental DISC e validação institucional.</p>
+      <h1 class="fade-up fade-up-2">A indicação que você precisava<br><em>para a nomeação.</em></h1>
+      <p class="hero-sub fade-up fade-up-3">Conectamos profissionais do Direito a vagas de livre nomeação em Tribunais, Ministérios Públicos, Defensorias e Procuradorias.</p>
       <div class="hero-ctas fade-up fade-up-4">
         <a href="https://jurisbank.streamlit.app/?p=cadastro" target="_blank" class="btn-hero-primary">Cadastrar meu currículo →</a>
         <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank" class="btn-hero-secondary">Sou recrutador</a>
@@ -482,8 +482,8 @@ footer{
       <div class="hero-card-header">
         <div class="hero-card-avatar">RC</div>
         <div>
-          <div class="hero-card-name">Rafael Costa</div>
-          <div class="hero-card-sub">Pós-graduado em Direito Público · UFMG · MP</div>
+          <div style="font-size:15px;font-weight:700;color:#0d1f4e">Rafael Costa</div>
+          <div style="font-size:12px;color:#6080c0;margin-top:2px">Pós-graduado em Direito Público · UFMG · MP</div>
         </div>
       </div>
       <div class="hero-card-selos">
@@ -498,8 +498,8 @@ footer{
           Analítico, preciso e orientado à qualidade. Excelente em pesquisa jurídica.
         </div>
       </div>
-      <div style="background:rgba(255,248,230,0.08);border:1px solid rgba(240,192,64,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px">
-        <span style="font-size:11px;color:rgba(240,192,64,0.8)">📚 Estudando para: Promotor de Justiça (MP Estadual)</span>
+      <div style="background:#fff8e6;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:14px">
+        <span style="font-size:11px;color:#b45309">📚 Estudando para: Promotor de Justiça (MP Estadual)</span>
       </div>
       <div class="hero-card-footer">
         <span class="disponivel">● Disponível</span>
@@ -581,8 +581,8 @@ footer{
 <section class="disc-section" id="disc">
   <div class="disc-inner">
     <div class="section-badge" style="background:rgba(200,150,12,0.15);color:var(--dourado-claro)">Perfil comportamental</div>
-    <h2 class="section-title" style="color:var(--branco)">Além do currículo.<br><em style="color:var(--dourado-claro)">O perfil DISC.</em></h2>
-    <p class="section-sub" style="color:rgba(255,255,255,0.6)">12 perguntas que identificam o estilo comportamental do candidato. O recrutador sabe antes da entrevista quem se encaixa no perfil do gabinete.</p>
+    <h2 class="section-title" style="color:var(--branco)">Além do currículo.<br><em style="color:var(--dourado-claro)">O perfil.</em></h2>
+    <p class="section-sub" style="color:rgba(255,255,255,0.6)">Perguntas que identificam o estilo comportamental do candidato e quem se encaixa no perfil procurado para a vaga.</p>
     <div class="disc-grid">
       <div class="disc-card d-d">
         <div class="disc-letra">D</div>
@@ -650,6 +650,76 @@ footer{
   </div>
 </section>
 
+
+<!-- FERRAMENTAS DO RECRUTADOR -->
+<section style="padding:100px 2rem;background:#ffffff;">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="margin-bottom:3.5rem">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:#e8f0fe;color:#1a3a8f;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:1rem">Para Recrutadores</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,46px);font-weight:900;color:#0d1f4e;letter-spacing:-1px;line-height:1.1;margin-bottom:1rem">Ferramentas para<br><span style="background:linear-gradient(135deg,#c8960c,#f0c040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">uma seleção segura.</span></h2>
+      <p style="font-size:16px;color:#6080c0;line-height:1.7;max-width:560px">Caminhos estruturados para encontrar, avaliar e selecionar o profissional certo — com rastreabilidade e conformidade com as normas de impessoalidade.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      <div style="background:#f4f6fc;border:1.5px solid #d0dcfa;border-radius:18px;padding:28px;transition:all 0.2s">
+        <div style="font-size:32px;margin-bottom:16px">🔍</div>
+        <h3 style="font-size:17px;font-weight:700;color:#0d1f4e;margin-bottom:8px">Busca avançada</h3>
+        <p style="font-size:14px;color:#6080c0;line-height:1.6;margin-bottom:16px">Filtre por área, disponibilidade, OAB, selos, perfil DISC, sistema jurídico e experiência mínima. Encontre o perfil exato que seu gabinete precisa.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">6 filtros</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Filtro DISC</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Por sistema</span>
+        </div>
+      </div>
+      <div style="background:#f4f6fc;border:1.5px solid #d0dcfa;border-radius:18px;padding:28px">
+        <div style="font-size:32px;margin-bottom:16px">📢</div>
+        <h3 style="font-size:17px;font-weight:700;color:#0d1f4e;margin-bottom:8px">Chamadas de vagas</h3>
+        <p style="font-size:14px;color:#6080c0;line-height:1.6;margin-bottom:16px">Publique uma Chamada para sua vaga de livre nomeação com prazo, requisitos, remuneração e forma de seleção. Candidatos compatíveis são notificados automaticamente.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Formulário completo</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Prazo definido</span>
+        </div>
+      </div>
+      <div style="background:#f4f6fc;border:1.5px solid #d0dcfa;border-radius:18px;padding:28px">
+        <div style="font-size:32px;margin-bottom:16px">★</div>
+        <h3 style="font-size:17px;font-weight:700;color:#0d1f4e;margin-bottom:8px">Favoritos e anotações</h3>
+        <p style="font-size:14px;color:#6080c0;line-height:1.6;margin-bottom:16px">Salve candidatos em sua lista de favoritos e adicione anotações privadas visíveis apenas para você. Organize seu processo sem expor informações a terceiros.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Privado</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Por recrutador</span>
+        </div>
+      </div>
+      <div style="background:#f4f6fc;border:1.5px solid #d0dcfa;border-radius:18px;padding:28px">
+        <div style="font-size:32px;margin-bottom:16px">🏅</div>
+        <h3 style="font-size:17px;font-weight:700;color:#0d1f4e;margin-bottom:8px">Selos de certificação</h3>
+        <p style="font-size:14px;color:#6080c0;line-height:1.6;margin-bottom:16px">Cada candidato possui selos baseados em documentação verificável — OAB ativa, carta de recomendação institucional, avaliação de desempenho e experiência comprovada.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">4 selos</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Documentado</span>
+        </div>
+      </div>
+      <div style="background:#f4f6fc;border:1.5px solid #d0dcfa;border-radius:18px;padding:28px">
+        <div style="font-size:32px;margin-bottom:16px">🧠</div>
+        <h3 style="font-size:17px;font-weight:700;color:#0d1f4e;margin-bottom:8px">Perfil DISC</h3>
+        <p style="font-size:14px;color:#6080c0;line-height:1.6;margin-bottom:16px">Saiba antes da entrevista se o candidato tem perfil Dominante, Influente, Estável ou de Conformidade. Filtre pelo perfil comportamental ideal para o seu gabinete.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">4 perfis</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">Filtro por perfil</span>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#0d1f4e,#1a3a8f);border-radius:18px;padding:28px;border:none">
+        <div style="font-size:32px;margin-bottom:16px">⚖</div>
+        <h3 style="font-size:17px;font-weight:700;color:#ffffff;margin-bottom:8px">Conformidade legal</h3>
+        <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:16px">Toda seleção documentada, com consentimento LGPD e disclaimer de não vinculação. Em conformidade com a Súmula Vinculante nº 13 e a Resolução CNJ nº 07/2005.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(200,150,12,0.2);color:#f0c040">LGPD</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(200,150,12,0.2);color:#f0c040">SV nº 13</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(200,150,12,0.2);color:#f0c040">CNJ nº 07/2005</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CTA FINAL -->
 <section class="cta-final">
   <div class="cta-final-inner">
@@ -669,7 +739,7 @@ footer{
       <div><span class="footer-logo-text">Juris<span>Bank</span></span><span style="font-size:10px;color:rgba(200,150,12,0.4);display:block;margin-top:2px">ius indicandum</span></div>
       <div class="footer-links">
         <a href="https://jurisbank.streamlit.app/?p=candidatos" target="_blank">Candidatos</a>
-        <a href="https://jurisbank.streamlit.app/?p=cadastro" target="_blank">Cadastrar currículo</a>
+        <a href="https://jurisbank.streamlit.app/?p=cadastro" target="_blank">Área do Candidato</a>
         <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank">Área do Recrutador</a>
         <a href="https://jurisbank.streamlit.app/?p=privacidade" target="_blank">Política de Privacidade</a>
         <a href="https://jurisbank.streamlit.app/?p=termos" target="_blank">Termos de Uso</a>

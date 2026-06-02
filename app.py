@@ -4,6 +4,7 @@ from google.oauth2.service_account import Credentials
 import fitz
 import re
 import hashlib
+import secrets
 from datetime import datetime, date
 
 st.set_page_config(
@@ -136,12 +137,13 @@ aba_candidatos = planilha.sheet1
 aba_recrutadores = planilha.worksheet("recrutadores")
 aba_chamadas = planilha.worksheet("chamadas")
 aba_interesses = planilha.worksheet("interesses")
+aba_recomendacoes = planilha.worksheet("recomendacoes")
 
 # ── Navegação por URL ─────────────────────────────────────────────────────────
 params = st.query_params
 p = params.get("p","candidatos")
 if isinstance(p,list): p = p[0]
-if p not in ["candidatos","chamadas","cadastro","recrutador","privacidade","termos"]:
+if p not in ["candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
     p = "candidatos"
 if "pagina" not in st.session_state or params.get("p"):
     st.session_state.pagina = p
@@ -593,6 +595,23 @@ elif pagina == "cadastro":
         if er and "@" in er:
             if er.split("@")[-1] in dv: st.markdown('<div class="info-box">✓ E-mail institucional reconhecido.</div>',unsafe_allow_html=True)
             else: st.warning("Domínio não reconhecido.")
+
+        if er and "@" in er:
+            st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
+            st.markdown('<p style="font-weight:600;color:rgba(255,255,255,0.8);margin-bottom:4px">Solicitar avaliação direta na plataforma</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">O recomendador receberá um link exclusivo para preencher uma avaliação do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
+            if st.button("Gerar link de avaliação →", key="gerar_link"):
+                email_cand_temp = st.session_state.dc.get("email","")
+                if not email_cand_temp:
+                    st.error("Preencha seu e-mail na etapa anterior primeiro.")
+                else:
+                    token = secrets.token_urlsafe(24)
+                    aba_recomendacoes.append_row([token, email_cand_temp, er, "pendente", datetime.now().strftime("%d/%m/%Y %H:%M"), "", ""])
+                    link = f"https://jurisbank.streamlit.app/?p=recomendar&token={token}"
+                    st.markdown(f'<div class="info-box">✓ Link gerado! Compartilhe com seu recomendador:<br><strong style="font-size:12px;word-break:break-all">{link}</strong></div>',unsafe_allow_html=True)
+                    st.session_state.dc["token_recomendacao"] = token
+                    st.info("Quando o recomendador preencher a avaliação, o selo ★ Recomendado será ativado automaticamente no seu perfil.")
+
         d=st.session_state.dc; sp=[]
         if d.get("oab")=="Sim": sp.append("✓ Verificado")
         if carta: sp.append("★ Recomendado")
@@ -961,6 +980,112 @@ elif pagina == "recrutador":
                         aba_recrutadores.append_row([nr,er,hash_senha(sr),dr["estado"],dr["municipio"],dr["orgao"],dr["nome_orgao"],dr["cargo"],dr["areas"],"pendente",datetime.now().strftime("%d/%m/%Y %H:%M")])
                         del st.session_state.cad_rec
                         st.success("Cadastro realizado! Aguarde a ativação."); st.balloons()
+
+
+# ── PÁGINA: AVALIAÇÃO DO RECOMENDADOR ────────────────────────────────────────
+elif pagina == "recomendar":
+    token_url = st.query_params.get("token", "")
+    if isinstance(token_url, list): token_url = token_url[0]
+
+    if not token_url:
+        st.markdown('''<div class="hero-card">
+            <h1 class="page-title">Link<br><em>inválido.</em></h1>
+            <p class="page-sub">Este link de avaliação não é válido ou já foi utilizado.</p>
+        </div>''', unsafe_allow_html=True)
+    else:
+        # Buscar token na planilha
+        recs_recom = aba_recomendacoes.get_all_records()
+        rec_recom = next((r for r in recs_recom if r.get("token") == token_url), None)
+
+        if not rec_recom:
+            st.markdown('''<div class="hero-card">
+                <h1 class="page-title">Link<br><em>não encontrado.</em></h1>
+                <p class="page-sub">Este link de avaliação não existe ou expirou.</p>
+            </div>''', unsafe_allow_html=True)
+        elif rec_recom.get("status") == "concluido":
+            st.markdown('''<div class="hero-card">
+                <h1 class="page-title">Avaliação<br><em>já realizada.</em></h1>
+                <p class="page-sub">Esta avaliação já foi preenchida. Obrigado pela sua contribuição.</p>
+            </div>''', unsafe_allow_html=True)
+        else:
+            # Buscar dados do candidato
+            todos_cands = aba_candidatos.get_all_records()
+            cand_recom = next((c for c in todos_cands if c.get("email") == rec_recom.get("email_candidato")), None)
+            nome_cand = cand_recom["nome"] if cand_recom else rec_recom.get("email_candidato", "candidato")
+
+            st.markdown(f'''<div class="hero-card">
+                <h1 class="page-title">Avaliação de<br><em>Recomendação.</em></h1>
+                <p class="page-sub">Você foi indicado como recomendador de <strong style="color:#f0c040">{nome_cand}</strong> no JurisBank. Preencha a avaliação abaixo.</p>
+            </div>''', unsafe_allow_html=True)
+
+            st.markdown(f'''<div class="disclaimer-box">
+                Esta avaliação é de caráter profissional e será exibida para recrutadores de Tribunais, Ministérios Públicos, Defensorias e Procuradorias. Ao enviar, você confirma que as informações prestadas são verdadeiras.
+            </div>''', unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            with st.form("form_recomendacao"):
+                st.markdown('<p style="font-size:15px;font-weight:700;color:#ffffff;margin-bottom:1rem">Sobre o candidato</p>', unsafe_allow_html=True)
+
+                tempo = st.selectbox("Há quanto tempo conhece o candidato? *", [
+                    "Selecione...", "Menos de 1 ano", "1 a 2 anos", "2 a 5 anos", "Mais de 5 anos"
+                ])
+                contexto = st.selectbox("Em qual contexto profissional? *", [
+                    "Selecione...", "Assessoria direta no meu gabinete",
+                    "Atuação em outro órgão público", "Trabalho conjunto em projeto ou força-tarefa",
+                    "Docência ou orientação acadêmica", "Outro"
+                ])
+
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.markdown('<p style="font-size:15px;font-weight:700;color:#ffffff;margin-bottom:1rem">Avaliação profissional</p>', unsafe_allow_html=True)
+
+                pontos_fortes = st.text_area(
+                    "Quais os principais pontos fortes do candidato? *",
+                    height=100,
+                    placeholder="Descreva as qualidades profissionais que mais se destacaram..."
+                )
+                adequacao = st.selectbox("O candidato é adequado para assessoria em órgão público? *", [
+                    "Selecione...", "Sim, fortemente recomendo",
+                    "Sim, com algumas ressalvas", "Neutro", "Não recomendo"
+                ])
+                nota = st.select_slider(
+                    "Nota geral (1 a 5) *",
+                    options=[1, 2, 3, 4, 5],
+                    value=4
+                )
+                comentarios = st.text_area(
+                    "Comentários adicionais (opcional)",
+                    height=80,
+                    placeholder="Observações complementares sobre o candidato..."
+                )
+
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                confirmacao = st.checkbox(
+                    "Confirmo que sou membro ativo de órgão do sistema de justiça e que as informações prestadas são verdadeiras, assumindo responsabilidade por seu conteúdo."
+                )
+
+                submitted = st.form_submit_button("Enviar avaliação →")
+
+                if submitted:
+                    if tempo == "Selecione..." or contexto == "Selecione..." or adequacao == "Selecione..." or not pontos_fortes:
+                        st.error("Preencha todos os campos obrigatórios.")
+                    elif not confirmacao:
+                        st.error("Confirme sua responsabilidade sobre as informações prestadas.")
+                    else:
+                        resposta = f"Tempo: {tempo} | Contexto: {contexto} | Adequação: {adequacao} | Nota: {nota}/5 | Pontos fortes: {pontos_fortes}"
+                        # Atualizar planilha de recomendações
+                        idx_recom = next((i for i, r in enumerate(recs_recom) if r.get("token") == token_url), None)
+                        if idx_recom is not None:
+                            aba_recomendacoes.update_cell(idx_recom + 2, 4, "concluido")
+                            aba_recomendacoes.update_cell(idx_recom + 2, 6, resposta)
+                            aba_recomendacoes.update_cell(idx_recom + 2, 7, comentarios)
+                        # Ativar selo recomendado no candidato
+                        if cand_recom:
+                            todos_cands2 = aba_candidatos.get_all_records()
+                            idx_cand = next((i for i, c in enumerate(todos_cands2) if c.get("email") == rec_recom.get("email_candidato")), None)
+                            if idx_cand is not None:
+                                aba_candidatos.update_cell(idx_cand + 2, 14, "Sim")  # coluna N = selo_recomendado
+                        st.success("Avaliação enviada com sucesso! O selo ★ Recomendado foi ativado no perfil do candidato.")
+                        st.balloons()
 
 # ── PÁGINAS LEGAIS ────────────────────────────────────────────────────────────
 elif pagina in ["privacidade","termos"]:
