@@ -390,7 +390,7 @@ def render_disc_perfil(d):
     </div>"""
 
 def botao_voltar():
-    st.markdown(f'<a href="{LANDING_URL}" target="_parent" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;margin-bottom:1.5rem">← Voltar à página inicial</a>', unsafe_allow_html=True)
+    st.markdown(f'<a href="{LANDING_URL}" target="_blanck" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;margin-bottom:1.5rem">← Voltar à página inicial</a>', unsafe_allow_html=True)
 
 # ── PÁGINA: INÍCIO (boas-vindas) ──────────────────────────────────────────────
 if pagina == "inicio":
