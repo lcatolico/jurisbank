@@ -5,6 +5,8 @@ import fitz
 import re
 import hashlib
 import secrets
+import urllib.request
+import json
 from datetime import datetime, date
 
 st.set_page_config(
@@ -292,6 +294,63 @@ def render_disc(d):
         <p style="color:rgba(255,255,255,0.65);font-size:12px;margin:0 0 4px"><strong style="color:{tb}">No gabinete:</strong> {det.get('no_gabinete','')}</p>
         <p style="color:rgba(255,255,255,0.65);font-size:12px;margin:0"><strong style="color:{tb}">Atenção:</strong> {det.get('atencao','')}</p>
     </div>"""
+
+
+def enviar_email(destinatario, assunto, corpo_html):
+    """Envia e-mail via Resend API."""
+    try:
+        api_key = st.secrets["resend"]["api_key"]
+        remetente = st.secrets["resend"]["remetente"]
+        payload = json.dumps({
+            "from": remetente,
+            "to": [destinatario],
+            "subject": assunto,
+            "html": corpo_html
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "https://api.resend.com/emails",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(req) as response:
+            return response.status == 200
+    except Exception as e:
+        return False
+
+def email_recomendador(nome_candidato, email_recomendador, link):
+    assunto = f"JurisBank — {nome_candidato} solicitou sua avaliação"
+    corpo = f"""
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff">
+        <div style="background:linear-gradient(135deg,#0d1f4e,#1a3a8f);padding:32px;text-align:center;border-radius:12px 12px 0 0">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#c8960c,#f0c040);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px">⚖</div>
+            <h1 style="color:#ffffff;font-size:22px;margin:0;letter-spacing:-0.5px">JurisBank</h1>
+            <p style="color:rgba(255,255,255,0.6);font-size:12px;margin:4px 0 0;font-style:italic">ius indicandum</p>
+        </div>
+        <div style="padding:32px;background:#f4f6fc;border-radius:0 0 12px 12px">
+            <h2 style="color:#0d1f4e;font-size:20px;margin:0 0 12px">Solicitação de avaliação</h2>
+            <p style="color:#4a5568;font-size:15px;line-height:1.7;margin:0 0 20px">
+                O profissional <strong style="color:#0d1f4e">{nome_candidato}</strong> indicou você como recomendador no JurisBank e solicita que você preencha uma avaliação do seu perfil profissional.
+            </p>
+            <p style="color:#4a5568;font-size:14px;line-height:1.7;margin:0 0 24px">
+                A avaliação é rápida (menos de 5 minutos) e ficará disponível para recrutadores de Tribunais, Ministérios Públicos, Defensorias e Procuradorias ao analisar o perfil do candidato.
+            </p>
+            <div style="text-align:center;margin:28px 0">
+                <a href="{link}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#c8960c,#f0c040);color:#0d1f4e;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">
+                    Preencher avaliação →
+                </a>
+            </div>
+            <p style="color:#8090b8;font-size:12px;line-height:1.6;margin:0;border-top:1px solid #d0dcfa;padding-top:16px">
+                Este link é exclusivo e de uso único. Caso não reconheça esta solicitação, ignore este e-mail.<br>
+                <strong>JurisBank</strong> — plataforma de aproximação entre profissionais do Direito e órgãos do sistema de justiça.
+            </p>
+        </div>
+    </div>
+    """
+    return enviar_email(email_recomendador, assunto, corpo)
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
 nav_pages = [
@@ -608,7 +667,13 @@ elif pagina == "cadastro":
                     token = secrets.token_urlsafe(24)
                     aba_recomendacoes.append_row([token, email_cand_temp, er, "pendente", datetime.now().strftime("%d/%m/%Y %H:%M"), "", ""])
                     link = f"https://jurisbank.streamlit.app/?p=recomendar&token={token}"
-                    st.markdown(f'<div class="info-box">✓ Link gerado! Compartilhe com seu recomendador:<br><strong style="font-size:12px;word-break:break-all">{link}</strong></div>',unsafe_allow_html=True)
+                    nome_cand_temp = st.session_state.dc.get("nome", "candidato")
+                    # Enviar e-mail ao recomendador
+                    enviado = email_recomendador(nome_cand_temp, er, link)
+                    if enviado:
+                        st.markdown(f'<div class="info-box">✓ E-mail enviado para <strong>{er}</strong>!<br><span style="font-size:12px;opacity:0.8">O recomendador receberá o link para preencher a avaliação.</span></div>',unsafe_allow_html=True)
+                    else:
+                        st.markdown(f'<div class="info-box">✓ Link gerado! Caso o e-mail não chegue, compartilhe o link manualmente:<br><strong style="font-size:12px;word-break:break-all">{link}</strong></div>',unsafe_allow_html=True)
                     st.session_state.dc["token_recomendacao"] = token
                     st.info("Quando o recomendador preencher a avaliação, o selo ★ Recomendado será ativado automaticamente no seu perfil.")
 
