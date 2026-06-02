@@ -233,8 +233,13 @@ aba_interesses = planilha.worksheet("interesses")
 
 # ── Navegação por URL ─────────────────────────────────────────────────────────
 params = st.query_params
-pagina = params.get("p", "inicio")
-if isinstance(pagina, list): pagina = pagina[0]
+if "embed" in params and "p" not in params:
+    pagina = st.session_state.get("_pagina", "candidatos")
+elif "p" in params:
+    pagina = params["p"]
+    st.session_state["_pagina"] = pagina
+else:
+    pagina = st.session_state.get("_pagina", "inicio")
 
 # ── Constantes ────────────────────────────────────────────────────────────────
 AVATAR_CORES = ["#1a3a8f","#2e7d5e","#7b3fa0","#c05a1a","#1a6b8a","#a04040","#3a6b2a"]
@@ -395,7 +400,7 @@ if pagina == "inicio":
         <h1 style="font-family:'Playfair Display',serif;font-size:clamp(36px,5vw,56px);font-weight:900;color:#ffffff;letter-spacing:-1.5px;line-height:1.05;margin:0 0 1rem">JurisBank</h1>
         <p style="font-size:16px;color:rgba(255,255,255,0.5);font-style:italic;margin:0 0 2rem;letter-spacing:.05em">ius indicandum</p>
         <p style="font-size:17px;color:rgba(255,255,255,0.65);max-width:480px;line-height:1.7;margin:0 0 2.5rem">Banco de talentos jurídicos certificados para assessoria em Tribunais, Ministérios Públicos, Defensorias e Procuradorias.</p>
-        <a href="{LANDING_URL}" target="_parent" style="display:inline-flex;align-items:center;gap:8px;padding:16px 40px;background:linear-gradient(135deg,#c8960c,#f0c040);color:#0d1f4e;font-family:'Sora',sans-serif;font-weight:700;font-size:16px;border-radius:12px;text-decoration:none;box-shadow:0 4px 20px rgba(200,150,12,0.35)">
+        <a href="{LANDING_URL}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:16px 40px;background:linear-gradient(135deg,#c8960c,#f0c040);color:#0d1f4e;font-family:'Sora',sans-serif;font-weight:700;font-size:16px;border-radius:12px;text-decoration:none;box-shadow:0 4px 20px rgba(200,150,12,0.35)">
             Acessar o JurisBank →
         </a>
     </div>
