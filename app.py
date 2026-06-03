@@ -71,9 +71,9 @@ header[data-testid="stHeader"] { display: none !important; }
 .hero-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 20px; padding: 2rem 2.5rem; margin-bottom: 1.5rem; }
 .page-title { font-family: 'Playfair Display',serif; font-size: clamp(28px,4vw,42px); font-weight: 900; color: #0d1f4e; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.1; }
 .page-title em { font-style: normal; background: linear-gradient(135deg,#c8960c,#f0c040); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.page-sub { font-size: 15px; color: #6080c0; margin: 0; }
+.page-sub { font-size: 15px; color: #3a5a9a; margin: 0; font-weight: 500; }
 .stats-row { display: flex; gap: 12px; margin-top: 1.5rem; flex-wrap: wrap; }
-.stat-pill { background: #eef3fe; border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 600; color: #1a3a8f; border: 1px solid #c5d5f5; }
+.stat-pill { background: #dce8ff; border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 700; color: #0d1f4e; border: 1px solid #a0bcf0; }
 
 .cand-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 8px; transition: all 0.2s; }
 .cand-card:hover { border-color: #4070f4; box-shadow: 0 6px 24px rgba(64,112,244,0.1); transform: translateY(-1px); }
@@ -82,7 +82,7 @@ header[data-testid="stHeader"] { display: none !important; }
 
 .avatar { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; color: white; }
 .cand-name { font-size: 15px; font-weight: 700; color: #0d1f4e; margin: 0 0 3px; }
-.cand-sub { font-size: 12px; color: #8090b8; margin: 0; }
+.cand-sub { font-size: 12px; color: #4a6080; margin: 0; font-weight: 500; }
 
 .badge-sim { background: #e6f4ea; color: #1a7a4a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
 .badge-nao { background: #fff3e8; color: #c05a1a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #f0c8a0; }
@@ -98,7 +98,7 @@ header[data-testid="stHeader"] { display: none !important; }
 .selo-experiente { background: #f3effe; color: #6d28d9; border: 1px solid #ddd6fe; }
 
 .metric-box { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 14px; padding: 16px 18px; text-align: center; }
-.metric-label { font-size: 11px; font-weight: 600; color: #8090b8; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px; }
+.metric-label { font-size: 11px; font-weight: 700; color: #4a6080; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px; }
 .metric-value { font-size: 24px; font-weight: 800; color: #0d1f4e; margin: 0; }
 
 .teaser-box { background: linear-gradient(135deg,#0d1f4e,#1a3a8f); border-radius: 16px; padding: 20px 24px; text-align: center; }
@@ -106,11 +106,11 @@ header[data-testid="stHeader"] { display: none !important; }
 .teaser-label { font-size: 12px; color: rgba(255,255,255,0.65); margin: 4px 0 0; }
 
 .profile-name { font-family: 'Playfair Display',serif; font-size: 24px; font-weight: 900; color: #0d1f4e; margin: 0 0 6px; }
-.section-label { font-size: 11px; font-weight: 700; color: #4070f4; text-transform: uppercase; letter-spacing: .1em; margin: 1.5rem 0 0.5rem; }
-.info-card { background: #f4f7fe; border: 1.5px solid #d0dcfa; border-radius: 12px; padding: 14px 18px; font-size: 14px; color: #3a5a9a; line-height: 1.6; }
+.section-label { font-size: 11px; font-weight: 700; color: #1a3a8f; text-transform: uppercase; letter-spacing: .1em; margin: 1.5rem 0 0.5rem; }
+.info-card { background: #f0f5ff; border: 1.5px solid #c5d5f5; border-radius: 12px; padding: 14px 18px; font-size: 14px; color: #1a3a8f; line-height: 1.6; font-weight: 500; }
 .custom-divider { height: 1px; background: #e8f0fe; margin: 1.5rem 0; }
 .info-box { background: #e8effe; border: 1px solid #b0c5f5; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #1a3a8f; margin-top: 8px; font-weight: 500; }
-.lock-box { background: #f4f7fe; border: 1.5px solid #d0dcfa; border-radius: 12px; padding: 14px 18px; font-size: 13px; color: #8090b8; text-align: center; }
+.lock-box { background: #f4f7fe; border: 1.5px solid #d0dcfa; border-radius: 12px; padding: 14px 18px; font-size: 13px; color: #4a6080; text-align: center; }
 .disclaimer-box { background: #fff8e6; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #92400e; line-height: 1.6; margin-top: 1rem; }
 .aviso-pago { background: linear-gradient(135deg,#0d1f4e,#1a3a8f); border-radius: 16px; padding: 20px 24px; text-align: center; margin: 1rem 0; }
 
@@ -118,12 +118,12 @@ header[data-testid="stHeader"] { display: none !important; }
 .step { flex: 1; height: 4px; border-radius: 99px; background: #d0dcfa; }
 .step.active { background: linear-gradient(135deg,#c8960c,#f0c040); }
 .step.done { background: #1a7a4a; }
-.step-title { font-size: 13px; font-weight: 600; color: #8090b8; margin-bottom: 0.3rem; }
+.step-title { font-size: 13px; font-weight: 600; color: #3a5a9a; margin-bottom: 0.3rem; }
 .step-desc { font-family: 'Playfair Display',serif; font-size: 22px; font-weight: 700; color: #0d1f4e; margin-bottom: 1.5rem; }
 
 .doc-sub { font-size: 12px; font-weight: 700; color: #4070f4; text-transform: uppercase; letter-spacing: .08em; margin: 1.5rem 0 0.5rem; }
-.doc-body { font-size: 14px; color: #3a5a9a; line-height: 1.8; margin-bottom: 0.8rem; }
-.doc-item { font-size: 14px; color: #3a5a9a; line-height: 1.8; padding-left: 1rem; }
+.doc-body { font-size: 14px; color: #1a3a8f; line-height: 1.8; margin-bottom: 0.8rem; font-weight: 500; }
+.doc-item { font-size: 14px; color: #1a3a8f; line-height: 1.8; padding-left: 1rem; font-weight: 500; }
 
 /* Planos */
 .plano-card { border-radius: 16px; padding: 24px; border: 1.5px solid #d0dcfa; background: #ffffff; }
@@ -143,11 +143,11 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background:
 .stTextInput input, .stTextArea textarea { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Sora',sans-serif !important; font-size: 14px !important; }
 .stTextInput input:focus, .stTextArea textarea:focus { border-color: #4070f4 !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
 .stSelectbox > div > div { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; }
-.stRadio label, .stCheckbox label { color: #3a5a9a !important; }
+.stRadio label, .stCheckbox label { color: #0d1f4e !important; font-weight: 500 !important; }
 .stMultiSelect > div > div { background: #ffffff !important; border-color: #d0dcfa !important; border-radius: 10px !important; }
-label[data-baseweb="label"] { color: #3a5a9a !important; }
+label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 600 !important; }
 .stTabs [data-baseweb="tab-list"] { background: #e8f0fe !important; border-radius: 12px !important; padding: 4px !important; gap: 4px !important; }
-.stTabs [data-baseweb="tab"] { background: transparent !important; color: #6080c0 !important; border-radius: 8px !important; }
+.stTabs [data-baseweb="tab"] { background: transparent !important; color: #1a3a8f !important; border-radius: 8px !important; font-weight: 600 !important; }
 .stTabs [aria-selected="true"] { background: #ffffff !important; color: #1a3a8f !important; font-weight: 700 !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -272,7 +272,7 @@ def email_recomendador(nome_cand, email_rec, link):
             <div style="text-align:center;margin:28px 0">
                 <a href="{link}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#c8960c,#f0c040);color:#0d1f4e;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">Preencher avaliação →</a>
             </div>
-            <p style="color:#8090b8;font-size:12px;border-top:1px solid #d0dcfa;padding-top:16px">Este link é exclusivo e de uso único. JurisBank — plataforma de aproximação entre profissionais do Direito e órgãos do sistema de justiça.</p>
+            <p style="color:#4a6080;font-size:12px;border-top:1px solid #d0dcfa;padding-top:16px">Este link é exclusivo e de uso único. JurisBank — plataforma de aproximação entre profissionais do Direito e órgãos do sistema de justiça.</p>
         </div>
     </div>"""
     return enviar_email(email_rec, assunto, corpo)
@@ -365,15 +365,15 @@ def modal_planos():
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("""<div class="plano-card">
-                <p class="plano-nome" style="color:#6080c0">Gratuito</p>
+                <p class="plano-nome" style="color:#2a4a8a">Gratuito</p>
                 <p class="plano-preco" style="color:#0d1f4e">R$ 0</p>
-                <p class="plano-periodo" style="color:#8090b8">para sempre</p>
+                <p class="plano-periodo" style="color:#4a6080">para sempre</p>
                 <div class="plano-item" style="color:#3a5a9a">✅ Cadastro completo com selos</div>
                 <div class="plano-item" style="color:#3a5a9a">✅ Aparecer no banco de talentos</div>
                 <div class="plano-item" style="color:#3a5a9a">✅ Perfil DISC</div>
                 <div class="plano-item" style="color:#3a5a9a">✅ Ver Seletivos abertos</div>
-                <div class="plano-item" style="color:#8090b8">❌ Inscrição em Seletivos</div>
-                <div class="plano-item" style="color:#8090b8">❌ Destaque no perfil</div>
+                <div class="plano-item" style="color:#4a6080">❌ Inscrição em Seletivos</div>
+                <div class="plano-item" style="color:#4a6080">❌ Destaque no perfil</div>
             </div>""", unsafe_allow_html=True)
         with col2:
             st.markdown("""<div class="plano-card destaque">
@@ -400,7 +400,7 @@ def modal_planos():
                 st.markdown(f"""<div class="plano-card" style="text-align:center">
                     <p style="font-size:14px;font-weight:700;color:#0d1f4e;margin-bottom:4px">{nome}</p>
                     <p style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#0d1f4e;margin:0">{preco}</p>
-                    <p style="font-size:12px;color:#8090b8;margin-top:4px">{desc}</p>
+                    <p style="font-size:12px;color:#4a6080;margin-top:4px">{desc}</p>
                 </div>""", unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
@@ -408,7 +408,7 @@ def modal_planos():
             st.markdown("""<div class="plano-card" style="text-align:center">
                 <p style="font-size:14px;font-weight:700;color:#0d1f4e;margin-bottom:4px">📢 1 Seletivo (30 dias)</p>
                 <p style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#0d1f4e;margin:0">R$ 89,90</p>
-                <p style="font-size:12px;color:#8090b8;margin-top:4px">Publicação + painel de inscritos</p>
+                <p style="font-size:12px;color:#4a6080;margin-top:4px">Publicação + painel de inscritos</p>
             </div>""", unsafe_allow_html=True)
         with col2:
             st.markdown("""<div class="plano-card destaque" style="text-align:center">
@@ -417,7 +417,7 @@ def modal_planos():
                 <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px">Melhor custo-benefício</p>
             </div>""", unsafe_allow_html=True)
 
-        st.markdown('<p style="font-size:11px;color:#8090b8;text-align:center;margin-top:1rem">Pagamentos em breve. Cadastre-se agora gratuitamente.</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:11px;color:#4a6080;text-align:center;margin-top:1rem">Pagamentos em breve. Cadastre-se agora gratuitamente.</p>', unsafe_allow_html=True)
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
 def render_topbar():
@@ -537,7 +537,7 @@ if pagina == "inicio":
 
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
         st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:0.5rem">Receba avisos de novos Seletivos</p>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size:13px;color:#8090b8;margin-bottom:1rem">Deixe seu e-mail. Quando surgir um Seletivo na sua área, você é o primeiro a saber.</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">Deixe seu e-mail. Quando surgir um Seletivo na sua área, você é o primeiro a saber.</p>', unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)
         with col1: ei = st.text_input("Seu e-mail", key="ei_home")
         with col2: ai = st.multiselect("Áreas", AREAS, key="ai_home")
@@ -562,7 +562,7 @@ elif pagina == "candidatos":
                 <div class="avatar" style="width:60px;height:60px;border-radius:14px;background:{cor};font-size:20px">{iniciais(c['nome'])}</div>
                 <div>
                     <div class="profile-name">{c['nome']}</div>
-                    <div style="font-size:13px;color:#6080c0;margin-bottom:6px">{c.get('formacao','—')} · {c.get('instituicao','—')}</div>
+                    <div style="font-size:13px;color:#2a4a8a;margin-bottom:6px">{c.get('formacao','—')} · {c.get('instituicao','—')}</div>
                     <div>{html_selos(c)}</div>
                 </div>
             </div>
@@ -626,7 +626,7 @@ elif pagina == "candidatos":
             cm={"Verificado":"selo_verificado","Recomendado":"selo_recomendado","Destaque":"selo_destaque","Experiente":"selo_experiente"}
             cf=[c for c in cf if c.get(cm[fsel])=="Sim"]
 
-        st.markdown(f'<p style="font-size:13px;color:#8090b8;margin-bottom:1rem">{len(cf)} candidato(s)</p>',unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">{len(cf)} candidato(s)</p>',unsafe_allow_html=True)
 
         for i,cand in enumerate(cf):
             cor=cor_avatar(cand["nome"]); dsp=cand.get("disponibilidade","Não")
@@ -701,7 +701,7 @@ elif pagina == "seletivos":
     if fs=="Abertos": chf=[s for s in chf if sel_aberto(s)]
     elif fs=="Encerrados": chf=[s for s in chf if not sel_aberto(s)]
 
-    st.markdown(f'<p style="font-size:13px;color:#8090b8;margin-bottom:1rem">{len(chf)} seletivo(s)</p>',unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">{len(chf)} seletivo(s)</p>',unsafe_allow_html=True)
 
     for i,sel in enumerate(chf):
         ab=sel_aberto(sel); ins_=inscritos_sel(sel); n=len(ins_)
@@ -713,11 +713,11 @@ elif pagina == "seletivos":
                 <div style="flex:1">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
                         {sb}
-                        <span style="font-size:11px;color:#8090b8">📅 {sel.get('prazo','—')}</span>
-                        <span style="font-size:11px;color:#8090b8">👥 {n} inscrito(s)</span>
+                        <span style="font-size:11px;color:#4a6080">📅 {sel.get('prazo','—')}</span>
+                        <span style="font-size:11px;color:#4a6080">👥 {n} inscrito(s)</span>
                     </div>
                     <p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:0 0 4px">{sel.get('titulo','—')}</p>
-                    <p style="font-size:13px;color:#6080c0;margin:0 0 8px">{sel.get('orgao','—')} · {sel.get('municipio','—')}/{sel.get('estado','—')}</p>
+                    <p style="font-size:13px;color:#2a4a8a;margin:0 0 8px">{sel.get('orgao','—')} · {sel.get('municipio','—')}/{sel.get('estado','—')}</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
                         <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">{sel.get('area','—')}</span>
                         <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#f3effe;color:#6d28d9">{sel.get('regime','—')}</span>
@@ -821,11 +821,11 @@ elif pagina == "cadastro":
         c1,c2=st.columns(2)
         with c1:
             st.markdown('<p style="font-weight:600;color:#b45309;margin-bottom:4px">★ Carta de recomendação</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#8090b8;margin-bottom:8px">De um Juiz, Promotor, Defensor ou Procurador ativo</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">De um Juiz, Promotor, Defensor ou Procurador ativo</p>',unsafe_allow_html=True)
             carta=st.file_uploader("",type="pdf",key="carta",label_visibility="collapsed")
         with c2:
             st.markdown('<p style="font-weight:600;color:#b45309;margin-bottom:4px">◆ Avaliação de desempenho</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#8090b8;margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
             aval=st.file_uploader("",type="pdf",key="aval",label_visibility="collapsed")
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
         st.markdown('<p style="font-weight:600;color:#3a5a9a;margin-bottom:4px">E-mail do recomendador</p>',unsafe_allow_html=True)
@@ -838,7 +838,7 @@ elif pagina == "cadastro":
         if er and "@" in er:
             st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
             st.markdown('<p style="font-weight:600;color:#3a5a9a;margin-bottom:4px">Solicitar avaliação direta na plataforma</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#8090b8;margin-bottom:8px">O recomendador receberá um link exclusivo para preencher uma avaliação do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">O recomendador receberá um link exclusivo para preencher uma avaliação do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
             if st.button("Gerar link de avaliação →",key="gerar_link"):
                 email_cand_temp=st.session_state.dc.get("email","")
                 if not email_cand_temp: st.error("Preencha seu e-mail na etapa anterior primeiro.")
@@ -875,7 +875,7 @@ elif pagina == "cadastro":
                 st.session_state.et=3; st.rerun()
 
     elif et==3:
-        st.markdown('<p style="font-size:14px;color:#8090b8;margin-bottom:1.5rem">Não há respostas certas ou erradas.</p>',unsafe_allow_html=True)
+        st.markdown('<p style="font-size:14px;color:#4a6080;margin-bottom:1.5rem">Não há respostas certas ou erradas.</p>',unsafe_allow_html=True)
         rd=[]
         for j,(perg,ops) in enumerate(PERGUNTAS_DISC):
             r=st.radio(f"**{j+1}.** {perg}",ops,key=f"dq{j}",index=None)
@@ -958,7 +958,7 @@ elif pagina == "recrutador":
             elif csel=="Não concursando": fi=[c for c in fi if not c.get("concurso") or c.get("concurso")=="Não estou estudando para concurso"]
             if sisel: fi=[c for c in fi if sisel.lower() in str(c.get("sistemas","")).lower()]
 
-            st.markdown(f'<p style="font-size:13px;color:#8090b8;margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
+            st.markdown(f'<p style="font-size:13px;color:#4a6080;margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
 
             for i,cand in enumerate(fi):
                 cor=cor_avatar(cand["nome"]); dc=cand.get("disponibilidade","Não")
@@ -1070,13 +1070,13 @@ elif pagina == "recrutador":
                     st.markdown(f"""<div class="seletivo-card">
                         <div style="display:flex;justify-content:space-between;align-items:center">
                             <div>
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#8090b8">📅 {sel.get('prazo','—')}</span></div>
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#4a6080">📅 {sel.get('prazo','—')}</span></div>
                                 <p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:0 0 2px">{sel.get('titulo','—')}</p>
-                                <p style="font-size:12px;color:#6080c0;margin:0">{sel.get('municipio','—')}/{sel.get('estado','—')} · {sel.get('area','—')}</p>
+                                <p style="font-size:12px;color:#2a4a8a;margin:0">{sel.get('municipio','—')}/{sel.get('estado','—')} · {sel.get('area','—')}</p>
                             </div>
                             <div style="text-align:right">
                                 <p style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#c8960c;margin:0">{n}</p>
-                                <p style="font-size:11px;color:#8090b8;margin:0">inscrito(s)</p>
+                                <p style="font-size:11px;color:#4a6080;margin:0">inscrito(s)</p>
                             </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
@@ -1121,7 +1121,7 @@ elif pagina == "recrutador":
                                                 <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
                                                 <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}</div>
                                             </div>
-                                            <div style="font-size:12px;color:#6080c0">✉ {cand.get('email','—')}</div>
+                                            <div style="font-size:12px;color:#2a4a8a">✉ {cand.get('email','—')}</div>
                                         </div>
                                     </div>""",unsafe_allow_html=True)
 
@@ -1138,7 +1138,7 @@ elif pagina == "recrutador":
                                 <p class="cand-name">{cand['nome']}</p>
                                 <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
                                 {html_selos(cand)}
-                                {'<p style="font-size:11px;color:#8090b8;margin-top:4px">📝 '+nt+'</p>' if nt else ''}
+                                {'<p style="font-size:11px;color:#4a6080;margin-top:4px">📝 '+nt+'</p>' if nt else ''}
                             </div>
                             <div>{'<span class="badge-sim">● Disponível</span>' if cand.get('disponibilidade')=='Sim' else '<span class="badge-nao">● Indisponível</span>'}</div>
                         </div>
@@ -1165,7 +1165,7 @@ elif pagina == "recrutador":
                 else: st.error("Preencha e-mail e senha.")
         with tabs[1]:
             st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:1rem 0 0.5rem">Criar conta</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:13px;color:#8090b8;margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
             if st.button("Começar →",key="bc"):
                 st.session_state.cad_rec={"etapa":1}; st.rerun()
     else:
@@ -1320,4 +1320,4 @@ elif pagina in ["privacidade","termos"]:
             elif tp=="l":
                 for it in tx: st.markdown(f'<p class="doc-item">• {it}</p>',unsafe_allow_html=True)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-    st.markdown(f'<p style="font-size:12px;color:#8090b8;text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:12px;color:#4a6080;text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
