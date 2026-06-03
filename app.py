@@ -67,7 +67,10 @@ header[data-testid="stHeader"] { display: none !important; }
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     color: #0d1f4e !important;
-    font-size: 19px;
+    font-family: 'Playfair Display',serif;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0;
     box-shadow: 0 8px 20px rgba(200,150,12,0.28);
 }
 .topbar .topbar-logo-name {
@@ -447,21 +450,21 @@ def email_recomendador(nome_candidato, email_recomendador, link):
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
 nav_pages = [
-    ("candidatos","👤 Candidatos"),
-    ("chamadas","📢 Chamadas"),
-    ("cadastro","📄 Cadastrar"),
+    ("candidatos","Candidatos"),
+    ("chamadas","Chamadas"),
+    ("cadastro","Cadastrar"),
 ]
 
-nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">⚖</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
+nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
 for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     nav_html += f'<a href="?p={pg}" class="{active}">{lb}</a>'
 
 if rec_logado():
     rec = st.session_state.rec_logado
-    nav_html += f'<a href="?p=recrutador" class="{"active" if pagina=="recrutador" else ""}">🏛 {rec["nome"].split()[0]}</a>'
+    nav_html += f'<a href="?p=recrutador" class="{"active" if pagina=="recrutador" else ""}">{rec["nome"].split()[0]}</a>'
 else:
-    nav_html += '<a href="?p=recrutador" class="btn-rec">🔐 Recrutador</a>'
+    nav_html += '<a href="?p=recrutador" class="btn-rec">Recrutador</a>'
 
 nav_html += '</div></div>'
 st.markdown(nav_html, unsafe_allow_html=True)
