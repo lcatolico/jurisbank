@@ -28,7 +28,7 @@ header[data-testid="stHeader"] { display: none !important; }
 [data-testid="stSidebar"] { display: none !important; }
 
 [data-testid="stAppViewContainer"] {
-    background: #f4f6fc;
+    background: #eef3fe;
     min-height: 100vh;
 }
 .main .block-container { padding: 0 2.5rem 3rem; max-width: 1100px; background: transparent; }
@@ -36,31 +36,31 @@ header[data-testid="stHeader"] { display: none !important; }
 /* ── Topbar ── */
 .topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 0 1.5rem;
-    border-bottom: 1px solid #d0dcfa;
-    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+    margin: 0 -2.5rem 2rem;
     flex-wrap: wrap; gap: 12px;
-    background: transparent;
+    background: #0d1f4e;
+    border-bottom: 2px solid rgba(200,150,12,0.3);
 }
 .topbar-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .topbar-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg,#c8960c,#f0c040); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 2px 12px rgba(200,150,12,0.3); }
-.topbar-logo-name { font-family: 'Playfair Display',serif; font-size: 18px; font-weight: 700; color: #0d1f4e; }
+.topbar-logo-name { font-family: 'Playfair Display',serif; font-size: 18px; font-weight: 700; color: #ffffff; }
 .topbar-logo-sub { font-size: 9px; color: rgba(200,150,12,0.8); font-style: italic; letter-spacing:.05em; display: block; margin-top: -2px; }
 .topbar-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .topbar-nav a {
     padding: 7px 14px; border-radius: 8px;
     font-size: 13px; font-weight: 600;
-    color: #4a5568; text-decoration: none;
+    color: rgba(255,255,255,0.75); text-decoration: none;
     border: 1px solid transparent;
     transition: all 0.2s;
 }
-.topbar-nav a:hover { color: #0d1f4e; background: #e8f0fe; }
-.topbar-nav a.active { color: #1a3a8f; border-color: #b0c5f5; background: #e8f0fe; }
+.topbar-nav a:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
+.topbar-nav a.active { color: #f0c040; border-color: rgba(200,150,12,0.4); background: rgba(200,150,12,0.12); }
 .topbar-nav a.btn-rec {
-    background: #0d1f4e; color: #ffffff;
-    border: none; font-weight: 700;
+    background: rgba(255,255,255,0.12); color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.2); font-weight: 700;
 }
-.topbar-nav a.btn-rec:hover { background: #1a3a8f; color: #ffffff; }
+.topbar-nav a.btn-rec:hover { background: rgba(255,255,255,0.2); }
 .topbar-nav a.btn-cand {
     background: linear-gradient(135deg,#c8960c,#f0c040);
     color: #0d1f4e; border: none; font-weight: 700;
