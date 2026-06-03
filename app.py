@@ -319,15 +319,15 @@ def calc_disc(rs):
 
 def render_disc(d):
     cb=DISC_CORES_BADGE.get(d,"rgba(255,255,255,0.06)"); tb=DISC_TEXTO_BADGE.get(d,"#fff"); det=DISC_DETALHES.get(d,{})
-    return f"""<div class="info-card" style="background:{cb};border-color:rgba(255,255,255,0.08)">
+    return f"""<div class="info-card" style="background:{cb};border-color:#c5d5f5">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
             <span style="font-weight:800;color:{tb};font-size:22px">{d}</span>
             <span style="font-weight:700;color:{tb};font-size:15px">{det.get('nome','')}</span>
         </div>
         <p style="color:{tb};font-size:13px;font-weight:600;margin:0 0 8px">{det.get('resumo','')}</p>
-        <p style="color:rgba(255,255,255,0.65);font-size:12px;margin:0 0 4px"><strong style="color:{tb}">Pontos fortes:</strong> {det.get('pontos_fortes','')}</p>
-        <p style="color:rgba(255,255,255,0.65);font-size:12px;margin:0 0 4px"><strong style="color:{tb}">No gabinete:</strong> {det.get('no_gabinete','')}</p>
-        <p style="color:rgba(255,255,255,0.65);font-size:12px;margin:0"><strong style="color:{tb}">Atenção:</strong> {det.get('atencao','')}</p>
+        <p style="color:#2a4a8a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">Pontos fortes:</strong> {det.get('pontos_fortes','')}</p>
+        <p style="color:#2a4a8a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">No gabinete:</strong> {det.get('no_gabinete','')}</p>
+        <p style="color:#2a4a8a;font-size:12px;margin:0"><strong style="color:{tb}">Atenção:</strong> {det.get('atencao','')}</p>
     </div>"""
 
 
@@ -424,7 +424,7 @@ if pagina == "candidatos":
                 <div class="avatar" style="width:60px;height:60px;border-radius:14px;background:{cor};font-size:20px">{iniciais(c['nome'])}</div>
                 <div>
                     <div class="profile-name">{c['nome']}</div>
-                    <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:6px">{c.get('formacao','—')} · {c.get('instituicao','—')}</div>
+                    <div style="font-size:13px;color:#4a6080;margin-bottom:6px">{c.get('formacao','—')} · {c.get('instituicao','—')}</div>
                     <div>{html_selos(c)}</div>
                 </div>
             </div>
@@ -483,7 +483,7 @@ if pagina == "candidatos":
             cm={"Verificado":"selo_verificado","Recomendado":"selo_recomendado","Destaque":"selo_destaque","Experiente":"selo_experiente"}
             cf=[c for c in cf if c.get(cm[fsel])=="Sim"]
 
-        st.markdown(f'<p style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:1rem">{len(cf)} candidato(s)</p>',unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin-bottom:1rem">{len(cf)} candidato(s)</p>',unsafe_allow_html=True)
         for i,cand in enumerate(cf):
             cor=cor_avatar(cand["nome"]); dsp=cand.get("disponibilidade","Não")
             bdg='<span class="badge-sim">● Disponível</span>' if dsp=="Sim" else '<span class="badge-nao">● Indisponível</span>'
@@ -545,7 +545,7 @@ elif pagina == "chamadas":
     if fs=="Abertas": chf=[ch for ch in chf if ch_aberta(ch)]
     elif fs=="Encerradas": chf=[ch for ch in chf if not ch_aberta(ch)]
 
-    st.markdown(f'<p style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:1rem">{len(chf)} chamada(s)</p>',unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin-bottom:1rem">{len(chf)} chamada(s)</p>',unsafe_allow_html=True)
 
     for i,ch in enumerate(chf):
         ab=ch_aberta(ch); ins_=inscritos(ch); n=len(ins_)
@@ -557,11 +557,11 @@ elif pagina == "chamadas":
                 <div style="flex:1">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
                         {sb}
-                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">📅 {ch.get('prazo','—')}</span>
-                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">👥 {n} inscrito(s)</span>
+                        <span style="font-size:11px;color:#4a6080;font-weight:600">📅 {ch.get('prazo','—')}</span>
+                        <span style="font-size:11px;color:#4a6080;font-weight:600">👥 {n} inscrito(s)</span>
                     </div>
-                    <p style="font-size:16px;font-weight:700;color:#fff;margin:0 0 4px">{ch.get('titulo','—')}</p>
-                    <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0 0 8px">{ch.get('orgao','—')} · {ch.get('municipio','—')}/{ch.get('estado','—')}</p>
+                    <p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:0 0 4px">{ch.get('titulo','—')}</p>
+                    <p style="font-size:13px;color:#4a6080;font-weight:500;margin:0 0 8px">{ch.get('orgao','—')} · {ch.get('municipio','—')}/{ch.get('estado','—')}</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
                         <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:rgba(168,197,255,0.1);color:#a8c5ff">{ch.get('area','—')}</span>
                         <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:rgba(196,181,253,0.1);color:#c4b5fd">{ch.get('regime','—')}</span>
@@ -580,10 +580,10 @@ elif pagina == "chamadas":
                 if st.button("Inscrever-se →",key=f"i{i}"):
                     st.session_state[f"ci{i}"]=True; st.rerun()
             elif ja: st.markdown('<span class="badge-inscrito">✓ Inscrito</span>',unsafe_allow_html=True)
-            elif not cand_logado() and ab: st.markdown('<span style="font-size:11px;color:rgba(255,255,255,0.3)">Login para se inscrever</span>',unsafe_allow_html=True)
+            elif not cand_logado() and ab: st.markdown('<span style="font-size:11px;color:#4a6080;font-weight:600">Login para se inscrever</span>',unsafe_allow_html=True)
 
         if st.session_state.get(f"ci{i}"):
-            st.markdown(f'<div class="info-card" style="margin-top:8px"><strong style="color:#fff">Inscrever em: {ch.get("titulo","")}</strong></div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card" style="margin-top:8px"><strong style="color:#0d1f4e">Inscrever em: {ch.get("titulo","")}</strong></div>',unsafe_allow_html=True)
             cons=st.checkbox("Autorizo o compartilhamento do meu perfil com o recrutador desta Chamada, nos termos da LGPD.",key=f"cs{i}")
             ca,cx=st.columns(2)
             with ca:
@@ -614,7 +614,7 @@ elif pagina == "chamadas":
                 st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>',unsafe_allow_html=True)
 
     st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-    st.markdown('<p style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">Receba avisos de novas Chamadas</p>',unsafe_allow_html=True)
+    st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:4px">Receba avisos de novas Chamadas</p>',unsafe_allow_html=True)
     c1,c2,c3=st.columns(3)
     with c1: ei=st.text_input("Seu e-mail",key="ei")
     with c2: ai=st.multiselect("Áreas",AREAS,key="ai")
@@ -676,14 +676,14 @@ elif pagina == "cadastro":
         c1,c2=st.columns(2)
         with c1:
             st.markdown('<p style="font-weight:600;color:#f0c040;margin-bottom:4px">★ Carta de recomendação</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">De um Juiz, Promotor, Defensor ou Procurador ativo</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;font-weight:500;margin-bottom:8px">De um Juiz, Promotor, Defensor ou Procurador ativo</p>',unsafe_allow_html=True)
             carta=st.file_uploader("",type="pdf",key="carta",label_visibility="collapsed")
         with c2:
             st.markdown('<p style="font-weight:600;color:#f0c040;margin-bottom:4px">◆ Avaliação de desempenho</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;font-weight:500;margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
             aval=st.file_uploader("",type="pdf",key="aval",label_visibility="collapsed")
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-        st.markdown('<p style="font-weight:600;color:rgba(255,255,255,0.75);margin-bottom:4px">E-mail do recomendador</p>',unsafe_allow_html=True)
+        st.markdown('<p style="font-weight:700;color:#0d1f4e;margin-bottom:4px">E-mail do recomendador</p>',unsafe_allow_html=True)
         er=st.text_input("",placeholder="nome@mpsc.mp.br",key="er",label_visibility="collapsed")
         dv=["mpsc.mp.br","tjsc.jus.br","sc.def.br","pge.sc.gov.br","trf4.jus.br","jfsc.jus.br","mpf.mp.br","agu.gov.br"]
         if er and "@" in er:
@@ -692,8 +692,8 @@ elif pagina == "cadastro":
 
         if er and "@" in er:
             st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-            st.markdown('<p style="font-weight:600;color:rgba(255,255,255,0.8);margin-bottom:4px">Solicitar avaliação direta na plataforma</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">O recomendador receberá um link exclusivo para preencher uma avaliação do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-weight:700;color:#0d1f4e;margin-bottom:4px">Solicitar avaliação direta na plataforma</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;font-weight:500;margin-bottom:8px">O recomendador receberá um link exclusivo para preencher uma avaliação do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
             if st.button("Gerar link de avaliação →", key="gerar_link"):
                 email_cand_temp = st.session_state.dc.get("email","")
                 if not email_cand_temp:
@@ -731,7 +731,7 @@ elif pagina == "cadastro":
                 st.session_state.et=3; st.rerun()
 
     elif et==3:
-        st.markdown('<p style="font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:1.5rem">Não há respostas certas ou erradas.</p>',unsafe_allow_html=True)
+        st.markdown('<p style="font-size:14px;color:#4a6080;font-weight:500;margin-bottom:1.5rem">Não há respostas certas ou erradas.</p>',unsafe_allow_html=True)
         rd=[]
         for j,(perg,ops) in enumerate(PERGUNTAS_DISC):
             r=st.radio(f"**{j+1}.** {perg}",ops,key=f"dq{j}",index=None)
@@ -796,7 +796,7 @@ elif pagina == "recrutador":
             with c2: ssel=st.selectbox("Selo",["Todos","Verificado","Recomendado","Destaque","Experiente"])
             with c3:
                 dsc=st.selectbox("DISC",["Todos","D — Dominante","I — Influente","S — Estável","C — Conformidade"])
-                if dsc!="Todos": st.markdown(f'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;font-size:11px;color:rgba(255,255,255,0.5);margin-top:4px">ℹ {DISC_EXPLICACOES_FILTRO.get(dsc,"")}</div>',unsafe_allow_html=True)
+                if dsc!="Todos": st.markdown(f'<div style="background:#f0f5ff;border:1px solid #c5d5f5;border-radius:8px;padding:8px;font-size:11px;color:#2a4a8a;font-weight:600;margin-top:4px">ℹ {DISC_EXPLICACOES_FILTRO.get(dsc,"")}</div>',unsafe_allow_html=True)
             with c4: csel=st.selectbox("Concurso",["Todos","Concursando","Não concursando"])
             with c5: sisel=st.text_input("Sistema",placeholder="Ex: Eproc")
             with c6: emin=st.number_input("Exp. mín.",min_value=0,max_value=20,value=0)
@@ -815,7 +815,7 @@ elif pagina == "recrutador":
             elif csel=="Não concursando": fi=[c for c in fi if not c.get("concurso") or c.get("concurso")=="Não estou estudando para concurso"]
             if sisel: fi=[c for c in fi if sisel.lower() in str(c.get("sistemas","")).lower()]
 
-            st.markdown(f'<p style="font-size:13px;color:rgba(255,255,255,0.35);margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
+            st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
             for i,cand in enumerate(fi):
                 cor=cor_avatar(cand["nome"]); dc=cand.get("disponibilidade","Não")
                 bdg='<span class="badge-sim">● Disponível</span>' if dc=="Sim" else '<span class="badge-nao">● Indisponível</span>'
@@ -866,7 +866,7 @@ elif pagina == "recrutador":
 
         with tabs[1]:
             ch_col,btn_col=st.columns([8,3])
-            with ch_col: st.markdown('<p style="font-size:15px;font-weight:700;color:#fff">Minhas Chamadas</p>',unsafe_allow_html=True)
+            with ch_col: st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e">Minhas Chamadas</p>',unsafe_allow_html=True)
             with btn_col:
                 if st.button("+ Nova Chamada",key="nch"):
                     st.session_state["criar_ch"]=True; st.rerun()
@@ -911,13 +911,13 @@ elif pagina == "recrutador":
                     st.markdown(f"""<div class="chamada-card">
                         <div style="display:flex;justify-content:space-between;align-items:center">
                             <div>
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:rgba(255,255,255,0.35)">📅 {ch.get('prazo','—')}</span></div>
-                                <p style="font-size:15px;font-weight:700;color:#fff;margin:0 0 2px">{ch.get('titulo','—')}</p>
-                                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0">{ch.get('municipio','—')}/{ch.get('estado','—')} · {ch.get('area','—')}</p>
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#4a6080;font-weight:600">📅 {ch.get('prazo','—')}</span></div>
+                                <p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:0 0 2px">{ch.get('titulo','—')}</p>
+                                <p style="font-size:12px;color:#4a6080;font-weight:500;margin:0">{ch.get('municipio','—')}/{ch.get('estado','—')} · {ch.get('area','—')}</p>
                             </div>
                             <div style="text-align:right">
                                 <p style="font-size:26px;font-weight:800;color:#f0c040;margin:0">{n}</p>
-                                <p style="font-size:11px;color:rgba(255,255,255,0.35);margin:0">inscrito(s)</p>
+                                <p style="font-size:11px;color:#4a6080;font-weight:600;margin:0">inscrito(s)</p>
                             </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
@@ -962,7 +962,7 @@ elif pagina == "recrutador":
                                                 <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
                                                 <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}</div>
                                             </div>
-                                            <div style="font-size:12px;color:rgba(255,255,255,0.4)">✉ {cand.get('email','—')}</div>
+                                            <div style="font-size:12px;color:#4a6080;font-weight:500">✉ {cand.get('email','—')}</div>
                                         </div>
                                     </div>""",unsafe_allow_html=True)
 
@@ -979,7 +979,7 @@ elif pagina == "recrutador":
                                 <p class="cand-name">{cand['nome']}</p>
                                 <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
                                 {html_selos(cand)}
-                                {'<p style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px">📝 '+nt+'</p>' if nt else ''}
+                                {'<p style="font-size:11px;color:#4a6080;font-weight:500;margin-top:4px">📝 '+nt+'</p>' if nt else ''}
                             </div>
                             <div>{'<span class="badge-sim">● Disponível</span>' if cand.get('disponibilidade')=='Sim' else '<span class="badge-nao">● Indisponível</span>'}</div>
                         </div>
@@ -994,7 +994,7 @@ elif pagina == "recrutador":
         </div>""",unsafe_allow_html=True)
         tabs=st.tabs(["Entrar","Criar conta"])
         with tabs[0]:
-            st.markdown('<p style="font-size:16px;font-weight:700;color:#fff;margin:1rem 0">Acesse sua conta</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Acesse sua conta</p>',unsafe_allow_html=True)
             el=st.text_input("E-mail institucional",key="le")
             sl=st.text_input("Senha",type="password",key="ls")
             if st.button("Entrar →",key="bl"):
@@ -1005,8 +1005,8 @@ elif pagina == "recrutador":
                     else: st.error("E-mail ou senha incorretos, ou conta ainda não aprovada.")
                 else: st.error("Preencha e-mail e senha.")
         with tabs[1]:
-            st.markdown('<p style="font-size:15px;font-weight:700;color:#fff;margin:1rem 0 0.5rem">Criar conta</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:1rem 0 0.5rem">Criar conta</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:13px;color:#4a6080;font-weight:500;margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
             if st.button("Começar →",key="bc"):
                 st.session_state.cad_rec={"etapa":1}; st.rerun()
     else:
@@ -1124,7 +1124,7 @@ elif pagina == "recomendar":
             st.markdown("<br>", unsafe_allow_html=True)
 
             with st.form("form_recomendacao"):
-                st.markdown('<p style="font-size:15px;font-weight:700;color:#ffffff;margin-bottom:1rem">Sobre o candidato</p>', unsafe_allow_html=True)
+                st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:1rem">Sobre o candidato</p>', unsafe_allow_html=True)
 
                 tempo = st.selectbox("Há quanto tempo conhece o candidato? *", [
                     "Selecione...", "Menos de 1 ano", "1 a 2 anos", "2 a 5 anos", "Mais de 5 anos"
@@ -1136,7 +1136,7 @@ elif pagina == "recomendar":
                 ])
 
                 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                st.markdown('<p style="font-size:15px;font-weight:700;color:#ffffff;margin-bottom:1rem">Avaliação profissional</p>', unsafe_allow_html=True)
+                st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:1rem">Avaliação profissional</p>', unsafe_allow_html=True)
 
                 pontos_fortes = st.text_area(
                     "Quais os principais pontos fortes do candidato? *",
@@ -1217,4 +1217,4 @@ elif pagina in ["privacidade","termos"]:
             elif tp=="l":
                 for it in tx: st.markdown(f'<p class="doc-item">• {it}</p>',unsafe_allow_html=True)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-    st.markdown(f'<p style="font-size:12px;color:rgba(255,255,255,0.2);text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:12px;color:#4a6080;font-weight:500;text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
