@@ -128,18 +128,29 @@ label[data-baseweb="label"] { color: rgba(255,255,255,0.75) !important; }
 """, unsafe_allow_html=True)
 
 # ── Google Sheets ─────────────────────────────────────────────────────────────
-escopos = ["https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive"]
-if "gcp_service_account" in st.secrets:
-    credenciais = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]),scopes=escopos)
-else:
-    credenciais = Credentials.from_service_account_file("credenciais.json",scopes=escopos)
-cliente = gspread.authorize(credenciais)
-planilha = cliente.open("JurisBank")
-aba_candidatos = planilha.sheet1
-aba_recrutadores = planilha.worksheet("recrutadores")
-aba_chamadas = planilha.worksheet("chamadas")
-aba_interesses = planilha.worksheet("interesses")
-aba_recomendacoes = planilha.worksheet("recomendacoes")
+@st.cache_resource
+def conectar_sheets():
+    escopos = ["https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive"]
+    if "gcp_service_account" in st.secrets:
+        cred = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]),scopes=escopos)
+    else:
+        cred = Credentials.from_service_account_file("credenciais.json",scopes=escopos)
+    cl = gspread.authorize(cred)
+    pl = cl.open("JurisBank")
+    return {
+        "candidatos": pl.sheet1,
+        "recrutadores": pl.worksheet("recrutadores"),
+        "chamadas": pl.worksheet("chamadas"),
+        "interesses": pl.worksheet("interesses"),
+        "recomendacoes": pl.worksheet("recomendacoes"),
+    }
+
+abas = conectar_sheets()
+aba_candidatos = abas["candidatos"]
+aba_recrutadores = abas["recrutadores"]
+aba_chamadas = abas["chamadas"]
+aba_interesses = abas["interesses"]
+aba_recomendacoes = abas["recomendacoes"]
 
 # ── Navegação por URL ─────────────────────────────────────────────────────────
 params = st.query_params
