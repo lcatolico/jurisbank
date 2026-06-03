@@ -11,7 +11,7 @@ from datetime import datetime, date
 
 st.set_page_config(
     page_title="JurisBank",
-    page_icon="âš–",
+    page_icon="⚖",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -20,7 +20,7 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Sora:wght@400;500;600;700;800&display=swap');
 
-html, body, [class*="css"] { font-family: 'Sora', sans-serif; color: #0d1f4e; }
+html, body, [class*="css"] { font-family: 'Sora', sans-serif; }
 [data-testid="stToolbar"] { display: none !important; }
 [data-testid="stSidebarCollapsedControl"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
@@ -33,24 +33,7 @@ header[data-testid="stHeader"] { display: none !important; }
 }
 .main .block-container { padding: 0 2.5rem 3rem; max-width: 1100px; background: transparent; }
 
-[data-testid="stMarkdownContainer"],
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] li,
-[data-testid="stMarkdownContainer"] span {
-    color: #0d1f4e;
-}
-[data-testid="stMarkdownContainer"] small,
-[data-testid="stCaptionContainer"],
-.stCaptionContainer {
-    color: #4a6080 !important;
-    font-weight: 500;
-}
-[data-testid="stMarkdownContainer"] strong {
-    color: #0d1f4e;
-    font-weight: 700;
-}
-
-/* â”€â”€ Topbar â”€â”€ */
+/* ── Topbar ── */
 .topbar {
     display: flex; align-items: center; justify-content: space-between;
     padding: 1rem 1.5rem;
@@ -84,11 +67,11 @@ header[data-testid="stHeader"] { display: none !important; }
 }
 .topbar-nav a.btn-cand:hover { opacity: 0.9; color: #0d1f4e; }
 
-/* â”€â”€ Cards â”€â”€ */
+/* ── Cards ── */
 .hero-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 20px; padding: 2rem 2.5rem; margin-bottom: 1.5rem; }
 .page-title { font-family: 'Playfair Display',serif; font-size: clamp(28px,4vw,42px); font-weight: 900; color: #0d1f4e; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.1; }
 .page-title em { font-style: normal; background: linear-gradient(135deg,#c8960c,#f0c040); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.page-sub { font-size: 15px; color: #2a4a8a; margin: 0; font-weight: 600; }
+.page-sub { font-size: 15px; color: #3a5a9a; margin: 0; font-weight: 500; }
 .stats-row { display: flex; gap: 12px; margin-top: 1.5rem; flex-wrap: wrap; }
 .stat-pill { background: #dce8ff; border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 700; color: #0d1f4e; border: 1px solid #a0bcf0; }
 
@@ -104,7 +87,7 @@ header[data-testid="stHeader"] { display: none !important; }
 .badge-sim { background: #e6f4ea; color: #1a7a4a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
 .badge-nao { background: #fff3e8; color: #c05a1a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #f0c8a0; }
 .badge-aberto { background: #e6f4ea; color: #1a7a4a; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
-.badge-encerrado { background: #f4f7fe; color: #4a6080; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #d0dcfa; }
+.badge-encerrado { background: #f4f4f4; color: #888; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #ddd; }
 .badge-inscrito { background: #e8effe; color: #1a3a8f; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0c5f5; }
 .badge-pago { background: #fff8e6; color: #b45309; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #fde68a; }
 
@@ -135,10 +118,10 @@ header[data-testid="stHeader"] { display: none !important; }
 .step { flex: 1; height: 4px; border-radius: 99px; background: #d0dcfa; }
 .step.active { background: linear-gradient(135deg,#c8960c,#f0c040); }
 .step.done { background: #1a7a4a; }
-.step-title { font-size: 13px; font-weight: 700; color: #2a4a8a; margin-bottom: 0.3rem; }
+.step-title { font-size: 13px; font-weight: 600; color: #3a5a9a; margin-bottom: 0.3rem; }
 .step-desc { font-family: 'Playfair Display',serif; font-size: 22px; font-weight: 700; color: #0d1f4e; margin-bottom: 1.5rem; }
 
-.doc-sub { font-size: 12px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .08em; margin: 1.5rem 0 0.5rem; }
+.doc-sub { font-size: 12px; font-weight: 700; color: #4070f4; text-transform: uppercase; letter-spacing: .08em; margin: 1.5rem 0 0.5rem; }
 .doc-body { font-size: 14px; color: #1a3a8f; line-height: 1.8; margin-bottom: 0.8rem; font-weight: 500; }
 .doc-item { font-size: 14px; color: #1a3a8f; line-height: 1.8; padding-left: 1rem; font-weight: 500; }
 
@@ -150,34 +133,26 @@ header[data-testid="stHeader"] { display: none !important; }
 .plano-periodo { font-size: 12px; margin-bottom: 16px; }
 .plano-item { font-size: 13px; padding: 4px 0; display: flex; gap: 8px; align-items: flex-start; }
 
-/* BotÃµes */
+/* Botões */
 .stButton button { background: linear-gradient(135deg,#c8960c,#f0c040) !important; color: #0d1f4e !important; border: none !important; border-radius: 10px !important; font-family: 'Sora',sans-serif !important; font-weight: 700 !important; padding: 0.6rem 2rem !important; font-size: 14px !important; transition: all 0.2s !important; }
 .stButton button:hover { opacity: 0.9 !important; transform: translateY(-1px) !important; }
 div[data-testid="column"]:last-child .stButton button,
 div[data-testid="column"]:nth-last-child(2) .stButton button { background: #e8f0fe !important; color: #1a3a8f !important; border: 1.5px solid #c5d5f5 !important; border-radius: 10px !important; padding: 0.4rem 1rem !important; font-size: 12px !important; font-weight: 600 !important; width: 100%; }
 div[data-testid="column"]:last-child .stButton button:hover,
 div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background: #4070f4 !important; color: white !important; border-color: #4070f4 !important; }
-.stTextInput input, .stTextArea textarea { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Sora',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
-.stTextInput input::placeholder, .stTextArea textarea::placeholder { color: #4a6080 !important; opacity: 1 !important; font-weight: 500 !important; }
+.stTextInput input, .stTextArea textarea { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Sora',sans-serif !important; font-size: 14px !important; }
 .stTextInput input:focus, .stTextArea textarea:focus { border-color: #4070f4 !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
-.stSelectbox > div > div { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; }
-.stSelectbox [data-baseweb="select"] * { color: #0d1f4e !important; font-weight: 500 !important; }
-.stRadio label, .stCheckbox label { color: #0d1f4e !important; font-weight: 600 !important; }
+.stSelectbox > div > div { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; }
+.stRadio label, .stCheckbox label { color: #0d1f4e !important; font-weight: 500 !important; }
 .stMultiSelect > div > div { background: #ffffff !important; border-color: #d0dcfa !important; border-radius: 10px !important; }
-.stMultiSelect [data-baseweb="select"] * { color: #0d1f4e !important; font-weight: 500 !important; }
 label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 600 !important; }
 .stTabs [data-baseweb="tab-list"] { background: #e8f0fe !important; border-radius: 12px !important; padding: 4px !important; gap: 4px !important; }
 .stTabs [data-baseweb="tab"] { background: transparent !important; color: #1a3a8f !important; border-radius: 8px !important; font-weight: 600 !important; }
 .stTabs [aria-selected="true"] { background: #ffffff !important; color: #1a3a8f !important; font-weight: 700 !important; }
-.stAlert [data-testid="stMarkdownContainer"],
-.stAlert [data-testid="stMarkdownContainer"] p {
-    color: #0d1f4e !important;
-    font-weight: 600;
-}
 </style>
 """, unsafe_allow_html=True)
 
-# â”€â”€ Google Sheets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Google Sheets ─────────────────────────────────────────────────────────────
 @st.cache_resource
 def conectar_sheets():
     escopos = ["https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive"]
@@ -202,7 +177,7 @@ aba_seletivos = abas["seletivos"]
 aba_interesses = abas["interesses"]
 aba_recomendacoes = abas["recomendacoes"]
 
-# â”€â”€ NavegaÃ§Ã£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Navegação ─────────────────────────────────────────────────────────────────
 params = st.query_params
 p = params.get("p", "inicio")
 if isinstance(p, list): p = p[0]
@@ -212,49 +187,49 @@ if "pagina" not in st.session_state or params.get("p"):
     st.session_state.pagina = p
 pagina = st.session_state.pagina
 
-# â”€â”€ Constantes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Constantes ────────────────────────────────────────────────────────────────
 AVATAR_CORES = ["#1a3a8f","#2e7d5e","#7b3fa0","#c05a1a","#1a6b8a","#a04040","#3a6b2a"]
-DISC_LABEL = {"D":"Dominante","I":"Influente","S":"EstÃ¡vel","C":"Conformidade"}
+DISC_LABEL = {"D":"Dominante","I":"Influente","S":"Estável","C":"Conformidade"}
 DISC_CORES_BADGE = {"D":"#fee2e2","I":"#fef9c3","S":"#dcfce7","C":"#eff6ff"}
 DISC_TEXTO_BADGE = {"D":"#991b1b","I":"#854d0e","S":"#166534","C":"#1e3a8a"}
 DISC_EXPLICACOES = {
-    "D â€” Dominante":"Direto e decidido. Resolve problemas com rapidez.",
-    "I â€” Influente":"Comunicativo e entusiasta. Excelente no atendimento ao pÃºblico.",
-    "S â€” EstÃ¡vel":"Paciente e confiÃ¡vel. Ideal para rotinas de gabinete.",
-    "C â€” Conformidade":"AnalÃ­tico e preciso. Excelente em pesquisa jurÃ­dica."
+    "D — Dominante":"Direto e decidido. Resolve problemas com rapidez.",
+    "I — Influente":"Comunicativo e entusiasta. Excelente no atendimento ao público.",
+    "S — Estável":"Paciente e confiável. Ideal para rotinas de gabinete.",
+    "C — Conformidade":"Analítico e preciso. Excelente em pesquisa jurídica."
 }
 DISC_DETALHES = {
-    "D":{"nome":"Dominante","resumo":"Direto, decidido e orientado a resultados.","pontos_fortes":"Resolve problemas com rapidez, assume responsabilidades, trabalha bem sob pressÃ£o.","no_gabinete":"Ideal para demandas que exigem agilidade e tomada de decisÃ£o rÃ¡pida.","atencao":"Pode ser impaciente com processos lentos."},
-    "I":{"nome":"Influente","resumo":"Comunicativo, entusiasta e orientado a pessoas.","pontos_fortes":"Excelente no atendimento ao pÃºblico e trabalho em equipe.","no_gabinete":"Ideal para MinistÃ©rios PÃºblicos ou Defensorias com alto volume de atendimento.","atencao":"Pode ter dificuldade com tarefas repetitivas."},
-    "S":{"nome":"EstÃ¡vel","resumo":"Paciente, confiÃ¡vel e orientado a processos.","pontos_fortes":"ConsistÃªncia, lealdade e capacidade de manter rotinas com qualidade.","no_gabinete":"Perfil ideal para gabinetes com rotinas estabelecidas.","atencao":"Pode ter dificuldade com mudanÃ§as repentinas."},
-    "C":{"nome":"Conformidade","resumo":"AnalÃ­tico, preciso e orientado Ã  qualidade.","pontos_fortes":"AtenÃ§Ã£o aos detalhes, rigor tÃ©cnico e pesquisa jurÃ­dica.","no_gabinete":"Ideal para assessorias que demandam anÃ¡lise de processos complexos.","atencao":"Pode ser perfeccionista. Precisa de clareza nas instruÃ§Ãµes."}
+    "D":{"nome":"Dominante","resumo":"Direto, decidido e orientado a resultados.","pontos_fortes":"Resolve problemas com rapidez, assume responsabilidades, trabalha bem sob pressão.","no_gabinete":"Ideal para demandas que exigem agilidade e tomada de decisão rápida.","atencao":"Pode ser impaciente com processos lentos."},
+    "I":{"nome":"Influente","resumo":"Comunicativo, entusiasta e orientado a pessoas.","pontos_fortes":"Excelente no atendimento ao público e trabalho em equipe.","no_gabinete":"Ideal para Ministérios Públicos ou Defensorias com alto volume de atendimento.","atencao":"Pode ter dificuldade com tarefas repetitivas."},
+    "S":{"nome":"Estável","resumo":"Paciente, confiável e orientado a processos.","pontos_fortes":"Consistência, lealdade e capacidade de manter rotinas com qualidade.","no_gabinete":"Perfil ideal para gabinetes com rotinas estabelecidas.","atencao":"Pode ter dificuldade com mudanças repentinas."},
+    "C":{"nome":"Conformidade","resumo":"Analítico, preciso e orientado à qualidade.","pontos_fortes":"Atenção aos detalhes, rigor técnico e pesquisa jurídica.","no_gabinete":"Ideal para assessorias que demandam análise de processos complexos.","atencao":"Pode ser perfeccionista. Precisa de clareza nas instruções."}
 }
-DESCRICOES_DISC = {"D":"Dominante â€” Direto, decidido e orientado a resultados.","I":"Influente â€” Comunicativo e orientado a pessoas.","S":"EstÃ¡vel â€” Paciente e orientado a processos.","C":"Conformidade â€” AnalÃ­tico e orientado a qualidade."}
-CONCURSOS = ["NÃ£o estou estudando para concurso","Juiz de Direito (TJ)","Juiz Federal (TRF)","Promotor de JustiÃ§a (MP Estadual)","Procurador da RepÃºblica (MPF)","Defensor PÃºblico Estadual","Defensor PÃºblico Federal (DPU)","Procurador do Estado (PGE)","Procurador Municipal","Delegado de PolÃ­cia","Auditor Fiscal / Receita Federal","Outro concurso jurÃ­dico"]
+DESCRICOES_DISC = {"D":"Dominante — Direto, decidido e orientado a resultados.","I":"Influente — Comunicativo e orientado a pessoas.","S":"Estável — Paciente e orientado a processos.","C":"Conformidade — Analítico e orientado a qualidade."}
+CONCURSOS = ["Não estou estudando para concurso","Juiz de Direito (TJ)","Juiz Federal (TRF)","Promotor de Justiça (MP Estadual)","Procurador da República (MPF)","Defensor Público Estadual","Defensor Público Federal (DPU)","Procurador do Estado (PGE)","Procurador Municipal","Delegado de Polícia","Auditor Fiscal / Receita Federal","Outro concurso jurídico"]
 ESTADOS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"]
-ORGAOS = ["Tribunal de JustiÃ§a (TJ)","MinistÃ©rio PÃºblico (MP)","Defensoria PÃºblica","Procuradoria Geral do Estado (PGE)","Procuradoria Geral do MunicÃ­pio (PGM)","Tribunal Regional Federal (TRF)","MinistÃ©rio PÃºblico Federal (MPF)","Advocacia Geral da UniÃ£o (AGU)","Tribunal de Contas (TCE/TCU)","Outro"]
-CARGOS = ["Juiz de Direito","Juiz Federal","Desembargador","Promotor de JustiÃ§a","Procurador de JustiÃ§a","Defensor PÃºblico","Procurador do Estado","Procurador Municipal","Servidor â€” RH / GestÃ£o de Pessoas","Outro"]
-AREAS = ["Criminal","CÃ­vel","FamÃ­lia e SucessÃµes","ExecuÃ§Ã£o Penal","InfÃ¢ncia e Juventude","Fazenda PÃºblica","Meio Ambiente","Moralidade Administrativa","ViolÃªncia DomÃ©stica","Direito PÃºblico","Direito TributÃ¡rio","Consumidor","SaÃºde","Todas as Ã¡reas"]
-REGIMES = ["Integral","Parcial","Remoto","HÃ­brido"]
-FORMAS_SELECAO = ["AnÃ¡lise de currÃ­culo","AnÃ¡lise de currÃ­culo + entrevista","Entrevista","AnÃ¡lise de portfÃ³lio + entrevista","Processo simplificado"]
+ORGAOS = ["Tribunal de Justiça (TJ)","Ministério Público (MP)","Defensoria Pública","Procuradoria Geral do Estado (PGE)","Procuradoria Geral do Município (PGM)","Tribunal Regional Federal (TRF)","Ministério Público Federal (MPF)","Advocacia Geral da União (AGU)","Tribunal de Contas (TCE/TCU)","Outro"]
+CARGOS = ["Juiz de Direito","Juiz Federal","Desembargador","Promotor de Justiça","Procurador de Justiça","Defensor Público","Procurador do Estado","Procurador Municipal","Servidor — RH / Gestão de Pessoas","Outro"]
+AREAS = ["Criminal","Cível","Família e Sucessões","Execução Penal","Infância e Juventude","Fazenda Pública","Meio Ambiente","Moralidade Administrativa","Violência Doméstica","Direito Público","Direito Tributário","Consumidor","Saúde","Todas as áreas"]
+REGIMES = ["Integral","Parcial","Remoto","Híbrido"]
+FORMAS_SELECAO = ["Análise de currículo","Análise de currículo + entrevista","Entrevista","Análise de portfólio + entrevista","Processo simplificado"]
 PERGUNTAS_DISC = [
-    ("Em situaÃ§Ãµes de pressÃ£o no trabalho, vocÃª tende a:",["Tomar decisÃµes rÃ¡pidas e assumir o controle","Motivar a equipe e buscar soluÃ§Ãµes criativas","Manter a calma e seguir o processo estabelecido","Analisar os dados antes de agir"]),
-    ("Quando recebe uma tarefa nova, vocÃª prefere:",["Ter autonomia total para decidir como fazer","Conversar com a equipe e trocar ideias","Entender bem o processo antes de comeÃ§ar","Ter instruÃ§Ãµes detalhadas e critÃ©rios claros"]),
-    ("Em reuniÃµes, vocÃª costuma:",["Liderar a discussÃ£o e propor soluÃ§Ãµes","Animar o grupo e trazer entusiasmo","Ouvir com atenÃ§Ã£o antes de opinar","Apresentar dados e anÃ¡lises detalhadas"]),
-    ("Seu ponto forte no trabalho Ã©:",["Resultados rÃ¡pidos e objetivos","Relacionamentos e comunicaÃ§Ã£o","Estabilidade e confiabilidade","PrecisÃ£o e qualidade tÃ©cnica"]),
-    ("Quando hÃ¡ um conflito na equipe, vocÃª:",["Enfrenta diretamente e busca resoluÃ§Ã£o imediata","Tenta mediar com diplomacia e bom humor","Evita confrontos e busca harmonia","Analisa a situaÃ§Ã£o antes de se posicionar"]),
-    ("VocÃª se sente mais motivado quando:",["Tem metas desafiadoras para superar","Trabalha com pessoas e recebe reconhecimento","Tem rotina estÃ¡vel e previsÃ­vel","Pode aprofundar conhecimento e fazer bem feito"]),
-    ("Seu estilo de comunicaÃ§Ã£o Ã©:",["Direto e objetivo","Entusiasmado e expressivo","Calmo e paciente","Preciso e detalhado"]),
-    ("Diante de uma mudanÃ§a repentina, vocÃª:",["Adapta rapidamente e assume o controle","VÃª como oportunidade e engaja a equipe","Precisa de tempo para se adaptar","Avalia os riscos antes de aceitar"]),
-    ("No trabalho em equipe, vocÃª assume o papel de:",["LÃ­der que define rumos e cobra resultados","Motivador que mantÃ©m o clima positivo","Apoiador que garante a harmonia do grupo","Especialista que garante a qualidade tÃ©cnica"]),
-    ("Quando comete um erro, vocÃª:",["Assume, corrige rapidamente e segue em frente","Conversa com alguÃ©m para processar e superar","Reflete com calma antes de agir diferente","Analisa o que deu errado para nÃ£o repetir"]),
-    ("Sua maior dificuldade no trabalho Ã©:",["PaciÃªncia com processos lentos","Manter o foco em tarefas repetitivas","Lidar com mudanÃ§as repentinas","Trabalhar sem informaÃ§Ãµes suficientes"]),
-    ("Como vocÃª prefere receber feedback:",["Direto e objetivo, sem rodeios","De forma encorajadora e positiva","Com calma, em conversa reservada","Com dados e exemplos concretos"]),
+    ("Em situações de pressão no trabalho, você tende a:",["Tomar decisões rápidas e assumir o controle","Motivar a equipe e buscar soluções criativas","Manter a calma e seguir o processo estabelecido","Analisar os dados antes de agir"]),
+    ("Quando recebe uma tarefa nova, você prefere:",["Ter autonomia total para decidir como fazer","Conversar com a equipe e trocar ideias","Entender bem o processo antes de começar","Ter instruções detalhadas e critérios claros"]),
+    ("Em reuniões, você costuma:",["Liderar a discussão e propor soluções","Animar o grupo e trazer entusiasmo","Ouvir com atenção antes de opinar","Apresentar dados e análises detalhadas"]),
+    ("Seu ponto forte no trabalho é:",["Resultados rápidos e objetivos","Relacionamentos e comunicação","Estabilidade e confiabilidade","Precisão e qualidade técnica"]),
+    ("Quando há um conflito na equipe, você:",["Enfrenta diretamente e busca resolução imediata","Tenta mediar com diplomacia e bom humor","Evita confrontos e busca harmonia","Analisa a situação antes de se posicionar"]),
+    ("Você se sente mais motivado quando:",["Tem metas desafiadoras para superar","Trabalha com pessoas e recebe reconhecimento","Tem rotina estável e previsível","Pode aprofundar conhecimento e fazer bem feito"]),
+    ("Seu estilo de comunicação é:",["Direto e objetivo","Entusiasmado e expressivo","Calmo e paciente","Preciso e detalhado"]),
+    ("Diante de uma mudança repentina, você:",["Adapta rapidamente e assume o controle","Vê como oportunidade e engaja a equipe","Precisa de tempo para se adaptar","Avalia os riscos antes de aceitar"]),
+    ("No trabalho em equipe, você assume o papel de:",["Líder que define rumos e cobra resultados","Motivador que mantém o clima positivo","Apoiador que garante a harmonia do grupo","Especialista que garante a qualidade técnica"]),
+    ("Quando comete um erro, você:",["Assume, corrige rapidamente e segue em frente","Conversa com alguém para processar e superar","Reflete com calma antes de agir diferente","Analisa o que deu errado para não repetir"]),
+    ("Sua maior dificuldade no trabalho é:",["Paciência com processos lentos","Manter o foco em tarefas repetitivas","Lidar com mudanças repentinas","Trabalhar sem informações suficientes"]),
+    ("Como você prefere receber feedback:",["Direto e objetivo, sem rodeios","De forma encorajadora e positiva","Com calma, em conversa reservada","Com dados e exemplos concretos"]),
 ]
 LETRAS_DISC = ["D","I","S","C"]
-DISCLAIMER = "âš ï¸ O JurisBank atua exclusivamente como plataforma de aproximaÃ§Ã£o. A publicaÃ§Ã£o deste Seletivo nÃ£o configura processo seletivo vinculante, concurso pÃºblico ou compromisso de contrataÃ§Ã£o. O uso do ius indicandum Ã© de responsabilidade exclusiva do recrutador."
+DISCLAIMER = "⚠️ O JurisBank atua exclusivamente como plataforma de aproximação. A publicação deste Seletivo não configura processo seletivo vinculante, concurso público ou compromisso de contratação. O uso do ius indicandum é de responsabilidade exclusiva do recrutador."
 
-# â”€â”€ FunÃ§Ãµes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Funções ───────────────────────────────────────────────────────────────────
 def cor_avatar(n): return AVATAR_CORES[sum(ord(c) for c in n)%len(AVATAR_CORES)]
 def iniciais(n):
     p=n.strip().split()
@@ -285,19 +260,19 @@ def enviar_email(destinatario, assunto, corpo_html):
     except: return False
 
 def email_recomendador(nome_cand, email_rec, link):
-    assunto = f"JurisBank â€” {nome_cand} solicitou sua avaliaÃ§Ã£o"
+    assunto = f"JurisBank — {nome_cand} solicitou sua avaliação"
     corpo = f"""<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:linear-gradient(135deg,#0d1f4e,#1a3a8f);padding:32px;text-align:center;border-radius:12px 12px 0 0">
             <h1 style="color:#ffffff;font-size:22px;margin:0">JurisBank</h1>
             <p style="color:rgba(255,255,255,0.6);font-size:12px;margin:4px 0 0;font-style:italic">ius indicandum</p>
         </div>
         <div style="padding:32px;background:#f4f6fc;border-radius:0 0 12px 12px">
-            <h2 style="color:#0d1f4e;font-size:20px;margin:0 0 12px">SolicitaÃ§Ã£o de avaliaÃ§Ã£o</h2>
-            <p style="color:#4a5568;font-size:15px;line-height:1.7;margin:0 0 20px">O profissional <strong>{nome_cand}</strong> indicou vocÃª como recomendador no JurisBank e solicita que vocÃª preencha uma avaliaÃ§Ã£o do seu perfil profissional.</p>
+            <h2 style="color:#0d1f4e;font-size:20px;margin:0 0 12px">Solicitação de avaliação</h2>
+            <p style="color:#4a5568;font-size:15px;line-height:1.7;margin:0 0 20px">O profissional <strong>{nome_cand}</strong> indicou você como recomendador no JurisBank e solicita que você preencha uma avaliação do seu perfil profissional.</p>
             <div style="text-align:center;margin:28px 0">
-                <a href="{link}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#c8960c,#f0c040);color:#0d1f4e;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">Preencher avaliaÃ§Ã£o â†’</a>
+                <a href="{link}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#c8960c,#f0c040);color:#0d1f4e;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">Preencher avaliação →</a>
             </div>
-            <p style="color:#4a6080;font-size:12px;border-top:1px solid #d0dcfa;padding-top:16px">Este link Ã© exclusivo e de uso Ãºnico. JurisBank â€” plataforma de aproximaÃ§Ã£o entre profissionais do Direito e Ã³rgÃ£os do sistema de justiÃ§a.</p>
+            <p style="color:#4a6080;font-size:12px;border-top:1px solid #d0dcfa;padding-top:16px">Este link é exclusivo e de uso único. JurisBank — plataforma de aproximação entre profissionais do Direito e órgãos do sistema de justiça.</p>
         </div>
     </div>"""
     return enviar_email(email_rec, assunto, corpo)
@@ -307,7 +282,7 @@ def extrair_pdf(f):
     return "".join(p.get_text() for p in doc)
 
 def extrair_campos(txt):
-    c={"nome":"","email":"","oab":"NÃ£o","experiencia_orgaos":"","sistemas":"","pos_graduacao":"","resumo":""}
+    c={"nome":"","email":"","oab":"Não","experiencia_orgaos":"","sistemas":"","pos_graduacao":"","resumo":""}
     ls=txt.split("\n"); tc=txt.lower()
     em=re.findall(r'[\w\.\-]+@[\w\.\-]+\.\w+',txt)
     if em: c["email"]=em[0]
@@ -317,9 +292,9 @@ def extrair_campos(txt):
     if enc: c["sistemas"]=", ".join(enc)
     for l in ls:
         l=l.strip()
-        if any(x in l for x in ["PÃ³s","pÃ³s","Especializ","Mestrado","Doutorado"]):
+        if any(x in l for x in ["Pós","pós","Especializ","Mestrado","Doutorado"]):
             if len(l)>10 and not c["pos_graduacao"]: c["pos_graduacao"]=l
-    om={"MPSC":"MPSC","TJSC":"TJSC","Defensoria":"Defensoria","Procuradoria":"Procuradoria","MinistÃ©rio PÃºblico":"MP","Tribunal de JustiÃ§a":"TJ","AGU":"AGU","PGE":"PGE"}
+    om={"MPSC":"MPSC","TJSC":"TJSC","Defensoria":"Defensoria","Procuradoria":"Procuradoria","Ministério Público":"MP","Tribunal de Justiça":"TJ","AGU":"AGU","PGE":"PGE"}
     eo=[]
     for o,s in om.items():
         if o.lower() in tc and s not in eo: eo.append(s)
@@ -333,14 +308,14 @@ def extrair_campos(txt):
     return c
 
 def calc_selos(oab,anos,carta,aval):
-    return {"verificado":"Sim" if oab=="Sim" else "NÃ£o","recomendado":"Sim" if carta else "NÃ£o","destaque":"Sim" if aval else "NÃ£o","experiente":"Sim" if anos>=2 else "NÃ£o"}
+    return {"verificado":"Sim" if oab=="Sim" else "Não","recomendado":"Sim" if carta else "Não","destaque":"Sim" if aval else "Não","experiente":"Sim" if anos>=2 else "Não"}
 
 def html_selos(c):
     h=""
-    if c.get("selo_verificado")=="Sim": h+='<span class="selo selo-verificado">âœ“ Verificado</span>'
-    if c.get("selo_recomendado")=="Sim": h+='<span class="selo selo-recomendado">â˜… Recomendado</span>'
-    if c.get("selo_destaque")=="Sim": h+='<span class="selo selo-destaque">â—† Destaque</span>'
-    if c.get("selo_experiente")=="Sim": h+='<span class="selo selo-experiente">â— Experiente</span>'
+    if c.get("selo_verificado")=="Sim": h+='<span class="selo selo-verificado">✓ Verificado</span>'
+    if c.get("selo_recomendado")=="Sim": h+='<span class="selo selo-recomendado">★ Recomendado</span>'
+    if c.get("selo_destaque")=="Sim": h+='<span class="selo selo-destaque">◆ Destaque</span>'
+    if c.get("selo_experiente")=="Sim": h+='<span class="selo selo-experiente">● Experiente</span>'
     return h
 
 def html_disc(c):
@@ -349,8 +324,8 @@ def html_disc(c):
     return f'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:{DISC_CORES_BADGE.get(d,"#eff6ff")};color:{DISC_TEXTO_BADGE.get(d,"#1e3a8a")};margin-left:4px">{d} {DISC_LABEL.get(d,"")}</span>'
 
 def html_conc(c):
-    if c.get("concurso") and c.get("concurso")!="NÃ£o estou estudando para concurso":
-        return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#fff8e6;color:#b45309;margin-left:4px;border:1px solid #fde68a">ðŸ“š Concursando</span>'
+    if c.get("concurso") and c.get("concurso")!="Não estou estudando para concurso":
+        return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#fff8e6;color:#b45309;margin-left:4px;border:1px solid #fde68a">📚 Concursando</span>'
     return ""
 
 def barra(atual,total=3):
@@ -377,14 +352,14 @@ def render_disc(d):
             <span style="font-weight:700;color:{tb};font-size:15px">{det.get('nome','')}</span>
         </div>
         <p style="color:{tb};font-size:13px;font-weight:600;margin:0 0 8px">{det.get('resumo','')}</p>
-        <p style="color:#2a4a8a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">Pontos fortes:</strong> {det.get('pontos_fortes','')}</p>
-        <p style="color:#2a4a8a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">No gabinete:</strong> {det.get('no_gabinete','')}</p>
-        <p style="color:#2a4a8a;font-size:12px;margin:0"><strong style="color:{tb}">AtenÃ§Ã£o:</strong> {det.get('atencao','')}</p>
+        <p style="color:#3a5a9a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">Pontos fortes:</strong> {det.get('pontos_fortes','')}</p>
+        <p style="color:#3a5a9a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">No gabinete:</strong> {det.get('no_gabinete','')}</p>
+        <p style="color:#3a5a9a;font-size:12px;margin:0"><strong style="color:{tb}">Atenção:</strong> {det.get('atencao','')}</p>
     </div>"""
 
 def modal_planos():
-    with st.expander("ðŸ’° Ver planos e preÃ§os", expanded=st.session_state.get("ver_planos", False)):
-        st.markdown('<p style="font-family:\'Playfair Display\',serif;font-size:22px;font-weight:900;color:#0d1f4e;margin-bottom:1.5rem">Planos e preÃ§os</p>', unsafe_allow_html=True)
+    with st.expander("💰 Ver planos e preços", expanded=st.session_state.get("ver_planos", False)):
+        st.markdown('<p style="font-family:\'Playfair Display\',serif;font-size:22px;font-weight:900;color:#0d1f4e;margin-bottom:1.5rem">Planos e preços</p>', unsafe_allow_html=True)
 
         st.markdown('<p style="font-size:13px;font-weight:700;color:#4070f4;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem">Para Candidatos</p>', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
@@ -393,32 +368,32 @@ def modal_planos():
                 <p class="plano-nome" style="color:#2a4a8a">Gratuito</p>
                 <p class="plano-preco" style="color:#0d1f4e">R$ 0</p>
                 <p class="plano-periodo" style="color:#4a6080">para sempre</p>
-                <div class="plano-item" style="color:#2a4a8a">âœ… Cadastro completo com selos</div>
-                <div class="plano-item" style="color:#2a4a8a">âœ… Aparecer no banco de talentos</div>
-                <div class="plano-item" style="color:#2a4a8a">âœ… Perfil DISC</div>
-                <div class="plano-item" style="color:#2a4a8a">âœ… Ver Seletivos abertos</div>
-                <div class="plano-item" style="color:#4a6080">âŒ InscriÃ§Ã£o em Seletivos</div>
-                <div class="plano-item" style="color:#4a6080">âŒ Destaque no perfil</div>
+                <div class="plano-item" style="color:#3a5a9a">✅ Cadastro completo com selos</div>
+                <div class="plano-item" style="color:#3a5a9a">✅ Aparecer no banco de talentos</div>
+                <div class="plano-item" style="color:#3a5a9a">✅ Perfil DISC</div>
+                <div class="plano-item" style="color:#3a5a9a">✅ Ver Seletivos abertos</div>
+                <div class="plano-item" style="color:#4a6080">❌ Inscrição em Seletivos</div>
+                <div class="plano-item" style="color:#4a6080">❌ Destaque no perfil</div>
             </div>""", unsafe_allow_html=True)
         with col2:
             st.markdown("""<div class="plano-card destaque">
                 <p class="plano-nome" style="color:#f0c040">Ativo</p>
                 <p class="plano-preco" style="color:#ffffff">R$ 29,90</p>
-                <p class="plano-periodo" style="color:rgba(255,255,255,0.6)">/mÃªs</p>
-                <div class="plano-item" style="color:rgba(255,255,255,0.9)">âœ… Tudo do gratuito</div>
-                <div class="plano-item" style="color:rgba(255,255,255,0.9)">âœ… InscriÃ§Ã£o em Seletivos</div>
-                <div class="plano-item" style="color:rgba(255,255,255,0.9)">âœ… Destaque no perfil</div>
-                <div class="plano-item" style="color:rgba(255,255,255,0.9)">âœ… NotificaÃ§Ãµes de Seletivos</div>
+                <p class="plano-periodo" style="color:rgba(255,255,255,0.6)">/mês</p>
+                <div class="plano-item" style="color:rgba(255,255,255,0.9)">✅ Tudo do gratuito</div>
+                <div class="plano-item" style="color:rgba(255,255,255,0.9)">✅ Inscrição em Seletivos</div>
+                <div class="plano-item" style="color:rgba(255,255,255,0.9)">✅ Destaque no perfil</div>
+                <div class="plano-item" style="color:rgba(255,255,255,0.9)">✅ Notificações de Seletivos</div>
             </div>""", unsafe_allow_html=True)
 
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size:13px;font-weight:700;color:#4070f4;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem">Para Recrutadores â€” Pay-per-use</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:13px;font-weight:700;color:#4070f4;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem">Para Recrutadores — Pay-per-use</p>', unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3)
         produtos = [
-            ("ðŸ” 1 perfil completo", "R$ 19,90", "Nome, e-mail, resumo e DISC"),
-            ("ðŸ” 5 perfis", "R$ 79,90", "Economia de 20%"),
-            ("ðŸ” 10 perfis", "R$ 139,90", "Economia de 30%"),
+            ("🔍 1 perfil completo", "R$ 19,90", "Nome, e-mail, resumo e DISC"),
+            ("🔍 5 perfis", "R$ 79,90", "Economia de 20%"),
+            ("🔍 10 perfis", "R$ 139,90", "Economia de 30%"),
         ]
         for col, (nome, preco, desc) in zip([col1,col2,col3], produtos):
             with col:
@@ -431,44 +406,44 @@ def modal_planos():
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("""<div class="plano-card" style="text-align:center">
-                <p style="font-size:14px;font-weight:700;color:#0d1f4e;margin-bottom:4px">ðŸ“¢ 1 Seletivo (30 dias)</p>
+                <p style="font-size:14px;font-weight:700;color:#0d1f4e;margin-bottom:4px">📢 1 Seletivo (30 dias)</p>
                 <p style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#0d1f4e;margin:0">R$ 89,90</p>
-                <p style="font-size:12px;color:#4a6080;margin-top:4px">PublicaÃ§Ã£o + painel de inscritos</p>
+                <p style="font-size:12px;color:#4a6080;margin-top:4px">Publicação + painel de inscritos</p>
             </div>""", unsafe_allow_html=True)
         with col2:
             st.markdown("""<div class="plano-card destaque" style="text-align:center">
-                <p style="font-size:14px;font-weight:700;color:#f0c040;margin-bottom:4px">âš¡ 10 perfis + 1 Seletivo</p>
+                <p style="font-size:14px;font-weight:700;color:#f0c040;margin-bottom:4px">⚡ 10 perfis + 1 Seletivo</p>
                 <p style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#ffffff;margin:0">R$ 199,90</p>
-                <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px">Melhor custo-benefÃ­cio</p>
+                <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px">Melhor custo-benefício</p>
             </div>""", unsafe_allow_html=True)
 
         st.markdown('<p style="font-size:11px;color:#4a6080;text-align:center;margin-top:1rem">Pagamentos em breve. Cadastre-se agora gratuitamente.</p>', unsafe_allow_html=True)
 
-# â”€â”€ TOPBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── TOPBAR ────────────────────────────────────────────────────────────────────
 def render_topbar():
-    nav = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">âš–</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
+    nav = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">⚖</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
 
     if rec_logado():
         rec = st.session_state.rec_logado
-        nav += f'<a href="?p=recrutador" class="{"active" if pagina=="recrutador" else ""}">ðŸ› {rec["nome"].split()[0]}</a>'
-        nav += '<a href="?p=seletivos" class="' + ("active" if pagina=="seletivos" else "") + '">ðŸ“¢ Seletivos</a>'
+        nav += f'<a href="?p=recrutador" class="{"active" if pagina=="recrutador" else ""}">🏛 {rec["nome"].split()[0]}</a>'
+        nav += '<a href="?p=seletivos" class="' + ("active" if pagina=="seletivos" else "") + '">📢 Seletivos</a>'
     elif cand_logado():
         cand = st.session_state.cand_logado
-        nav += f'<a href="?p=inicio" class="{"active" if pagina=="inicio" else ""}">ðŸ‘¤ {cand["nome"].split()[0]}</a>'
-        nav += '<a href="?p=candidatos" class="' + ("active" if pagina=="candidatos" else "") + '">ðŸ‘¥ Candidatos</a>'
-        nav += '<a href="?p=seletivos" class="' + ("active" if pagina=="seletivos" else "") + '">ðŸ“¢ Seletivos</a>'
+        nav += f'<a href="?p=inicio" class="{"active" if pagina=="inicio" else ""}">👤 {cand["nome"].split()[0]}</a>'
+        nav += '<a href="?p=candidatos" class="' + ("active" if pagina=="candidatos" else "") + '">👥 Candidatos</a>'
+        nav += '<a href="?p=seletivos" class="' + ("active" if pagina=="seletivos" else "") + '">📢 Seletivos</a>'
     else:
-        nav += '<a href="?p=candidatos" class="' + ("active" if pagina=="candidatos" else "") + '">ðŸ‘¥ Candidatos</a>'
-        nav += '<a href="?p=seletivos" class="' + ("active" if pagina=="seletivos" else "") + '">ðŸ“¢ Seletivos</a>'
-        nav += '<a href="?p=recrutador" class="btn-rec">ðŸ” Recrutador</a>'
-        nav += '<a href="?p=cadastro" class="btn-cand">Cadastrar â†’</a>'
+        nav += '<a href="?p=candidatos" class="' + ("active" if pagina=="candidatos" else "") + '">👥 Candidatos</a>'
+        nav += '<a href="?p=seletivos" class="' + ("active" if pagina=="seletivos" else "") + '">📢 Seletivos</a>'
+        nav += '<a href="?p=recrutador" class="btn-rec">🔐 Recrutador</a>'
+        nav += '<a href="?p=cadastro" class="btn-cand">Cadastrar →</a>'
 
     nav += '</div></div>'
     st.markdown(nav, unsafe_allow_html=True)
 
 render_topbar()
 
-# â”€â”€ PÃGINA: INÃCIO / DASHBOARD VISITANTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PÁGINA: INÍCIO / DASHBOARD VISITANTE ─────────────────────────────────────
 if pagina == "inicio":
     dados = aba_candidatos.get_all_records()
     seletivos = aba_seletivos.get_all_records()
@@ -481,28 +456,28 @@ if pagina == "inicio":
         # Dashboard candidato ativo
         cand = st.session_state.cand_logado
         st.markdown(f"""<div class="hero-card">
-            <h1 class="page-title">OlÃ¡, <em>{cand['nome'].split()[0]}!</em></h1>
-            <p class="page-sub">Seu perfil estÃ¡ ativo no JurisBank</p>
+            <h1 class="page-title">Olá, <em>{cand['nome'].split()[0]}!</em></h1>
+            <p class="page-sub">Seu perfil está ativo no JurisBank</p>
             <div class="stats-row">
-                <div class="stat-pill">ðŸ“¢ {total_sel} Seletivos abertos</div>
-                <div class="stat-pill">ðŸ‘¥ {total_cands} candidatos no banco</div>
+                <div class="stat-pill">📢 {total_sel} Seletivos abertos</div>
+                <div class="stat-pill">👥 {total_cands} candidatos no banco</div>
             </div>
         </div>""", unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown(f'<div class="metric-box"><p class="metric-label">Ãrea</p><p class="metric-value" style="font-size:16px">{cand.get("area","â€”")}</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-box"><p class="metric-label">Área</p><p class="metric-value" style="font-size:16px">{cand.get("area","—")}</p></div>', unsafe_allow_html=True)
         with col2:
-            st.markdown(f'<div class="metric-box"><p class="metric-label">DisponÃ­vel</p><p class="metric-value" style="font-size:16px">{cand.get("disponibilidade","â€”")}</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-box"><p class="metric-label">Disponível</p><p class="metric-value" style="font-size:16px">{cand.get("disponibilidade","—")}</p></div>', unsafe_allow_html=True)
         with col3:
-            st.markdown(f'<div class="metric-box"><p class="metric-label">Perfil DISC</p><p class="metric-value" style="font-size:16px">{cand.get("disc","â€”")}</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-box"><p class="metric-label">Perfil DISC</p><p class="metric-value" style="font-size:16px">{cand.get("disc","—")}</p></div>', unsafe_allow_html=True)
 
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("ðŸ“¢ Ver Seletivos", use_container_width=True): ir("seletivos")
+            if st.button("📢 Ver Seletivos", use_container_width=True): ir("seletivos")
         with col2:
-            if st.button("ðŸ‘¥ Ver candidatos", use_container_width=True): ir("candidatos")
+            if st.button("👥 Ver candidatos", use_container_width=True): ir("candidatos")
         with col3:
             if st.button("Sair da conta", use_container_width=True):
                 del st.session_state.cand_logado; st.rerun()
@@ -515,17 +490,17 @@ if pagina == "inicio":
             st.markdown(render_disc(cand["disc"]), unsafe_allow_html=True)
 
     else:
-        # Dashboard visitante â€” teaser
+        # Dashboard visitante — teaser
         st.markdown(f"""<div class="hero-card">
-            <h1 class="page-title">Banco de Talentos<br><em>JurÃ­dicos.</em></h1>
-            <p class="page-sub">Profissionais certificados para assessoria em Tribunais, MinistÃ©rios PÃºblicos, Procuradorias e Defensorias</p>
+            <h1 class="page-title">Banco de Talentos<br><em>Jurídicos.</em></h1>
+            <p class="page-sub">Profissionais certificados para assessoria em Tribunais, Ministérios Públicos, Procuradorias e Defensorias</p>
         </div>""", unsafe_allow_html=True)
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_cands}</p><p class="teaser-label">Profissionais cadastrados</p></div>', unsafe_allow_html=True)
         with col2:
-            st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_disp}</p><p class="teaser-label">DisponÃ­veis agora</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_disp}</p><p class="teaser-label">Disponíveis agora</p></div>', unsafe_allow_html=True)
         with col3:
             st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_cert}</p><p class="teaser-label">Perfis certificados</p></div>', unsafe_allow_html=True)
         with col4:
@@ -534,12 +509,12 @@ if pagina == "inicio":
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([2,2,2])
         with col1:
-            if st.button("ðŸ“„ Cadastrar agora â€” Ã© grÃ¡tis", use_container_width=True): ir("cadastro")
+            if st.button("📄 Cadastrar agora — é grátis", use_container_width=True): ir("cadastro")
         with col2:
-            if st.button("ðŸ”‘ JÃ¡ tenho cadastro", use_container_width=True):
+            if st.button("🔑 Já tenho cadastro", use_container_width=True):
                 st.session_state["login_cand"] = True; st.rerun()
         with col3:
-            if st.button("ðŸ’° Ver planos", use_container_width=True):
+            if st.button("💰 Ver planos", use_container_width=True):
                 st.session_state["ver_planos"] = not st.session_state.get("ver_planos", False); st.rerun()
 
         if st.session_state.get("ver_planos"):
@@ -551,50 +526,50 @@ if pagina == "inicio":
             em = st.text_input("Seu e-mail cadastrado", key="em_login_cand")
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("Entrar â†’", key="btn_login_cand"):
+                if st.button("Entrar →", key="btn_login_cand"):
                     tc = aba_candidatos.get_all_records()
                     cf = next((c for c in tc if c.get("email","").lower()==em.lower()), None)
                     if cf: st.session_state.cand_logado=cf; st.session_state["login_cand"]=False; st.rerun()
-                    else: st.error("E-mail nÃ£o encontrado.")
+                    else: st.error("E-mail não encontrado.")
             with col2:
                 if st.button("Cancelar", key="btn_canc_cand"):
                     st.session_state["login_cand"]=False; st.rerun()
 
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
         st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:0.5rem">Receba avisos de novos Seletivos</p>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">Deixe seu e-mail. Quando surgir um Seletivo na sua Ã¡rea, vocÃª Ã© o primeiro a saber.</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">Deixe seu e-mail. Quando surgir um Seletivo na sua área, você é o primeiro a saber.</p>', unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)
         with col1: ei = st.text_input("Seu e-mail", key="ei_home")
-        with col2: ai = st.multiselect("Ãreas", AREAS, key="ai_home")
+        with col2: ai = st.multiselect("Áreas", AREAS, key="ai_home")
         with col3: sti = st.multiselect("Estados", ESTADOS, key="sti_home")
         if st.button("Quero receber avisos", key="bint_home"):
-            if not ei or not ai: st.error("Preencha e-mail e Ã¡rea.")
+            if not ei or not ai: st.error("Preencha e-mail e área.")
             else:
                 aba_interesses.append_row([ei,", ".join(ai),", ".join(sti),datetime.now().strftime("%d/%m/%Y")])
-                st.success("Pronto! VocÃª serÃ¡ avisado quando surgir um Seletivo compatÃ­vel.")
+                st.success("Pronto! Você será avisado quando surgir um Seletivo compatível.")
 
-# â”€â”€ PÃGINA: CANDIDATOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PÁGINA: CANDIDATOS ────────────────────────────────────────────────────────
 elif pagina == "candidatos":
     dados = aba_candidatos.get_all_records()
     if "cand_sel" not in st.session_state: st.session_state.cand_sel = None
 
     if st.session_state.cand_sel:
         c = st.session_state.cand_sel; cor = cor_avatar(c["nome"])
-        if st.button("â† Voltar"): st.session_state.cand_sel=None; st.rerun()
+        if st.button("← Voltar"): st.session_state.cand_sel=None; st.rerun()
 
         st.markdown(f"""<div class="hero-card">
             <div style="display:flex;align-items:center;gap:16px">
                 <div class="avatar" style="width:60px;height:60px;border-radius:14px;background:{cor};font-size:20px">{iniciais(c['nome'])}</div>
                 <div>
                     <div class="profile-name">{c['nome']}</div>
-                    <div style="font-size:13px;color:#2a4a8a;margin-bottom:6px">{c.get('formacao','â€”')} Â· {c.get('instituicao','â€”')}</div>
+                    <div style="font-size:13px;color:#2a4a8a;margin-bottom:6px">{c.get('formacao','—')} · {c.get('instituicao','—')}</div>
                     <div>{html_selos(c)}</div>
                 </div>
             </div>
         </div>""", unsafe_allow_html=True)
 
         col1,col2,col3,col4=st.columns(4)
-        for col,lb,vl in [(col1,"Ãrea",c.get("area","â€”")),(col2,"OAB",c.get("oab","â€”")),(col3,"DisponÃ­vel",c.get("disponibilidade","â€”")),(col4,"Ã“rgÃ£os",c.get("experiencia_orgaos","â€”") or "â€”")]:
+        for col,lb,vl in [(col1,"Área",c.get("area","—")),(col2,"OAB",c.get("oab","—")),(col3,"Disponível",c.get("disponibilidade","—")),(col4,"Órgãos",c.get("experiencia_orgaos","—") or "—")]:
             with col: st.markdown(f'<div class="metric-box"><p class="metric-label">{lb}</p><p class="metric-value" style="font-size:16px">{vl}</p></div>',unsafe_allow_html=True)
 
         if c.get("disc"):
@@ -607,7 +582,7 @@ elif pagina == "candidatos":
                 st.markdown(f'<div class="info-card">{c["resumo"]}</div>',unsafe_allow_html=True)
             else:
                 prev=c["resumo"][:150]+"..." if len(c["resumo"])>150 else c["resumo"]
-                st.markdown(f'<div class="info-card">{prev}<br><br><span style="font-size:12px;color:#4070f4">ðŸ” Resumo completo disponÃ­vel para recrutadores.</span></div>',unsafe_allow_html=True)
+                st.markdown(f'<div class="info-card">{prev}<br><br><span style="font-size:12px;color:#4070f4">🔐 Resumo completo disponível para recrutadores.</span></div>',unsafe_allow_html=True)
 
         st.markdown('<p class="section-label">Contato</p>',unsafe_allow_html=True)
         if rec_logado():
@@ -615,25 +590,25 @@ elif pagina == "candidatos":
             if not st.session_state.get("termo_aceito"):
                 st.markdown("""<div class="disclaimer-box">
                     <strong>Termo de responsabilidade</strong><br>
-                    Ao acessar os dados de contato deste candidato, vocÃª confirma que utilizarÃ¡ as informaÃ§Ãµes exclusivamente para fins de seleÃ§Ã£o profissional para cargo de livre nomeaÃ§Ã£o no seu Ã³rgÃ£o, em conformidade com os princÃ­pios da impessoalidade e vedaÃ§Ã£o ao nepotismo (SV nÂº 13 do STF e ResoluÃ§Ã£o CNJ nÂº 07/2005).
+                    Ao acessar os dados de contato deste candidato, você confirma que utilizará as informações exclusivamente para fins de seleção profissional para cargo de livre nomeação no seu órgão, em conformidade com os princípios da impessoalidade e vedação ao nepotismo (SV nº 13 do STF e Resolução CNJ nº 07/2005).
                 </div>""", unsafe_allow_html=True)
-                if st.button("âœ… Aceito e quero ver os dados de contato"):
+                if st.button("✅ Aceito e quero ver os dados de contato"):
                     st.session_state["termo_aceito"] = True; st.rerun()
             else:
-                st.markdown(f'<div class="info-card">âœ‰ {c.get("email","â€”")}</div>',unsafe_allow_html=True)
+                st.markdown(f'<div class="info-card">✉ {c.get("email","—")}</div>',unsafe_allow_html=True)
         else:
-            st.markdown('<div class="lock-box">ðŸ” DisponÃ­vel apenas para recrutadores aprovados.</div>',unsafe_allow_html=True)
+            st.markdown('<div class="lock-box">🔐 Disponível apenas para recrutadores aprovados.</div>',unsafe_allow_html=True)
     else:
         total=len(dados); disp=sum(1 for c in dados if c.get("disponibilidade")=="Sim")
         cert=sum(1 for c in dados if any(c.get(f"selo_{s}")=="Sim" for s in ["verificado","recomendado","destaque","experiente"]))
 
         st.markdown(f"""<div class="hero-card">
-            <h1 class="page-title">Banco de Talentos<br><em>JurÃ­dicos.</em></h1>
-            <p class="page-sub">Profissionais certificados para assessoria em Tribunais, MinistÃ©rios PÃºblicos, Procuradorias e Defensorias</p>
+            <h1 class="page-title">Banco de Talentos<br><em>Jurídicos.</em></h1>
+            <p class="page-sub">Profissionais certificados para assessoria em Tribunais, Ministérios Públicos, Procuradorias e Defensorias</p>
             <div class="stats-row">
-                <div class="stat-pill">âš– {total} cadastrados</div>
-                <div class="stat-pill">âœ“ {disp} disponÃ­veis</div>
-                <div class="stat-pill">â˜… {cert} certificados</div>
+                <div class="stat-pill">⚖ {total} cadastrados</div>
+                <div class="stat-pill">✓ {disp} disponíveis</div>
+                <div class="stat-pill">★ {cert} certificados</div>
             </div>
         </div>""", unsafe_allow_html=True)
 
@@ -641,7 +616,7 @@ elif pagina == "candidatos":
         with col1: busca=st.text_input("Buscar por nome",placeholder="Nome...")
         with col2:
             ar=["Todas"]+sorted(set(c["area"] for c in dados if c.get("area")))
-            asel=st.selectbox("Ãrea",ar)
+            asel=st.selectbox("Área",ar)
         with col3: fsel=st.selectbox("Selo",["Todos","Verificado","Recomendado","Destaque","Experiente"])
 
         cf=dados
@@ -654,8 +629,8 @@ elif pagina == "candidatos":
         st.markdown(f'<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">{len(cf)} candidato(s)</p>',unsafe_allow_html=True)
 
         for i,cand in enumerate(cf):
-            cor=cor_avatar(cand["nome"]); dsp=cand.get("disponibilidade","NÃ£o")
-            bdg='<span class="badge-sim">â— DisponÃ­vel</span>' if dsp=="Sim" else '<span class="badge-nao">â— IndisponÃ­vel</span>'
+            cor=cor_avatar(cand["nome"]); dsp=cand.get("disponibilidade","Não")
+            bdg='<span class="badge-sim">● Disponível</span>' if dsp=="Sim" else '<span class="badge-nao">● Indisponível</span>'
             cc,cb=st.columns([11,2])
             with cc:
                 st.markdown(f"""<div class="cand-card">
@@ -664,7 +639,7 @@ elif pagina == "candidatos":
                             <div class="avatar" style="background:{cor}">{iniciais(cand['nome'])}</div>
                             <div>
                                 <p class="cand-name">{cand['nome']}</p>
-                                <p class="cand-sub">{cand.get('formacao','â€”')} Â· {cand.get('instituicao','â€”')} Â· {cand.get('area','â€”')}</p>
+                                <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('instituicao','—')} · {cand.get('area','—')}</p>
                                 <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}{html_conc(cand)}</div>
                             </div>
                         </div>
@@ -673,50 +648,50 @@ elif pagina == "candidatos":
                 </div>""",unsafe_allow_html=True)
             with cb:
                 st.write("")
-                if st.button("Ver â†’",key=f"b{i}"):
+                if st.button("Ver →",key=f"b{i}"):
                     st.session_state.cand_sel=cand; st.rerun()
 
-# â”€â”€ PÃGINA: SELETIVOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PÁGINA: SELETIVOS ─────────────────────────────────────────────────────────
 elif pagina == "seletivos":
     todas = aba_seletivos.get_all_records()
 
     st.markdown("""<div class="hero-card">
         <h1 class="page-title">Seletivos<br><em>Abertos.</em></h1>
-        <p class="page-sub">Vagas de cargos de livre nomeaÃ§Ã£o em Tribunais, MinistÃ©rios PÃºblicos, Defensorias e Procuradorias</p>
+        <p class="page-sub">Vagas de cargos de livre nomeação em Tribunais, Ministérios Públicos, Defensorias e Procuradorias</p>
     </div>""", unsafe_allow_html=True)
     st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
     if not cand_logado() and not rec_logado():
         st.markdown("""<div class="aviso-pago">
-            <p style="font-size:16px;font-weight:700;color:#f0c040;margin:0 0 8px">ðŸ” InscriÃ§Ã£o disponÃ­vel para candidatos ativos</p>
+            <p style="font-size:16px;font-weight:700;color:#f0c040;margin:0 0 8px">🔐 Inscrição disponível para candidatos ativos</p>
             <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0 0 16px">Cadastre-se gratuitamente e assine o plano Ativo para se inscrever nos Seletivos.</p>
         </div>""", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("ðŸ“„ Cadastrar agora", use_container_width=True): ir("cadastro")
+            if st.button("📄 Cadastrar agora", use_container_width=True): ir("cadastro")
         with col2:
-            if st.button("ðŸ”‘ JÃ¡ tenho cadastro", use_container_width=True):
+            if st.button("🔑 Já tenho cadastro", use_container_width=True):
                 st.session_state["login_cand_sel"]=True; st.rerun()
 
         if st.session_state.get("login_cand_sel"):
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
             em=st.text_input("Seu e-mail cadastrado",key="em_sel")
-            if st.button("Entrar â†’",key="btn_sel"):
+            if st.button("Entrar →",key="btn_sel"):
                 tc=aba_candidatos.get_all_records()
                 cf=next((c for c in tc if c.get("email","").lower()==em.lower()),None)
                 if cf: st.session_state.cand_logado=cf; st.session_state["login_cand_sel"]=False; st.rerun()
-                else: st.error("E-mail nÃ£o encontrado.")
+                else: st.error("E-mail não encontrado.")
 
     if cand_logado():
         cand=st.session_state.cand_logado
         col1,col2=st.columns([8,2])
-        with col1: st.markdown(f'<div class="info-box">ðŸ‘¤ {cand["nome"]} â€” <span style="font-size:11px">candidato ativo</span></div>',unsafe_allow_html=True)
+        with col1: st.markdown(f'<div class="info-box">👤 {cand["nome"]} — <span style="font-size:11px">candidato ativo</span></div>',unsafe_allow_html=True)
         with col2:
             if st.button("Sair",key="sc"): del st.session_state.cand_logado; st.rerun()
 
     col1,col2,col3=st.columns(3)
-    with col1: fa=st.selectbox("Ãrea",["Todas"]+AREAS,key="fa")
+    with col1: fa=st.selectbox("Área",["Todas"]+AREAS,key="fa")
     with col2: fe=st.selectbox("Estado",["Todos"]+ESTADOS,key="fe")
     with col3: fs=st.selectbox("Status",["Abertos","Todos","Encerrados"],key="fs")
 
@@ -730,7 +705,7 @@ elif pagina == "seletivos":
 
     for i,sel in enumerate(chf):
         ab=sel_aberto(sel); ins_=inscritos_sel(sel); n=len(ins_)
-        sb='<span class="badge-aberto">â— Aberto</span>' if ab else '<span class="badge-encerrado">â— Encerrado</span>'
+        sb='<span class="badge-aberto">● Aberto</span>' if ab else '<span class="badge-encerrado">● Encerrado</span>'
         ja=cand_logado() and st.session_state.cand_logado.get("email","") in ins_
 
         st.markdown(f"""<div class="seletivo-card">
@@ -738,15 +713,15 @@ elif pagina == "seletivos":
                 <div style="flex:1">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
                         {sb}
-                        <span style="font-size:11px;color:#4a6080">ðŸ“… {sel.get('prazo','â€”')}</span>
-                        <span style="font-size:11px;color:#4a6080">ðŸ‘¥ {n} inscrito(s)</span>
+                        <span style="font-size:11px;color:#4a6080">📅 {sel.get('prazo','—')}</span>
+                        <span style="font-size:11px;color:#4a6080">👥 {n} inscrito(s)</span>
                     </div>
-                    <p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:0 0 4px">{sel.get('titulo','â€”')}</p>
-                    <p style="font-size:13px;color:#2a4a8a;margin:0 0 8px">{sel.get('orgao','â€”')} Â· {sel.get('municipio','â€”')}/{sel.get('estado','â€”')}</p>
+                    <p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:0 0 4px">{sel.get('titulo','—')}</p>
+                    <p style="font-size:13px;color:#2a4a8a;margin:0 0 8px">{sel.get('orgao','—')} · {sel.get('municipio','—')}/{sel.get('estado','—')}</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
-                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">{sel.get('area','â€”')}</span>
-                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#f3effe;color:#6d28d9">{sel.get('regime','â€”')}</span>
-                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#e6f4ea;color:#15803d">{sel.get('vagas','â€”')} vaga(s)</span>
+                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f">{sel.get('area','—')}</span>
+                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#f3effe;color:#6d28d9">{sel.get('regime','—')}</span>
+                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:#e6f4ea;color:#15803d">{sel.get('vagas','—')} vaga(s)</span>
                     </div>
                 </div>
             </div>
@@ -758,11 +733,11 @@ elif pagina == "seletivos":
                 st.session_state[f"vd{i}"]=not st.session_state.get(f"vd{i}",False); st.rerun()
         with ci:
             if ab and cand_logado() and not ja:
-                if st.button("Inscrever-se â†’",key=f"i{i}"):
+                if st.button("Inscrever-se →",key=f"i{i}"):
                     st.session_state[f"ci{i}"]=True; st.rerun()
-            elif ja: st.markdown('<span class="badge-inscrito">âœ“ Inscrito</span>',unsafe_allow_html=True)
+            elif ja: st.markdown('<span class="badge-inscrito">✓ Inscrito</span>',unsafe_allow_html=True)
             elif not cand_logado() and ab:
-                st.markdown('<span class="badge-pago">ðŸ” Plano Ativo</span>',unsafe_allow_html=True)
+                st.markdown('<span class="badge-pago">🔐 Plano Ativo</span>',unsafe_allow_html=True)
 
         if st.session_state.get(f"ci{i}"):
             st.markdown(f'<div class="info-card" style="margin-top:8px"><strong style="color:#0d1f4e">Inscrever em: {sel.get("titulo","")}</strong></div>',unsafe_allow_html=True)
@@ -779,7 +754,7 @@ elif pagina == "seletivos":
                             idx=next((j for j,c in enumerate(tc) if c.get("id")==sel.get("id")),None)
                             if idx is not None: aba_seletivos.update_cell(idx+2,16,", ".join(ia))
                         del st.session_state[f"ci{i}"]
-                        st.success("InscriÃ§Ã£o realizada!"); st.rerun()
+                        st.success("Inscrição realizada!"); st.rerun()
             with cx:
                 if st.button("Cancelar",key=f"cx{i}"):
                     del st.session_state[f"ci{i}"]; st.rerun()
@@ -787,28 +762,28 @@ elif pagina == "seletivos":
         if st.session_state.get(f"vd{i}"):
             with st.expander("Detalhes",expanded=True):
                 c1,c2,c3=st.columns(3)
-                with c1: st.markdown(f'<div class="metric-box"><p class="metric-label">RemuneraÃ§Ã£o</p><p class="metric-value" style="font-size:13px">{sel.get("remuneracao","â€”")}</p></div>',unsafe_allow_html=True)
-                with c2: st.markdown(f'<div class="metric-box"><p class="metric-label">Regime</p><p class="metric-value" style="font-size:13px">{sel.get("regime","â€”")}</p></div>',unsafe_allow_html=True)
-                with c3: st.markdown(f'<div class="metric-box"><p class="metric-label">SeleÃ§Ã£o</p><p class="metric-value" style="font-size:13px">{sel.get("forma_selecao","â€”")}</p></div>',unsafe_allow_html=True)
+                with c1: st.markdown(f'<div class="metric-box"><p class="metric-label">Remuneração</p><p class="metric-value" style="font-size:13px">{sel.get("remuneracao","—")}</p></div>',unsafe_allow_html=True)
+                with c2: st.markdown(f'<div class="metric-box"><p class="metric-label">Regime</p><p class="metric-value" style="font-size:13px">{sel.get("regime","—")}</p></div>',unsafe_allow_html=True)
+                with c3: st.markdown(f'<div class="metric-box"><p class="metric-label">Seleção</p><p class="metric-value" style="font-size:13px">{sel.get("forma_selecao","—")}</p></div>',unsafe_allow_html=True)
                 if sel.get("requisitos"):
                     st.markdown('<p class="section-label">Requisitos</p>',unsafe_allow_html=True)
                     st.markdown(f'<div class="info-card">{sel["requisitos"]}</div>',unsafe_allow_html=True)
                 st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>',unsafe_allow_html=True)
 
-# â”€â”€ PÃGINA: CADASTRO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PÁGINA: CADASTRO ──────────────────────────────────────────────────────────
 elif pagina == "cadastro":
     if "et" not in st.session_state: st.session_state.et=1
     if "campos" not in st.session_state: st.session_state.campos={}
     if "dc" not in st.session_state: st.session_state.dc={}
     et=st.session_state.et
-    ts=[("Seus dados\nprofissionais.","Upload do currÃ­culo ou preenchimento manual"),("CertificaÃ§Ã£o e\nreferÃªncias.","Documentos que geram selos"),("Perfil\ncomportamental.","12 perguntas â€” 3 minutos")]
+    ts=[("Seus dados\nprofissionais.","Upload do currículo ou preenchimento manual"),("Certificação e\nreferências.","Documentos que geram selos"),("Perfil\ncomportamental.","12 perguntas — 3 minutos")]
     tt,ts_=ts[et-1]
     st.markdown(f'<div class="hero-card"><h1 class="page-title">{tt}</h1><p class="page-sub">{ts_}</p></div>',unsafe_allow_html=True)
     st.markdown(barra(et,3),unsafe_allow_html=True)
     st.markdown(f'<p class="step-title">Etapa {et} de 3</p>',unsafe_allow_html=True)
 
     if et==1:
-        pdf=st.file_uploader("Upload do currÃ­culo em PDF (opcional)",type="pdf")
+        pdf=st.file_uploader("Upload do currículo em PDF (opcional)",type="pdf")
         if pdf and not st.session_state.campos:
             with st.spinner("Extraindo..."): st.session_state.campos=extrair_campos(extrair_pdf(pdf))
             st.rerun()
@@ -819,24 +794,24 @@ elif pagina == "cadastro":
         with c1: nome=st.text_input("Nome completo *",value=campos.get("nome",""))
         with c2: email=st.text_input("E-mail *",value=campos.get("email",""))
         c1,c2,c3=st.columns(3)
-        with c1: form=st.selectbox("FormaÃ§Ã£o *",["Bacharel em Direito","PÃ³s-graduado em Direito","Mestre em Direito","Doutor em Direito"])
-        with c2: inst=st.text_input("InstituiÃ§Ã£o *")
-        with c3: area=st.selectbox("Ãrea *",["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"])
+        with c1: form=st.selectbox("Formação *",["Bacharel em Direito","Pós-graduado em Direito","Mestre em Direito","Doutor em Direito"])
+        with c2: inst=st.text_input("Instituição *")
+        with c3: area=st.selectbox("Área *",["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"])
         c1,c2,c3=st.columns(3)
-        with c1: oab=st.radio("OAB ativa?",["Sim","NÃ£o"],index=0 if campos.get("oab")=="Sim" else 1,horizontal=True)
-        with c2: anos=st.number_input("Anos em Ã³rgÃ£o pÃºblico",min_value=0,max_value=40,value=0)
-        with c3: disp=st.radio("DisponÃ­vel?",["Sim","NÃ£o"],horizontal=True)
-        exp=st.text_input("Ã“rgÃ£os de atuaÃ§Ã£o",value=campos.get("experiencia_orgaos",""))
+        with c1: oab=st.radio("OAB ativa?",["Sim","Não"],index=0 if campos.get("oab")=="Sim" else 1,horizontal=True)
+        with c2: anos=st.number_input("Anos em órgão público",min_value=0,max_value=40,value=0)
+        with c3: disp=st.radio("Disponível?",["Sim","Não"],horizontal=True)
+        exp=st.text_input("Órgãos de atuação",value=campos.get("experiencia_orgaos",""))
         sis=st.text_input("Sistemas dominados",value=campos.get("sistemas",""))
-        pos=st.text_input("PÃ³s-graduaÃ§Ã£o",value=campos.get("pos_graduacao",""))
+        pos=st.text_input("Pós-graduação",value=campos.get("pos_graduacao",""))
         res=st.text_area("Resumo profissional",value=campos.get("resumo",""),height=100)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
         conc=st.selectbox("Estudando para algum concurso?",CONCURSOS)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-        cons=st.checkbox("Li e aceito a PolÃ­tica de Privacidade e os Termos de Uso. Consinto com o tratamento dos meus dados nos termos da LGPD (Lei nÂº 13.709/2018).")
+        cons=st.checkbox("Li e aceito a Política de Privacidade e os Termos de Uso. Consinto com o tratamento dos meus dados nos termos da LGPD (Lei nº 13.709/2018).")
         st.markdown("<br>",unsafe_allow_html=True)
-        if st.button("PrÃ³ximo â†’"):
-            if not nome or not email or not inst: st.error("Preencha nome, e-mail e instituiÃ§Ã£o.")
+        if st.button("Próximo →"):
+            if not nome or not email or not inst: st.error("Preencha nome, e-mail e instituição.")
             elif not cons: st.error("Aceite os Termos para continuar.")
             else:
                 st.session_state.dc.update({"nome":nome,"email":email,"formacao":form,"instituicao":inst,"area":area,"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":exp,"sistemas":sis,"pos":pos,"resumo":res,"concurso":conc})
@@ -845,26 +820,26 @@ elif pagina == "cadastro":
     elif et==2:
         c1,c2=st.columns(2)
         with c1:
-            st.markdown('<p style="font-weight:600;color:#b45309;margin-bottom:4px">â˜… Carta de recomendaÃ§Ã£o</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-weight:600;color:#b45309;margin-bottom:4px">★ Carta de recomendação</p>',unsafe_allow_html=True)
             st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">De um Juiz, Promotor, Defensor ou Procurador ativo</p>',unsafe_allow_html=True)
             carta=st.file_uploader("",type="pdf",key="carta",label_visibility="collapsed")
         with c2:
-            st.markdown('<p style="font-weight:600;color:#b45309;margin-bottom:4px">â—† AvaliaÃ§Ã£o de desempenho</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">AvaliaÃ§Ã£o formal emitida pelo Ã³rgÃ£o</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-weight:600;color:#b45309;margin-bottom:4px">◆ Avaliação de desempenho</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
             aval=st.file_uploader("",type="pdf",key="aval",label_visibility="collapsed")
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-        st.markdown('<p style="font-weight:600;color:#2a4a8a;margin-bottom:4px">E-mail do recomendador</p>',unsafe_allow_html=True)
+        st.markdown('<p style="font-weight:600;color:#3a5a9a;margin-bottom:4px">E-mail do recomendador</p>',unsafe_allow_html=True)
         er=st.text_input("",placeholder="nome@mpsc.mp.br",key="er",label_visibility="collapsed")
         dv=["mpsc.mp.br","tjsc.jus.br","sc.def.br","pge.sc.gov.br","trf4.jus.br","jfsc.jus.br","mpf.mp.br","agu.gov.br"]
         if er and "@" in er:
-            if er.split("@")[-1] in dv: st.markdown('<div class="info-box">âœ“ E-mail institucional reconhecido.</div>',unsafe_allow_html=True)
-            else: st.warning("DomÃ­nio nÃ£o reconhecido.")
+            if er.split("@")[-1] in dv: st.markdown('<div class="info-box">✓ E-mail institucional reconhecido.</div>',unsafe_allow_html=True)
+            else: st.warning("Domínio não reconhecido.")
 
         if er and "@" in er:
             st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-            st.markdown('<p style="font-weight:600;color:#2a4a8a;margin-bottom:4px">Solicitar avaliaÃ§Ã£o direta na plataforma</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">O recomendador receberÃ¡ um link exclusivo para preencher uma avaliaÃ§Ã£o do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
-            if st.button("Gerar link de avaliaÃ§Ã£o â†’",key="gerar_link"):
+            st.markdown('<p style="font-weight:600;color:#3a5a9a;margin-bottom:4px">Solicitar avaliação direta na plataforma</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#4a6080;margin-bottom:8px">O recomendador receberá um link exclusivo para preencher uma avaliação do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
+            if st.button("Gerar link de avaliação →",key="gerar_link"):
                 email_cand_temp=st.session_state.dc.get("email","")
                 if not email_cand_temp: st.error("Preencha seu e-mail na etapa anterior primeiro.")
                 else:
@@ -874,17 +849,17 @@ elif pagina == "cadastro":
                     nome_cand_temp=st.session_state.dc.get("nome","candidato")
                     enviado=email_recomendador(nome_cand_temp,er,link)
                     if enviado:
-                        st.markdown(f'<div class="info-box">âœ“ E-mail enviado para <strong>{er}</strong>!</div>',unsafe_allow_html=True)
+                        st.markdown(f'<div class="info-box">✓ E-mail enviado para <strong>{er}</strong>!</div>',unsafe_allow_html=True)
                     else:
-                        st.markdown(f'<div class="info-box">âœ“ Link gerado! Compartilhe manualmente:<br><strong style="font-size:12px;word-break:break-all">{link}</strong></div>',unsafe_allow_html=True)
+                        st.markdown(f'<div class="info-box">✓ Link gerado! Compartilhe manualmente:<br><strong style="font-size:12px;word-break:break-all">{link}</strong></div>',unsafe_allow_html=True)
                     st.session_state.dc["token_recomendacao"]=token
-                    st.info("Quando o recomendador preencher, o selo â˜… Recomendado serÃ¡ ativado automaticamente.")
+                    st.info("Quando o recomendador preencher, o selo ★ Recomendado será ativado automaticamente.")
 
         d=st.session_state.dc; sp=[]
-        if d.get("oab")=="Sim": sp.append("âœ“ Verificado")
-        if carta: sp.append("â˜… Recomendado")
-        if aval: sp.append("â—† Destaque")
-        if d.get("anos_experiencia",0)>=2: sp.append("â— Experiente")
+        if d.get("oab")=="Sim": sp.append("✓ Verificado")
+        if carta: sp.append("★ Recomendado")
+        if aval: sp.append("◆ Destaque")
+        if d.get("anos_experiencia",0)>=2: sp.append("● Experiente")
         if sp:
             st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
             st.markdown('<p style="font-size:13px;font-weight:600;color:#0d1f4e">Selos:</p>',unsafe_allow_html=True)
@@ -893,14 +868,14 @@ elif pagina == "cadastro":
         st.markdown("<br>",unsafe_allow_html=True)
         c1,c2=st.columns(2)
         with c1:
-            if st.button("â† Voltar"): st.session_state.et=1; st.rerun()
+            if st.button("← Voltar"): st.session_state.et=1; st.rerun()
         with c2:
-            if st.button("PrÃ³ximo â†’"):
+            if st.button("Próximo →"):
                 st.session_state.dc.update({"carta":carta is not None,"avaliacao":aval is not None,"email_ref":er})
                 st.session_state.et=3; st.rerun()
 
     elif et==3:
-        st.markdown('<p style="font-size:14px;color:#4a6080;margin-bottom:1.5rem">NÃ£o hÃ¡ respostas certas ou erradas.</p>',unsafe_allow_html=True)
+        st.markdown('<p style="font-size:14px;color:#4a6080;margin-bottom:1.5rem">Não há respostas certas ou erradas.</p>',unsafe_allow_html=True)
         rd=[]
         for j,(perg,ops) in enumerate(PERGUNTAS_DISC):
             r=st.radio(f"**{j+1}.** {perg}",ops,key=f"dq{j}",index=None)
@@ -908,21 +883,21 @@ elif pagina == "cadastro":
         st.markdown("<br>",unsafe_allow_html=True)
         c1,c2=st.columns(2)
         with c1:
-            if st.button("â† Voltar"): st.session_state.et=2; st.rerun()
+            if st.button("← Voltar"): st.session_state.et=2; st.rerun()
         with c2:
-            if st.button("Cadastrar no JurisBank â†’"):
+            if st.button("Cadastrar no JurisBank →"):
                 if None in rd: st.error("Responda todas as 12 perguntas.")
                 else:
                     d=st.session_state.dc
                     selos=calc_selos(d["oab"],d["anos_experiencia"],d.get("carta",False),d.get("avaliacao",False))
                     pd_,_,desc=calc_disc(rd)
-                    aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","NÃ£o estou estudando para concurso")])
+                    aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Não estou estudando para concurso")])
                     st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}
                     st.success("Bem-vindo ao JurisBank!")
-                    st.markdown(f'<div class="info-box">Perfil: <strong>{pd_} â€” {desc}</strong></div>',unsafe_allow_html=True)
+                    st.markdown(f'<div class="info-box">Perfil: <strong>{pd_} — {desc}</strong></div>',unsafe_allow_html=True)
                     st.balloons()
 
-# â”€â”€ PÃGINA: RECRUTADOR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PÁGINA: RECRUTADOR ────────────────────────────────────────────────────────
 elif pagina == "recrutador":
     if rec_logado():
         rec=st.session_state.rec_logado
@@ -937,12 +912,12 @@ elif pagina == "recrutador":
         msel=[s for s in aba_seletivos.get_all_records() if s.get("email_recrutador")==rec["email"]]
 
         st.markdown(f"""<div class="hero-card">
-            <h1 class="page-title">OlÃ¡, <em>{rec['nome'].split()[0]}!</em></h1>
-            <p class="page-sub">{ra.get('nome_orgao',rec.get('orgao',''))} Â· {rec.get('estado','')}</p>
+            <h1 class="page-title">Olá, <em>{rec['nome'].split()[0]}!</em></h1>
+            <p class="page-sub">{ra.get('nome_orgao',rec.get('orgao',''))} · {rec.get('estado','')}</p>
             <div class="stats-row">
-                <div class="stat-pill">âš– {len(dados)} candidatos</div>
-                <div class="stat-pill">â˜… {len(favs)} favoritos</div>
-                <div class="stat-pill">ðŸ“¢ {len(msel)} seletivos</div>
+                <div class="stat-pill">⚖ {len(dados)} candidatos</div>
+                <div class="stat-pill">★ {len(favs)} favoritos</div>
+                <div class="stat-pill">📢 {len(msel)} seletivos</div>
             </div>
         </div>""", unsafe_allow_html=True)
 
@@ -950,45 +925,45 @@ elif pagina == "recrutador":
         with c_sair:
             if st.button("Sair da conta"): del st.session_state.rec_logado; ir("recrutador")
 
-        tabs=st.tabs(["ðŸ” Busca","ðŸ“¢ Seletivos","â˜… Favoritos"])
+        tabs=st.tabs(["🔍 Busca","📢 Seletivos","★ Favoritos"])
 
         with tabs[0]:
             c1,c2,c3=st.columns(3)
             with c1: busca=st.text_input("Nome",placeholder="Buscar...")
             with c2:
                 ad=["Todas"]+sorted(set(c["area"] for c in dados if c.get("area")))
-                asel=st.selectbox("Ãrea",ad)
-            with c3: dsel=st.selectbox("Disponibilidade",["Todos","DisponÃ­vel","IndisponÃ­vel"])
+                asel=st.selectbox("Área",ad)
+            with c3: dsel=st.selectbox("Disponibilidade",["Todos","Disponível","Indisponível"])
             c1,c2,c3,c4,c5,c6=st.columns(6)
-            with c1: osel=st.selectbox("OAB",["Todos","Sim","NÃ£o"])
+            with c1: osel=st.selectbox("OAB",["Todos","Sim","Não"])
             with c2: ssel=st.selectbox("Selo",["Todos","Verificado","Recomendado","Destaque","Experiente"])
             with c3:
-                dsc=st.selectbox("DISC",["Todos","D â€” Dominante","I â€” Influente","S â€” EstÃ¡vel","C â€” Conformidade"])
+                dsc=st.selectbox("DISC",["Todos","D — Dominante","I — Influente","S — Estável","C — Conformidade"])
                 if dsc!="Todos": st.markdown(f'<div class="info-box">{DISC_EXPLICACOES.get(dsc,"")}</div>',unsafe_allow_html=True)
-            with c4: csel=st.selectbox("Concurso",["Todos","Concursando","NÃ£o concursando"])
+            with c4: csel=st.selectbox("Concurso",["Todos","Concursando","Não concursando"])
             with c5: sisel=st.text_input("Sistema",placeholder="Ex: Eproc")
-            with c6: emin=st.number_input("Exp. mÃ­n.",min_value=0,max_value=20,value=0)
+            with c6: emin=st.number_input("Exp. mín.",min_value=0,max_value=20,value=0)
 
             fi=dados
             if busca: fi=[c for c in fi if busca.lower() in c["nome"].lower()]
             if asel!="Todas": fi=[c for c in fi if c.get("area")==asel]
             if dsel!="Todos":
-                v="Sim" if dsel=="DisponÃ­vel" else "NÃ£o"; fi=[c for c in fi if c.get("disponibilidade")==v]
+                v="Sim" if dsel=="Disponível" else "Não"; fi=[c for c in fi if c.get("disponibilidade")==v]
             if osel!="Todos": fi=[c for c in fi if c.get("oab")==osel]
             if ssel!="Todos":
                 cm={"Verificado":"selo_verificado","Recomendado":"selo_recomendado","Destaque":"selo_destaque","Experiente":"selo_experiente"}
                 fi=[c for c in fi if c.get(cm[ssel])=="Sim"]
             if dsc!="Todos": fi=[c for c in fi if c.get("disc")==dsc[0]]
-            if csel=="Concursando": fi=[c for c in fi if c.get("concurso") and c.get("concurso")!="NÃ£o estou estudando para concurso"]
-            elif csel=="NÃ£o concursando": fi=[c for c in fi if not c.get("concurso") or c.get("concurso")=="NÃ£o estou estudando para concurso"]
+            if csel=="Concursando": fi=[c for c in fi if c.get("concurso") and c.get("concurso")!="Não estou estudando para concurso"]
+            elif csel=="Não concursando": fi=[c for c in fi if not c.get("concurso") or c.get("concurso")=="Não estou estudando para concurso"]
             if sisel: fi=[c for c in fi if sisel.lower() in str(c.get("sistemas","")).lower()]
 
             st.markdown(f'<p style="font-size:13px;color:#4a6080;margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
 
             for i,cand in enumerate(fi):
-                cor=cor_avatar(cand["nome"]); dc=cand.get("disponibilidade","NÃ£o")
-                bdg='<span class="badge-sim">â— DisponÃ­vel</span>' if dc=="Sim" else '<span class="badge-nao">â— IndisponÃ­vel</span>'
-                ec=cand.get("email",""); ifav=ec in favs; fi_i="â˜…" if ifav else "â˜†"
+                cor=cor_avatar(cand["nome"]); dc=cand.get("disponibilidade","Não")
+                bdg='<span class="badge-sim">● Disponível</span>' if dc=="Sim" else '<span class="badge-nao">● Indisponível</span>'
+                ec=cand.get("email",""); ifav=ec in favs; fi_i="★" if ifav else "☆"
                 with st.container():
                     st.markdown(f"""<div class="cand-card">
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -996,7 +971,7 @@ elif pagina == "recrutador":
                                 <div class="avatar" style="background:{cor}">{iniciais(cand['nome'])}</div>
                                 <div>
                                     <p class="cand-name">{cand['nome']}</p>
-                                    <p class="cand-sub">{cand.get('formacao','â€”')} Â· {cand.get('instituicao','â€”')} Â· {cand.get('area','â€”')}</p>
+                                    <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('instituicao','—')} · {cand.get('area','—')}</p>
                                     <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}{html_conc(cand)}</div>
                                 </div>
                             </div>
@@ -1011,17 +986,17 @@ elif pagina == "recrutador":
                             aba_recrutadores.update_cell(idx_r+2,12,", ".join(favs))
                             st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]; st.rerun()
                     with cc:
-                        if st.button("Ver â†’",key=f"rb{i}"):
+                        if st.button("Ver →",key=f"rb{i}"):
                             st.session_state.cr=cand
                             st.session_state["termo_aceito"]=False
                             st.rerun()
 
-                if ec in anots: st.markdown(f'<div class="info-card" style="margin-top:-6px;margin-bottom:8px;font-size:12px">ðŸ“ {anots[ec]}</div>',unsafe_allow_html=True)
+                if ec in anots: st.markdown(f'<div class="info-card" style="margin-top:-6px;margin-bottom:8px;font-size:12px">📝 {anots[ec]}</div>',unsafe_allow_html=True)
 
                 if st.session_state.get("cr")==cand:
                     with st.expander("Perfil completo",expanded=True):
                         c1,c2,c3=st.columns(3)
-                        for cl,lb,vl in [(c1,"OAB",cand.get("oab","â€”")),(c2,"Ã“rgÃ£os",cand.get("experiencia_orgaos","â€”") or "â€”"),(c3,"Sistemas",cand.get("sistemas","â€”") or "â€”")]:
+                        for cl,lb,vl in [(c1,"OAB",cand.get("oab","—")),(c2,"Órgãos",cand.get("experiencia_orgaos","—") or "—"),(c3,"Sistemas",cand.get("sistemas","—") or "—")]:
                             with cl: st.markdown(f'<div class="metric-box"><p class="metric-label">{lb}</p><p class="metric-value" style="font-size:12px">{vl}</p></div>',unsafe_allow_html=True)
                         if cand.get("disc"): st.markdown(render_disc(cand["disc"]),unsafe_allow_html=True)
                         if cand.get("resumo"): st.markdown(f'<div class="info-card" style="margin-top:1rem">{cand["resumo"]}</div>',unsafe_allow_html=True)
@@ -1030,14 +1005,14 @@ elif pagina == "recrutador":
                         if not st.session_state.get("termo_aceito"):
                             st.markdown("""<div class="disclaimer-box">
                                 <strong>Termo de responsabilidade</strong><br>
-                                Ao acessar os dados de contato, vocÃª confirma que utilizarÃ¡ as informaÃ§Ãµes exclusivamente para fins de seleÃ§Ã£o profissional, em conformidade com os princÃ­pios de impessoalidade e vedaÃ§Ã£o ao nepotismo.
+                                Ao acessar os dados de contato, você confirma que utilizará as informações exclusivamente para fins de seleção profissional, em conformidade com os princípios de impessoalidade e vedação ao nepotismo.
                             </div>""", unsafe_allow_html=True)
-                            if st.button("âœ… Aceito â€” ver dados de contato", key=f"termo_{i}"):
+                            if st.button("✅ Aceito — ver dados de contato", key=f"termo_{i}"):
                                 st.session_state["termo_aceito"]=True; st.rerun()
                         else:
-                            st.markdown(f'<div class="info-card" style="margin-top:0.5rem">âœ‰ {cand.get("email","â€”")}</div>',unsafe_allow_html=True)
+                            st.markdown(f'<div class="info-card" style="margin-top:0.5rem">✉ {cand.get("email","—")}</div>',unsafe_allow_html=True)
 
-                        na=anots.get(ec,""); nn=st.text_area("",value=na,height=70,key=f"nt{i}",placeholder="AnotaÃ§Ã£o privada...")
+                        na=anots.get(ec,""); nn=st.text_area("",value=na,height=70,key=f"nt{i}",placeholder="Anotação privada...")
                         cs_,cf_=st.columns(2)
                         with cs_:
                             if st.button("Salvar",key=f"sv{i}"):
@@ -1059,28 +1034,28 @@ elif pagina == "recrutador":
                 with st.expander("Novo Seletivo",expanded=True):
                     st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>',unsafe_allow_html=True)
                     st.markdown("<br>",unsafe_allow_html=True)
-                    tsel=st.text_input("TÃ­tulo da vaga *",placeholder="Ex: Assessor JurÃ­dico â€” 3Âª Promotoria")
+                    tsel=st.text_input("Título da vaga *",placeholder="Ex: Assessor Jurídico — 3ª Promotoria")
                     c1,c2=st.columns(2)
-                    with c1: osel_=st.text_input("Nome do Ã³rgÃ£o *",value=ra.get("nome_orgao",""))
-                    with c2: tosel=st.selectbox("Tipo de Ã³rgÃ£o *",["Selecione..."]+ORGAOS)
+                    with c1: osel_=st.text_input("Nome do órgão *",value=ra.get("nome_orgao",""))
+                    with c2: tosel=st.selectbox("Tipo de órgão *",["Selecione..."]+ORGAOS)
                     c1,c2,c3=st.columns(3)
-                    with c1: asel_=st.selectbox("Ãrea *",["Selecione..."]+AREAS)
+                    with c1: asel_=st.selectbox("Área *",["Selecione..."]+AREAS)
                     with c2: esel=st.selectbox("Estado *",["Selecione..."]+ESTADOS,index=ESTADOS.index(rec.get("estado","SC"))+1 if rec.get("estado","") in ESTADOS else 0)
-                    with c3: msel_=st.text_input("MunicÃ­pio *",value=ra.get("municipio",""))
+                    with c3: msel_=st.text_input("Município *",value=ra.get("municipio",""))
                     rsel=st.text_area("Requisitos *",height=80)
                     c1,c2,c3=st.columns(3)
-                    with c1: remsel=st.text_input("RemuneraÃ§Ã£o *",placeholder="Ex: R$ 4.500,00")
+                    with c1: remsel=st.text_input("Remuneração *",placeholder="Ex: R$ 4.500,00")
                     with c2: regsel=st.selectbox("Regime *",["Selecione..."]+REGIMES)
                     with c3: vsel=st.number_input("Vagas *",min_value=1,max_value=20,value=1)
                     c1,c2=st.columns(2)
-                    with c1: fssel=st.selectbox("Forma de seleÃ§Ã£o *",["Selecione..."]+FORMAS_SELECAO)
+                    with c1: fssel=st.selectbox("Forma de seleção *",["Selecione..."]+FORMAS_SELECAO)
                     with c2: prsel=st.date_input("Prazo *",min_value=date.today())
                     st.markdown("<br>",unsafe_allow_html=True)
                     c1,c2=st.columns(2)
                     with c1:
                         if st.button("Cancelar",key="csel"): del st.session_state["criar_sel"]; st.rerun()
                     with c2:
-                        if st.button("Publicar â†’",key="psel"):
+                        if st.button("Publicar →",key="psel"):
                             ok=all([tsel,osel_,tosel!="Selecione...",asel_!="Selecione...",esel!="Selecione...",msel_,rsel,remsel,regsel!="Selecione...",fssel!="Selecione..."])
                             if not ok: st.error("Preencha todos os campos.")
                             else:
@@ -1091,13 +1066,13 @@ elif pagina == "recrutador":
             else:
                 for i,sel in enumerate(msel):
                     ab=sel_aberto(sel); ins_=inscritos_sel(sel); n=len(ins_)
-                    sb='<span class="badge-aberto">â— Aberto</span>' if ab else '<span class="badge-encerrado">â— Encerrado</span>'
+                    sb='<span class="badge-aberto">● Aberto</span>' if ab else '<span class="badge-encerrado">● Encerrado</span>'
                     st.markdown(f"""<div class="seletivo-card">
                         <div style="display:flex;justify-content:space-between;align-items:center">
                             <div>
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#4a6080">ðŸ“… {sel.get('prazo','â€”')}</span></div>
-                                <p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:0 0 2px">{sel.get('titulo','â€”')}</p>
-                                <p style="font-size:12px;color:#2a4a8a;margin:0">{sel.get('municipio','â€”')}/{sel.get('estado','â€”')} Â· {sel.get('area','â€”')}</p>
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#4a6080">📅 {sel.get('prazo','—')}</span></div>
+                                <p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:0 0 2px">{sel.get('titulo','—')}</p>
+                                <p style="font-size:12px;color:#2a4a8a;margin:0">{sel.get('municipio','—')}/{sel.get('estado','—')} · {sel.get('area','—')}</p>
                             </div>
                             <div style="text-align:right">
                                 <p style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#c8960c;margin:0">{n}</p>
@@ -1125,7 +1100,7 @@ elif pagina == "recrutador":
                                 c1,c2,c3=st.columns(3)
                                 with c1: st.markdown(f'<div class="metric-box"><p class="metric-label">Total</p><p class="metric-value">{len(id_)}</p></div>',unsafe_allow_html=True)
                                 with c2: st.markdown(f'<div class="metric-box"><p class="metric-label">Com OAB</p><p class="metric-value">{sum(1 for c in id_ if c.get("oab")=="Sim")}</p></div>',unsafe_allow_html=True)
-                                with c3: st.markdown(f'<div class="metric-box"><p class="metric-label">DisponÃ­veis</p><p class="metric-value">{sum(1 for c in id_ if c.get("disponibilidade")=="Sim")}</p></div>',unsafe_allow_html=True)
+                                with c3: st.markdown(f'<div class="metric-box"><p class="metric-label">Disponíveis</p><p class="metric-value">{sum(1 for c in id_ if c.get("disponibilidade")=="Sim")}</p></div>',unsafe_allow_html=True)
                                 dc_={}
                                 for c in id_:
                                     d=c.get("disc","")
@@ -1143,10 +1118,10 @@ elif pagina == "recrutador":
                                             <div class="avatar" style="background:{cor}">{iniciais(cand['nome'])}</div>
                                             <div style="flex:1">
                                                 <p class="cand-name">{cand['nome']}</p>
-                                                <p class="cand-sub">{cand.get('formacao','â€”')} Â· {cand.get('area','â€”')}</p>
+                                                <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
                                                 <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}</div>
                                             </div>
-                                            <div style="font-size:12px;color:#2a4a8a">âœ‰ {cand.get('email','â€”')}</div>
+                                            <div style="font-size:12px;color:#2a4a8a">✉ {cand.get('email','—')}</div>
                                         </div>
                                     </div>""",unsafe_allow_html=True)
 
@@ -1161,63 +1136,63 @@ elif pagina == "recrutador":
                             <div class="avatar" style="background:{cor}">{iniciais(cand['nome'])}</div>
                             <div style="flex:1">
                                 <p class="cand-name">{cand['nome']}</p>
-                                <p class="cand-sub">{cand.get('formacao','â€”')} Â· {cand.get('area','â€”')}</p>
+                                <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
                                 {html_selos(cand)}
-                                {'<p style="font-size:11px;color:#4a6080;margin-top:4px">ðŸ“ '+nt+'</p>' if nt else ''}
+                                {'<p style="font-size:11px;color:#4a6080;margin-top:4px">📝 '+nt+'</p>' if nt else ''}
                             </div>
-                            <div>{'<span class="badge-sim">â— DisponÃ­vel</span>' if cand.get('disponibilidade')=='Sim' else '<span class="badge-nao">â— IndisponÃ­vel</span>'}</div>
+                            <div>{'<span class="badge-sim">● Disponível</span>' if cand.get('disponibilidade')=='Sim' else '<span class="badge-nao">● Indisponível</span>'}</div>
                         </div>
                     </div>""",unsafe_allow_html=True)
-                    if st.button("âœ• Remover",key=f"rf{i}"):
+                    if st.button("✕ Remover",key=f"rf{i}"):
                         favs.remove(ec); aba_recrutadores.update_cell(idx_r+2,12,", ".join(favs)); st.rerun()
 
     elif "cad_rec" not in st.session_state:
         st.markdown("""<div class="hero-card">
-            <h1 class="page-title">Ãrea do<br><em>Recrutador.</em></h1>
-            <p class="page-sub">Acesse o banco de talentos jurÃ­dicos certificados</p>
+            <h1 class="page-title">Área do<br><em>Recrutador.</em></h1>
+            <p class="page-sub">Acesse o banco de talentos jurídicos certificados</p>
         </div>""",unsafe_allow_html=True)
         tabs=st.tabs(["Entrar","Criar conta"])
         with tabs[0]:
             st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Acesse sua conta</p>',unsafe_allow_html=True)
             el=st.text_input("E-mail institucional",key="le")
             sl=st.text_input("Senha",type="password",key="ls")
-            if st.button("Entrar â†’",key="bl"):
+            if st.button("Entrar →",key="bl"):
                 if el and sl:
                     recs_=aba_recrutadores.get_all_records(); sh=hash_senha(sl)
                     enc=next((r for r in recs_ if r["email"]==el and r["senha"]==sh and r["status"]=="ativo"),None)
                     if enc: st.session_state.rec_logado=enc; st.rerun()
-                    else: st.error("E-mail ou senha incorretos, ou conta ainda nÃ£o aprovada.")
+                    else: st.error("E-mail ou senha incorretos, ou conta ainda não aprovada.")
                 else: st.error("Preencha e-mail e senha.")
         with tabs[1]:
             st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:1rem 0 0.5rem">Criar conta</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">4 etapas. AtivaÃ§Ã£o apÃ³s validaÃ§Ã£o institucional.</p>',unsafe_allow_html=True)
-            if st.button("ComeÃ§ar â†’",key="bc"):
+            st.markdown('<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
+            if st.button("Começar →",key="bc"):
                 st.session_state.cad_rec={"etapa":1}; st.rerun()
     else:
         et=st.session_state.cad_rec.get("etapa",1)
         st.markdown(barra(et,4),unsafe_allow_html=True)
         if et==1:
             st.markdown('<p class="step-title">Etapa 1 de 4</p>',unsafe_allow_html=True)
-            st.markdown('<p class="step-desc">Onde vocÃª atua?</p>',unsafe_allow_html=True)
+            st.markdown('<p class="step-desc">Onde você atua?</p>',unsafe_allow_html=True)
             est=st.selectbox("Estado *",["Selecione..."]+ESTADOS)
-            mun=st.text_input("MunicÃ­pio *",placeholder="Ex: FlorianÃ³polis")
+            mun=st.text_input("Município *",placeholder="Ex: Florianópolis")
             st.markdown("<br>",unsafe_allow_html=True)
-            if st.button("PrÃ³ximo â†’"):
+            if st.button("Próximo →"):
                 if est=="Selecione..." or not mun: st.error("Preencha todos os campos.")
                 else:
                     st.session_state.cad_rec["estado"]=est; st.session_state.cad_rec["municipio"]=mun
                     st.session_state.cad_rec["etapa"]=2; st.rerun()
         elif et==2:
             st.markdown('<p class="step-title">Etapa 2 de 4</p>',unsafe_allow_html=True)
-            st.markdown('<p class="step-desc">Qual Ã© o seu Ã³rgÃ£o?</p>',unsafe_allow_html=True)
-            org=st.selectbox("Tipo de Ã³rgÃ£o *",["Selecione..."]+ORGAOS)
-            nom=st.text_input("Nome do Ã³rgÃ£o *",placeholder="Ex: MPSC â€” 3Âª Promotoria")
+            st.markdown('<p class="step-desc">Qual é o seu órgão?</p>',unsafe_allow_html=True)
+            org=st.selectbox("Tipo de órgão *",["Selecione..."]+ORGAOS)
+            nom=st.text_input("Nome do órgão *",placeholder="Ex: MPSC — 3ª Promotoria")
             st.markdown("<br>",unsafe_allow_html=True)
             c1,c2=st.columns(2)
             with c1:
-                if st.button("â† Voltar"): st.session_state.cad_rec["etapa"]=1; st.rerun()
+                if st.button("← Voltar"): st.session_state.cad_rec["etapa"]=1; st.rerun()
             with c2:
-                if st.button("PrÃ³ximo â†’"):
+                if st.button("Próximo →"):
                     if org=="Selecione..." or not nom: st.error("Preencha todos os campos.")
                     else:
                         st.session_state.cad_rec["orgao"]=org; st.session_state.cad_rec["nome_orgao"]=nom
@@ -1226,13 +1201,13 @@ elif pagina == "recrutador":
             st.markdown('<p class="step-title">Etapa 3 de 4</p>',unsafe_allow_html=True)
             st.markdown('<p class="step-desc">Seu perfil</p>',unsafe_allow_html=True)
             car=st.selectbox("Cargo *",["Selecione..."]+CARGOS)
-            ars=st.multiselect("Ãreas *",AREAS)
+            ars=st.multiselect("Áreas *",AREAS)
             st.markdown("<br>",unsafe_allow_html=True)
             c1,c2=st.columns(2)
             with c1:
-                if st.button("â† Voltar"): st.session_state.cad_rec["etapa"]=2; st.rerun()
+                if st.button("← Voltar"): st.session_state.cad_rec["etapa"]=2; st.rerun()
             with c2:
-                if st.button("PrÃ³ximo â†’"):
+                if st.button("Próximo →"):
                     if car=="Selecione..." or not ars: st.error("Preencha todos os campos.")
                     else:
                         st.session_state.cad_rec["cargo"]=car; st.session_state.cad_rec["areas"]=", ".join(ars)
@@ -1244,69 +1219,69 @@ elif pagina == "recrutador":
             er=st.text_input("E-mail institucional *",placeholder="nome@mpsc.mp.br")
             dv=["mpsc.mp.br","tjsc.jus.br","sc.def.br","pge.sc.gov.br","trf4.jus.br","jfsc.jus.br","mpf.mp.br","agu.gov.br","pgfn.gov.br"]
             if er and "@" in er:
-                if er.split("@")[-1] in dv: st.markdown('<div class="info-box">âœ“ E-mail institucional reconhecido.</div>',unsafe_allow_html=True)
-                else: st.warning("DomÃ­nio nÃ£o reconhecido. ValidaÃ§Ã£o manual.")
+                if er.split("@")[-1] in dv: st.markdown('<div class="info-box">✓ E-mail institucional reconhecido.</div>',unsafe_allow_html=True)
+                else: st.warning("Domínio não reconhecido. Validação manual.")
             sr=st.text_input("Senha *",type="password"); sc=st.text_input("Confirmar senha *",type="password")
             st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-            cr=st.checkbox("Li e aceito a PolÃ­tica de Privacidade e os Termos de Uso. Comprometo-me a usar os dados apenas para fins de seleÃ§Ã£o, nos termos da LGPD.")
+            cr=st.checkbox("Li e aceito a Política de Privacidade e os Termos de Uso. Comprometo-me a usar os dados apenas para fins de seleção, nos termos da LGPD.")
             st.markdown("<br>",unsafe_allow_html=True)
             c1,c2=st.columns(2)
             with c1:
-                if st.button("â† Voltar"): st.session_state.cad_rec["etapa"]=3; st.rerun()
+                if st.button("← Voltar"): st.session_state.cad_rec["etapa"]=3; st.rerun()
             with c2:
-                if st.button("Finalizar â†’"):
+                if st.button("Finalizar →"):
                     if not nr or not er or not sr: st.error("Preencha todos os campos.")
-                    elif sr!=sc: st.error("Senhas nÃ£o coincidem.")
-                    elif len(sr)<6: st.error("MÃ­nimo 6 caracteres.")
+                    elif sr!=sc: st.error("Senhas não coincidem.")
+                    elif len(sr)<6: st.error("Mínimo 6 caracteres.")
                     elif not cr: st.error("Aceite os Termos para continuar.")
                     else:
                         dr=st.session_state.cad_rec
                         aba_recrutadores.append_row([nr,er,hash_senha(sr),dr["estado"],dr["municipio"],dr["orgao"],dr["nome_orgao"],dr["cargo"],dr["areas"],"pendente",datetime.now().strftime("%d/%m/%Y %H:%M")])
                         del st.session_state.cad_rec
-                        st.success("Cadastro realizado! Aguarde a ativaÃ§Ã£o."); st.balloons()
+                        st.success("Cadastro realizado! Aguarde a ativação."); st.balloons()
 
-# â”€â”€ PÃGINA: AVALIAÃ‡ÃƒO DO RECOMENDADOR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PÁGINA: AVALIAÇÃO DO RECOMENDADOR ────────────────────────────────────────
 elif pagina == "recomendar":
     token_url = st.query_params.get("token","")
     if isinstance(token_url,list): token_url=token_url[0]
 
     if not token_url:
-        st.markdown('<div class="hero-card"><h1 class="page-title">Link<br><em>invÃ¡lido.</em></h1></div>',unsafe_allow_html=True)
+        st.markdown('<div class="hero-card"><h1 class="page-title">Link<br><em>inválido.</em></h1></div>',unsafe_allow_html=True)
     else:
         recs_recom=aba_recomendacoes.get_all_records()
         rec_recom=next((r for r in recs_recom if r.get("token")==token_url),None)
         if not rec_recom:
-            st.markdown('<div class="hero-card"><h1 class="page-title">Link<br><em>nÃ£o encontrado.</em></h1></div>',unsafe_allow_html=True)
+            st.markdown('<div class="hero-card"><h1 class="page-title">Link<br><em>não encontrado.</em></h1></div>',unsafe_allow_html=True)
         elif rec_recom.get("status")=="concluido":
-            st.markdown('<div class="hero-card"><h1 class="page-title">AvaliaÃ§Ã£o<br><em>jÃ¡ realizada.</em></h1><p class="page-sub">Obrigado pela sua contribuiÃ§Ã£o.</p></div>',unsafe_allow_html=True)
+            st.markdown('<div class="hero-card"><h1 class="page-title">Avaliação<br><em>já realizada.</em></h1><p class="page-sub">Obrigado pela sua contribuição.</p></div>',unsafe_allow_html=True)
         else:
             todos_cands=aba_candidatos.get_all_records()
             cand_recom=next((c for c in todos_cands if c.get("email")==rec_recom.get("email_candidato")),None)
             nome_cand=cand_recom["nome"] if cand_recom else rec_recom.get("email_candidato","candidato")
 
-            st.markdown(f'<div class="hero-card"><h1 class="page-title">AvaliaÃ§Ã£o de<br><em>RecomendaÃ§Ã£o.</em></h1><p class="page-sub">VocÃª foi indicado como recomendador de <strong>{nome_cand}</strong> no JurisBank.</p></div>',unsafe_allow_html=True)
-            st.markdown('<div class="disclaimer-box">Esta avaliaÃ§Ã£o Ã© de carÃ¡ter profissional e serÃ¡ exibida para recrutadores. Ao enviar, vocÃª confirma que as informaÃ§Ãµes sÃ£o verdadeiras.</div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="hero-card"><h1 class="page-title">Avaliação de<br><em>Recomendação.</em></h1><p class="page-sub">Você foi indicado como recomendador de <strong>{nome_cand}</strong> no JurisBank.</p></div>',unsafe_allow_html=True)
+            st.markdown('<div class="disclaimer-box">Esta avaliação é de caráter profissional e será exibida para recrutadores. Ao enviar, você confirma que as informações são verdadeiras.</div>',unsafe_allow_html=True)
             st.markdown("<br>",unsafe_allow_html=True)
 
             with st.form("form_rec"):
-                tempo=st.selectbox("HÃ¡ quanto tempo conhece o candidato? *",["Selecione...","Menos de 1 ano","1 a 2 anos","2 a 5 anos","Mais de 5 anos"])
-                contexto=st.selectbox("Em qual contexto profissional? *",["Selecione...","Assessoria direta no meu gabinete","AtuaÃ§Ã£o em outro Ã³rgÃ£o pÃºblico","Trabalho conjunto em projeto","DocÃªncia ou orientaÃ§Ã£o acadÃªmica","Outro"])
+                tempo=st.selectbox("Há quanto tempo conhece o candidato? *",["Selecione...","Menos de 1 ano","1 a 2 anos","2 a 5 anos","Mais de 5 anos"])
+                contexto=st.selectbox("Em qual contexto profissional? *",["Selecione...","Assessoria direta no meu gabinete","Atuação em outro órgão público","Trabalho conjunto em projeto","Docência ou orientação acadêmica","Outro"])
                 st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
                 pontos=st.text_area("Principais pontos fortes do candidato *",height=100,placeholder="Descreva as qualidades profissionais que mais se destacaram...")
-                adequacao=st.selectbox("O candidato Ã© adequado para assessoria em Ã³rgÃ£o pÃºblico? *",["Selecione...","Sim, fortemente recomendo","Sim, com algumas ressalvas","Neutro","NÃ£o recomendo"])
+                adequacao=st.selectbox("O candidato é adequado para assessoria em órgão público? *",["Selecione...","Sim, fortemente recomendo","Sim, com algumas ressalvas","Neutro","Não recomendo"])
                 nota=st.select_slider("Nota geral (1 a 5) *",options=[1,2,3,4,5],value=4)
-                comentarios=st.text_area("ComentÃ¡rios adicionais (opcional)",height=80,placeholder="ObservaÃ§Ãµes complementares...")
+                comentarios=st.text_area("Comentários adicionais (opcional)",height=80,placeholder="Observações complementares...")
                 st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-                conf=st.checkbox("Confirmo que sou membro ativo de Ã³rgÃ£o do sistema de justiÃ§a e que as informaÃ§Ãµes sÃ£o verdadeiras.")
-                submitted=st.form_submit_button("Enviar avaliaÃ§Ã£o â†’")
+                conf=st.checkbox("Confirmo que sou membro ativo de órgão do sistema de justiça e que as informações são verdadeiras.")
+                submitted=st.form_submit_button("Enviar avaliação →")
 
                 if submitted:
                     if tempo=="Selecione..." or contexto=="Selecione..." or adequacao=="Selecione..." or not pontos:
-                        st.error("Preencha todos os campos obrigatÃ³rios.")
+                        st.error("Preencha todos os campos obrigatórios.")
                     elif not conf:
-                        st.error("Confirme sua responsabilidade sobre as informaÃ§Ãµes.")
+                        st.error("Confirme sua responsabilidade sobre as informações.")
                     else:
-                        resposta=f"Tempo: {tempo} | Contexto: {contexto} | AdequaÃ§Ã£o: {adequacao} | Nota: {nota}/5 | Pontos fortes: {pontos}"
+                        resposta=f"Tempo: {tempo} | Contexto: {contexto} | Adequação: {adequacao} | Nota: {nota}/5 | Pontos fortes: {pontos}"
                         idx_recom=next((i for i,r in enumerate(recs_recom) if r.get("token")==token_url),None)
                         if idx_recom is not None:
                             aba_recomendacoes.update_cell(idx_recom+2,4,"concluido")
@@ -1316,34 +1291,33 @@ elif pagina == "recomendar":
                             todos_cands2=aba_candidatos.get_all_records()
                             idx_cand=next((i for i,c in enumerate(todos_cands2) if c.get("email")==rec_recom.get("email_candidato")),None)
                             if idx_cand is not None: aba_candidatos.update_cell(idx_cand+2,14,"Sim")
-                        st.success("AvaliaÃ§Ã£o enviada! O selo â˜… Recomendado foi ativado no perfil do candidato.")
+                        st.success("Avaliação enviada! O selo ★ Recomendado foi ativado no perfil do candidato.")
                         st.balloons()
 
-# â”€â”€ PÃGINAS LEGAIS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PÁGINAS LEGAIS ────────────────────────────────────────────────────────────
 elif pagina in ["privacidade","termos"]:
     ip=pagina=="privacidade"
-    st.markdown(f'<div class="hero-card"><h1 class="page-title">{"PolÃ­tica de<br><em>Privacidade.</em>" if ip else "Termos<br><em>de Uso.</em>"}</h1><p class="page-sub">VersÃ£o 1.0</p></div>',unsafe_allow_html=True)
+    st.markdown(f'<div class="hero-card"><h1 class="page-title">{"Política de<br><em>Privacidade.</em>" if ip else "Termos<br><em>de Uso.</em>"}</h1><p class="page-sub">Versão 1.0</p></div>',unsafe_allow_html=True)
     if ip:
         secs=[
-            ("1. Controlador",[("p","Operado por [RAZÃƒO SOCIAL A PREENCHER], CNPJ [A PREENCHER]. DPO: [E-MAIL A PREENCHER]")]),
-            ("2. Dados Coletados",[("l",["Nome, e-mail, formaÃ§Ã£o, OAB","HistÃ³rico em Ã³rgÃ£os pÃºblicos","Sistemas jurÃ­dicos, perfil DISC","Documentos de referÃªncia (quando fornecidos)","E-mail e senha dos recrutadores (hash SHA-256)"])]),
-            ("3. Finalidade",[("l",["GestÃ£o de perfis e selos","Viabilizar busca por recrutadores aprovados","GestÃ£o de inscriÃ§Ãµes em Seletivos","Melhoria dos serviÃ§os"])]),
-            ("4. Direitos",[("l",["Acesso, correÃ§Ã£o e eliminaÃ§Ã£o","Portabilidade","RevogaÃ§Ã£o do consentimento"]),("p","Contato: [E-MAIL DO DPO A PREENCHER]")]),
+            ("1. Controlador",[("p","Operado por [RAZÃO SOCIAL A PREENCHER], CNPJ [A PREENCHER]. DPO: [E-MAIL A PREENCHER]")]),
+            ("2. Dados Coletados",[("l",["Nome, e-mail, formação, OAB","Histórico em órgãos públicos","Sistemas jurídicos, perfil DISC","Documentos de referência (quando fornecidos)","E-mail e senha dos recrutadores (hash SHA-256)"])]),
+            ("3. Finalidade",[("l",["Gestão de perfis e selos","Viabilizar busca por recrutadores aprovados","Gestão de inscrições em Seletivos","Melhoria dos serviços"])]),
+            ("4. Direitos",[("l",["Acesso, correção e eliminação","Portabilidade","Revogação do consentimento"]),("p","Contato: [E-MAIL DO DPO A PREENCHER]")]),
         ]
     else:
         secs=[
-            ("1. AceitaÃ§Ã£o",[("p","Ao usar o JurisBank vocÃª concorda com estes Termos e com a PolÃ­tica de Privacidade.")]),
-            ("2. Seletivos",[("p","A publicaÃ§Ã£o de um Seletivo nÃ£o configura processo seletivo vinculante ou concurso pÃºblico. O uso do ius indicandum Ã© de responsabilidade exclusiva do recrutador.")]),
-            ("3. Impessoalidade",[("l",["PrincÃ­pio da impessoalidade (art. 37, CF/88)","VedaÃ§Ã£o ao nepotismo (SV nÂº 13 do STF)","ResoluÃ§Ã£o CNJ nÂº 07/2005"])]),
-            ("4. Responsabilidades",[("p","O JurisBank nÃ£o garante contrataÃ§Ãµes e nÃ£o se responsabiliza por decisÃµes dos recrutadores.")]),
-            ("5. Foro",[("p","Comarca de [MUNICÃPIO A PREENCHER], Estado de [ESTADO A PREENCHER].")]),
+            ("1. Aceitação",[("p","Ao usar o JurisBank você concorda com estes Termos e com a Política de Privacidade.")]),
+            ("2. Seletivos",[("p","A publicação de um Seletivo não configura processo seletivo vinculante ou concurso público. O uso do ius indicandum é de responsabilidade exclusiva do recrutador.")]),
+            ("3. Impessoalidade",[("l",["Princípio da impessoalidade (art. 37, CF/88)","Vedação ao nepotismo (SV nº 13 do STF)","Resolução CNJ nº 07/2005"])]),
+            ("4. Responsabilidades",[("p","O JurisBank não garante contratações e não se responsabiliza por decisões dos recrutadores.")]),
+            ("5. Foro",[("p","Comarca de [MUNICÍPIO A PREENCHER], Estado de [ESTADO A PREENCHER].")]),
         ]
     for ts,cont in secs:
         st.markdown(f'<div class="doc-sub">{ts}</div>',unsafe_allow_html=True)
         for tp,tx in cont:
             if tp=="p": st.markdown(f'<p class="doc-body">{tx}</p>',unsafe_allow_html=True)
             elif tp=="l":
-                for it in tx: st.markdown(f'<p class="doc-item">â€¢ {it}</p>',unsafe_allow_html=True)
+                for it in tx: st.markdown(f'<p class="doc-item">• {it}</p>',unsafe_allow_html=True)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-    st.markdown(f'<p style="font-size:12px;color:#4a6080;text-align:center">JurisBank â€” VersÃ£o 1.0 â€” {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
-
+    st.markdown(f'<p style="font-size:12px;color:#4a6080;text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
