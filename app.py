@@ -473,91 +473,14 @@ if pagina == "inicio":
             st.markdown(f'<div class="metric-box"><p class="metric-label">Perfil DISC</p><p class="metric-value" style="font-size:16px">{cand.get("disc","—")}</p></div>', unsafe_allow_html=True)
 
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         with col1:
             if st.button("📢 Ver Seletivos", use_container_width=True): ir("seletivos")
         with col2:
             if st.button("👥 Ver candidatos", use_container_width=True): ir("candidatos")
         with col3:
-            if st.button("✏️ Editar perfil", use_container_width=True):
-                st.session_state["editar_perfil"] = not st.session_state.get("editar_perfil", False)
-                st.rerun()
-        with col4:
-            if st.button("Sair", use_container_width=True):
-                del st.session_state.cand_logado
-                st.session_state.pop("editar_perfil", None)
-                st.rerun()
-
-        # Formulário de edição de perfil
-        if st.session_state.get("editar_perfil"):
-            st.markdown('<p class="section-label">Editar perfil</p>', unsafe_allow_html=True)
-            with st.form("form_editar_perfil"):
-                c1, c2, c3 = st.columns(3)
-                with c1:
-                    form_edit = st.selectbox("Formação", ["Bacharel em Direito","Pós-graduado em Direito","Mestre em Direito","Doutor em Direito"],
-                        index=["Bacharel em Direito","Pós-graduado em Direito","Mestre em Direito","Doutor em Direito"].index(cand.get("formacao","Bacharel em Direito")) if cand.get("formacao") in ["Bacharel em Direito","Pós-graduado em Direito","Mestre em Direito","Doutor em Direito"] else 0)
-                with c2:
-                    inst_edit = st.text_input("Instituição", value=cand.get("instituicao",""))
-                with c3:
-                    area_edit = st.selectbox("Área", ["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"],
-                        index=["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"].index(cand.get("area","Tribunal")) if cand.get("area") in ["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"] else 0)
-
-                c1, c2, c3 = st.columns(3)
-                with c1:
-                    oab_edit = st.radio("OAB ativa?", ["Sim","Não"],
-                        index=0 if cand.get("oab")=="Sim" else 1, horizontal=True)
-                with c2:
-                    anos_edit = st.number_input("Anos em órgão público", min_value=0, max_value=40,
-                        value=int(cand.get("anos_experiencia", 0)) if str(cand.get("anos_experiencia","")).isdigit() else 0)
-                with c3:
-                    disp_edit = st.radio("Disponível?", ["Sim","Não"],
-                        index=0 if cand.get("disponibilidade")=="Sim" else 1, horizontal=True)
-
-                exp_edit = st.text_input("Órgãos de atuação", value=cand.get("experiencia_orgaos",""))
-                sis_edit = st.text_input("Sistemas dominados", value=cand.get("sistemas",""))
-                pos_edit = st.text_input("Pós-graduação", value=cand.get("pos_graduacao",""))
-                res_edit = st.text_area("Resumo profissional", value=cand.get("resumo",""), height=100)
-                conc_edit = st.selectbox("Concurso", CONCURSOS,
-                    index=CONCURSOS.index(cand.get("concurso","Não estou estudando para concurso")) if cand.get("concurso") in CONCURSOS else 0)
-
-                c1, c2 = st.columns(2)
-                with c1:
-                    cancelar = st.form_submit_button("Cancelar")
-                with c2:
-                    salvar = st.form_submit_button("Salvar alterações →")
-
-                if cancelar:
-                    st.session_state["editar_perfil"] = False
-                    st.rerun()
-
-                if salvar:
-                    # Calcular selos com novos dados
-                    selos_novos = calc_selos(oab_edit, anos_edit, cand.get("selo_recomendado")=="Sim", cand.get("selo_destaque")=="Sim")
-                    # Encontrar linha do candidato na planilha
-                    todos = aba_candidatos.get_all_records()
-                    idx_cand = next((i for i, c in enumerate(todos) if c.get("email")==cand.get("email")), None)
-                    if idx_cand is not None:
-                        row = idx_cand + 2  # +2 por causa do header e índice 0
-                        aba_candidatos.update_cell(row, 3, form_edit)      # formacao
-                        aba_candidatos.update_cell(row, 4, inst_edit)       # instituicao
-                        aba_candidatos.update_cell(row, 5, area_edit)       # area
-                        aba_candidatos.update_cell(row, 6, disp_edit)       # disponibilidade
-                        aba_candidatos.update_cell(row, 7, oab_edit)        # oab
-                        aba_candidatos.update_cell(row, 9, sis_edit)        # sistemas
-                        aba_candidatos.update_cell(row, 10, pos_edit)       # pos_graduacao
-                        aba_candidatos.update_cell(row, 11, res_edit)       # resumo
-                        aba_candidatos.update_cell(row, 13, selos_novos["verificado"])  # selo_verificado
-                        aba_candidatos.update_cell(row, 16, selos_novos["experiente"]) # selo_experiente
-                        aba_candidatos.update_cell(row, 18, conc_edit)      # concurso
-                        aba_candidatos.update_cell(row, 8, exp_edit)        # experiencia_orgaos
-                        # Atualizar sessão
-                        cand_atualizado = aba_candidatos.get_all_records()[idx_cand]
-                        st.session_state.cand_logado = cand_atualizado
-                        st.session_state["editar_perfil"] = False
-                        st.success("Perfil atualizado com sucesso!")
-                        st.rerun()
-                    else:
-                        st.error("Erro ao localizar seu perfil. Tente novamente.")
+            if st.button("Sair da conta", use_container_width=True):
+                del st.session_state.cand_logado; st.rerun()
 
         st.markdown('<p class="section-label">Meus selos</p>', unsafe_allow_html=True)
         st.markdown(f'<div class="info-card">{html_selos(cand) or "Nenhum selo ainda. Complete seu cadastro para receber selos."}</div>', unsafe_allow_html=True)
@@ -567,62 +490,66 @@ if pagina == "inicio":
             st.markdown(render_disc(cand["disc"]), unsafe_allow_html=True)
 
     else:
-        # Dashboard visitante — teaser
+        # Tela de entrada — login ou cadastro
         st.markdown(f"""<div class="hero-card">
-            <h1 class="page-title">Banco de Talentos<br><em>Jurídicos.</em></h1>
-            <p class="page-sub">Profissionais certificados para assessoria em Tribunais, Ministérios Públicos, Procuradorias e Defensorias</p>
+            <h1 class="page-title">Área do<br><em>Candidato.</em></h1>
+            <p class="page-sub">Entre com seu cadastro ou registre-se gratuitamente</p>
+            <div class="stats-row">
+                <div class="stat-pill">⚖ {total_cands} profissionais cadastrados</div>
+                <div class="stat-pill">📢 {total_sel} Seletivos abertos</div>
+                <div class="stat-pill">★ {total_cert} perfis certificados</div>
+            </div>
         </div>""", unsafe_allow_html=True)
 
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_cands}</p><p class="teaser-label">Profissionais cadastrados</p></div>', unsafe_allow_html=True)
-        with col2:
-            st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_disp}</p><p class="teaser-label">Disponíveis agora</p></div>', unsafe_allow_html=True)
-        with col3:
-            st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_cert}</p><p class="teaser-label">Perfis certificados</p></div>', unsafe_allow_html=True)
-        with col4:
-            st.markdown(f'<div class="teaser-box"><p class="teaser-num">{total_sel}</p><p class="teaser-label">Seletivos abertos</p></div>', unsafe_allow_html=True)
+        tabs_entrada = st.tabs(["🔑 Já tenho cadastro", "📄 Cadastrar-me"])
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([2,2,2])
-        with col1:
-            if st.button("📄 Cadastrar agora — é grátis", use_container_width=True): ir("cadastro")
-        with col2:
-            if st.button("🔑 Já tenho cadastro", use_container_width=True):
-                st.session_state["login_cand"] = True; st.rerun()
-        with col3:
-            if st.button("💰 Ver planos", use_container_width=True):
-                st.session_state["ver_planos"] = not st.session_state.get("ver_planos", False); st.rerun()
-
-        if st.session_state.get("ver_planos"):
-            modal_planos()
-
-        if st.session_state.get("login_cand"):
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:1rem">Acessar minha conta</p>', unsafe_allow_html=True)
-            em = st.text_input("Seu e-mail cadastrado", key="em_login_cand")
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("Entrar →", key="btn_login_cand"):
+        with tabs_entrada[0]:
+            st.markdown("<br>", unsafe_allow_html=True)
+            em = st.text_input("Seu e-mail cadastrado", key="em_login_cand", placeholder="seu@email.com")
+            if st.button("Entrar →", key="btn_login_cand", use_container_width=True):
+                if not em:
+                    st.error("Digite seu e-mail.")
+                else:
                     tc = aba_candidatos.get_all_records()
                     cf = next((c for c in tc if c.get("email","").lower()==em.lower()), None)
-                    if cf: st.session_state.cand_logado=cf; st.session_state["login_cand"]=False; st.rerun()
-                    else: st.error("E-mail não encontrado.")
-            with col2:
-                if st.button("Cancelar", key="btn_canc_cand"):
-                    st.session_state["login_cand"]=False; st.rerun()
+                    if cf:
+                        st.session_state.cand_logado = cf
+                        st.rerun()
+                    else:
+                        st.error("E-mail não encontrado. Verifique ou cadastre-se na aba ao lado.")
+            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+            st.markdown('<p style="font-size:13px;font-weight:600;color:#0d1f4e;margin-bottom:0.5rem">Receba avisos de Seletivos sem cadastro completo</p>', unsafe_allow_html=True)
+            col1, col2, col3 = st.columns(3)
+            with col1: ei = st.text_input("E-mail", key="ei_home", placeholder="seu@email.com")
+            with col2: ai = st.multiselect("Áreas", AREAS, key="ai_home")
+            with col3: sti = st.multiselect("Estados", ESTADOS, key="sti_home")
+            if st.button("Quero receber avisos", key="bint_home"):
+                if not ei or not ai: st.error("Preencha e-mail e área.")
+                else:
+                    aba_interesses.append_row([ei,", ".join(ai),", ".join(sti),datetime.now().strftime("%d/%m/%Y")])
+                    st.success("Pronto! Você será avisado quando surgir um Seletivo compatível.")
 
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:0.5rem">Receba avisos de novos Seletivos</p>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size:13px;color:#4a6080;margin-bottom:1rem">Deixe seu e-mail. Quando surgir um Seletivo na sua área, você é o primeiro a saber.</p>', unsafe_allow_html=True)
-        col1, col2, col3 = st.columns(3)
-        with col1: ei = st.text_input("Seu e-mail", key="ei_home")
-        with col2: ai = st.multiselect("Áreas", AREAS, key="ai_home")
-        with col3: sti = st.multiselect("Estados", ESTADOS, key="sti_home")
-        if st.button("Quero receber avisos", key="bint_home"):
-            if not ei or not ai: st.error("Preencha e-mail e área.")
-            else:
-                aba_interesses.append_row([ei,", ".join(ai),", ".join(sti),datetime.now().strftime("%d/%m/%Y")])
+        with tabs_entrada[1]:
+            st.markdown("<br>", unsafe_allow_html=True)
+            card_cad = """<div class="hero-card" style="padding:1.5rem 2rem">
+                <p style="font-size:20px;font-weight:900;color:#0d1f4e;margin:0 0 6px">Cadastro gratuito</p>
+                <p style="font-size:13px;font-weight:500;color:#4a6080;margin:0 0 1rem">3 etapas rápidas — cerca de 5 minutos</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <span style="background:#dce8ff;border-radius:99px;padding:5px 14px;font-size:12px;font-weight:700;color:#0d1f4e;border:1px solid #a0bcf0">✓ Selos de certificação</span>
+                    <span style="background:#dce8ff;border-radius:99px;padding:5px 14px;font-size:12px;font-weight:700;color:#0d1f4e;border:1px solid #a0bcf0">✓ Perfil DISC</span>
+                    <span style="background:#dce8ff;border-radius:99px;padding:5px 14px;font-size:12px;font-weight:700;color:#0d1f4e;border:1px solid #a0bcf0">✓ Visibilidade para recrutadores</span>
+                </div>
+            </div>"""
+            st.markdown(card_cad, unsafe_allow_html=True)
+            if st.button("Começar cadastro →", use_container_width=True, key="btn_ir_cadastro"):
+                ir("cadastro")
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("💰 Ver planos e preços", key="btn_ver_planos"):
+                st.session_state["ver_planos"] = not st.session_state.get("ver_planos", False)
+                st.rerun()
+            if st.session_state.get("ver_planos"):
+                modal_planos()
+
                 st.success("Pronto! Você será avisado quando surgir um Seletivo compatível.")
 
 # ── PÁGINA: CANDIDATOS ────────────────────────────────────────────────────────
