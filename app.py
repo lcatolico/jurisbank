@@ -6,6 +6,7 @@ import re
 import hashlib
 import secrets
 import urllib.request
+import urllib.parse
 import json
 import html as html_lib
 from datetime import datetime, date
@@ -111,28 +112,32 @@ header[data-testid="stHeader"] { display: none !important; }
 .hero-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 20px; padding: 2rem 2.5rem; margin-bottom: 1.5rem; box-shadow: 0 8px 28px rgba(13,31,78,0.06); }
 .profile-shell { background: #ffffff; border: 1.5px solid #c5d5f5; border-radius: 16px; padding: 18px 22px; margin: 0 0 1rem; box-shadow: 0 10px 26px rgba(13,31,78,0.06); }
 .profile-shell-title { font-size: 13px; font-weight: 900; color: #0d1f4e; text-transform: uppercase; letter-spacing: .12em; margin: 0 0 14px; }
-.profile-panel { background: #ffffff; border: 1.5px solid #c5d5f5; border-radius: 22px; padding: 24px; margin: 0 auto 1.5rem; box-shadow: 0 12px 30px rgba(13,31,78,0.08); max-width: 620px; }
-.profile-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-.profile-avatar { width: 56px; height: 56px; border-radius: 12px; background: #247b56; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 900; flex-shrink: 0; }
-.profile-name-main { font-size: 18px; font-weight: 900; color: #0d1f4e; margin: 0 0 2px; }
-.profile-sub-main { font-size: 13px; font-weight: 600; color: #587bd6; margin: 0; line-height: 1.35; }
+.profile-panel { background: #ffffff; border: 1.5px solid #c5d5f5; border-radius: 22px; padding: 34px 38px; margin: 0 0 1.5rem; box-shadow: 0 12px 30px rgba(13,31,78,0.08); width: 100%; }
+.profile-head { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
+.profile-avatar { width: 68px; height: 68px; border-radius: 14px; background: #247b56; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; flex-shrink: 0; }
+.profile-name-main { font-size: 24px; font-weight: 900; color: #0d1f4e; margin: 0 0 2px; }
+.profile-sub-main { font-size: 15px; font-weight: 700; color: #587bd6; margin: 0; line-height: 1.35; }
 .profile-chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; }
 .profile-chip { display: inline-flex; align-items: center; min-height: 23px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: 1px solid #c5d5f5; background: #e8effe; color: #1a3a8f; }
 .profile-chip-green { background: #e6f4ea; color: #15803d; border-color: #b0dfc0; }
 .profile-chip-gold { background: #fff8e6; color: #b45309; border-color: #f0c040; }
-.profile-disc-card { background: #f7fbf9; border: 1px solid #d8efe4; border-radius: 13px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+.profile-disc-card { background: #f7fbf9; border: 1px solid #d8efe4; border-radius: 13px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
 .profile-disc-letter { color: #15803d; font-size: 24px; font-weight: 900; min-width: 26px; }
 .profile-disc-text { color: #587bd6; font-size: 13px; font-weight: 600; line-height: 1.45; margin: 0; }
 .profile-concurso { background: #fff8e6; border: 1.5px solid #f0c040; color: #b45309; border-radius: 12px; padding: 12px 14px; font-size: 13px; font-weight: 800; margin: 0 0 14px; }
 .profile-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 14px; }
-.profile-detail { background: #f3f7ff; border: 1px solid #d0dcfa; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #0d1f4e; line-height: 1.5; }
+.profile-detail { background: #f3f7ff; border: 1px solid #d0dcfa; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #0d1f4e; line-height: 1.6; }
 .profile-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
 .profile-status { display: inline-flex; align-items: center; min-height: 27px; padding: 0 12px; border-radius: 999px; border: 1px solid #b0dfc0; background: #e6f4ea; color: #15803d; font-size: 12px; font-weight: 900; }
 .profile-status-off { border-color: #f0c8a0; background: #fff3e8; color: #c05a1a; }
 .profile-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .profile-action { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 16px; border-radius: 10px; background: #fff8e6; border: 1.5px solid #f0c040; color: #c8960c !important; text-decoration: none !important; font-size: 12px; font-weight: 900; }
 .profile-action:hover { background: #f0c040; color: #0d1f4e !important; }
-@media (max-width: 760px) { .profile-panel { max-width: none; padding: 18px; } .profile-detail-grid { grid-template-columns: 1fr; } }
+.edit-hero { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 16px; padding: 1.35rem 1.6rem; margin-bottom: 1.2rem; box-shadow: 0 8px 24px rgba(13,31,78,0.05); }
+.edit-title { font-family: 'Playfair Display',serif; font-size: 30px; font-weight: 900; color: #0d1f4e; margin: 0 0 4px; line-height: 1.1; }
+.edit-title em { font-style: normal; color: #d9a514; }
+.edit-sub { font-size: 13px; color: #2a4a8a; margin: 0; font-weight: 600; }
+@media (max-width: 760px) { .profile-panel { max-width: none; padding: 22px; } .profile-detail-grid { grid-template-columns: 1fr; } }
 .page-title { font-family: 'Playfair Display',serif; font-size: clamp(30px,4vw,46px); font-weight: 900; color: #0d1f4e; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.1; }
 .page-title em { font-style: normal; background: linear-gradient(135deg,#c8960c,#f0c040); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .page-sub { font-size: 15px; color: #2a4a8a; margin: 0; font-weight: 600; }
@@ -691,15 +696,6 @@ if pagina == "inicio":
     if cand_logado():
         cand = st.session_state.cand_logado
         abertos = [ch for ch in aba_chamadas.get_all_records() if ch_aberta(ch)]
-        st.markdown(f"""<div class="hero-card">
-            <h1 class="page-title">Olá, <em>{cand.get('nome','candidato').split()[0]}!</em></h1>
-            <p class="page-sub">Acompanhe seu perfil, seus selos e os Seletivos disponíveis.</p>
-            <div class="stats-row">
-                <div class="stat-pill">{cand.get('area','Área não informada')}</div>
-                <div class="stat-pill">{len(abertos)} seletivos abertos</div>
-                <div class="stat-pill">DISC {cand.get('disc','pendente')}</div>
-            </div>
-        </div>""", unsafe_allow_html=True)
 
         formacoes_view = formacoes_candidato(cand)
         experiencias_view = experiencias_candidato(cand)
@@ -734,8 +730,11 @@ if pagina == "inicio":
         if cand.get("area"):
             subtitulo = f"{subtitulo} · {cand.get('area')}"
         status_class = "" if disponivel else "profile-status-off"
+        email_link = urllib.parse.quote(cand.get("email",""))
         perfil_html = (
             f'<div class="profile-panel">'
+            f'<h1 class="page-title" style="font-size:36px;margin-bottom:6px">Olá, <em>{html_lib.escape(cand.get("nome","candidato").split()[0])}!</em></h1>'
+            f'<p class="page-sub" style="margin-bottom:22px">Acompanhe seu perfil, seus selos e os Seletivos disponíveis.</p>'
             f'<div class="profile-head">'
             f'<div class="profile-avatar">{html_lib.escape(iniciais(cand.get("nome","")))}</div>'
             f'<div>'
@@ -761,7 +760,7 @@ if pagina == "inicio":
             f'<span class="profile-status {status_class}">● {disponivel_txt}</span>'
             f'<div class="profile-actions">'
             f'<a class="profile-action" href="?p=chamadas">Ver seletivos →</a>'
-            f'<a class="profile-action" href="?p=perfil">Editar perfil →</a>'
+            f'<a class="profile-action" href="?p=perfil&email={email_link}">Editar perfil →</a>'
             f'</div>'
             f'</div>'
             f'</div>'
@@ -968,9 +967,14 @@ if pagina == "inicio":
 
 # ── PÁGINA: EDITAR PERFIL DO CANDIDATO ───────────────────────────────────────
 elif pagina == "perfil":
+    email_param = params.get("email", "")
+    if isinstance(email_param, list):
+        email_param = email_param[0]
+    if not cand_logado() and email_param:
+        login_candidato(email_param)
     if not cand_logado():
-        st.markdown("""<div class="hero-card">
-            <h1 class="page-title">Editar<br><em>Perfil.</em></h1>
+        st.markdown("""<div class="edit-hero">
+            <h1 class="edit-title">Editar <em>Perfil.</em></h1>
             <p class="page-sub">Entre na Área do Candidato para acessar seu perfil.</p>
         </div>""", unsafe_allow_html=True)
         if st.button("Ir para login do candidato"):
@@ -984,9 +988,9 @@ elif pagina == "perfil":
         if "edit_qtd_exp" not in st.session_state:
             st.session_state.edit_qtd_exp = max(1, len(experiencias_base))
 
-        st.markdown("""<div class="hero-card">
-            <h1 class="page-title">Editar<br><em>Perfil.</em></h1>
-            <p class="page-sub">Atualize suas informações profissionais. Nome e e-mail permanecem vinculados ao cadastro.</p>
+        st.markdown("""<div class="edit-hero">
+            <h1 class="edit-title">Editar <em>Perfil.</em></h1>
+            <p class="edit-sub">Atualize suas informações profissionais. Nome e e-mail permanecem vinculados ao cadastro.</p>
         </div>""", unsafe_allow_html=True)
 
         if st.button("Voltar ao perfil", key="voltar_perfil_candidato"):
