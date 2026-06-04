@@ -371,6 +371,16 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
 .stTabs [data-baseweb="tab-list"] { background: #f2efe9 !important; border-color: #ddd8ce !important; }
 .stTabs [data-baseweb="tab"] { color: #6a6a6a !important; }
 .stTabs [aria-selected="true"] { color: #1e1e1e !important; box-shadow: 0 6px 14px rgba(30,30,30,0.08) !important; }
+.profile-sub-main { color: #6a6a6a !important; font-size: 13px !important; font-weight: 600 !important; }
+.profile-section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+.profile-section-card { background: #ffffff; border: 1px solid #ddd8ce; border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.profile-section-card.full { grid-column: 1 / -1; }
+.profile-section-title { color: #6a6a6a; font-size: 10px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px; }
+.profile-list { display: flex; flex-direction: column; gap: 8px; }
+.profile-list-item { color: #1e1e1e; font-size: 13px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
+.profile-list-item span { color: #6a6a6a; font-weight: 600; }
+.profile-empty { color: #6a6a6a; font-size: 13px; font-weight: 600; }
+@media (max-width: 760px) { .profile-section-grid { grid-template-columns: 1fr; } .profile-section-card.full { grid-column: auto; } }
 </style>
 """, unsafe_allow_html=True)
 
@@ -893,13 +903,22 @@ if pagina == "inicio":
         concurso_html = ""
         if concurso_val != "Não estou estudando para concurso":
             concurso_html = f'<div class="profile-concurso">📚 Estudando para: {html_lib.escape(concurso_val)}</div>'
-        subtitulo = resumo_formacoes(formacoes_view) or cand.get("instituicao","Perfil profissional em construção")
-        if cand.get("area"):
-            subtitulo = f"{subtitulo} · {cand.get('area')}"
+        interesses = cand.get("area","").strip()
+        subtitulo = interesses or "Perfil profissional em construção"
         status_class = "" if disponivel else "profile-status-off"
         email_link = urllib.parse.quote(cand.get("email",""))
         foto_url = str(cand.get("foto","") or "").strip()
         avatar_html = f'<img class="profile-photo" src="{html_lib.escape(foto_url)}" alt="Foto de perfil">' if foto_url else f'<div class="profile-avatar">{html_lib.escape(iniciais(cand.get("nome","")))}</div>'
+        formacoes_html = "".join(
+            f'<div class="profile-list-item">{html_lib.escape(f.get("grau","—"))}<br><span>{html_lib.escape(" · ".join([x for x in [f.get("instituicao","").strip(), f.get("periodo","").strip()] if x]) or "Instituição/período não informados")}</span></div>'
+            for f in formacoes_view
+        ) or '<div class="profile-empty">Nenhuma formação informada.</div>'
+        experiencias_html = "".join(
+            f'<div class="profile-list-item">{html_lib.escape(e.get("orgao","") or e.get("instituicao","") or "Experiência informada")}<br><span>{html_lib.escape(" · ".join([x for x in [e.get("instituicao","").strip(), e.get("area","").strip(), " a ".join([v for v in [e.get("inicio","").strip(), e.get("fim","").strip()] if v])] if x]) or "Detalhes não informados")}</span></div>'
+            for e in experiencias_view
+        ) or '<div class="profile-empty">Nenhuma experiência profissional informada.</div>'
+        sistemas_html = html_lib.escape(cand.get("sistemas","").strip() or "Nenhum sistema informado.")
+        interesses_html = html_lib.escape(interesses or "Nenhuma instituição de interesse informada.")
         perfil_html = (
             f'<div class="profile-panel">'
             f'<h1 class="page-title" style="font-size:36px;margin-bottom:6px">Olá, <em>{html_lib.escape(cand.get("nome","candidato").split()[0])}!</em></h1>'
@@ -915,14 +934,27 @@ if pagina == "inicio":
             f'<div class="profile-chip-row">{selos_html}</div>'
             f'{disc_html}'
             f'{concurso_html}'
-            f'<div class="profile-detail-grid">'
-            f'<div class="profile-detail">'
+            f'<div class="profile-section-grid">'
+            f'<div class="profile-section-card">'
+            f'<p class="profile-section-title">Formação acadêmica</p>'
+            f'<div class="profile-list">{formacoes_html}</div>'
+            f'</div>'
+            f'<div class="profile-section-card">'
+            f'<p class="profile-section-title">Instituições de interesse</p>'
+            f'<div class="profile-list-item">{interesses_html}</div>'
+            f'</div>'
+            f'<div class="profile-section-card">'
+            f'<p class="profile-section-title">Resumo profissional</p>'
             f'<strong>Experiência total:</strong> {anos_experiencias(experiencias_view)} ano(s)<br>'
             f'<strong>OAB ativa:</strong> {html_lib.escape(cand.get("oab","—"))}'
             f'</div>'
-            f'<div class="profile-detail">'
-            f'<strong>Experiência:</strong> {html_lib.escape(resumo_experiencias(experiencias_view) or cand.get("experiencia_orgaos","—"))}<br>'
-            f'<strong>Sistemas:</strong> {html_lib.escape(cand.get("sistemas","—"))}'
+            f'<div class="profile-section-card">'
+            f'<p class="profile-section-title">Sistemas e IA</p>'
+            f'<div class="profile-list-item">{sistemas_html}</div>'
+            f'</div>'
+            f'<div class="profile-section-card full">'
+            f'<p class="profile-section-title">Experiência profissional</p>'
+            f'<div class="profile-list">{experiencias_html}</div>'
             f'</div>'
             f'</div>'
             f'<div class="profile-foot">'
