@@ -1,4 +1,4 @@
-﻿﻿import streamlit as st
+﻿import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 import fitz
@@ -733,39 +733,40 @@ if pagina == "inicio":
         subtitulo = resumo_formacoes(formacoes_view) or cand.get("instituicao","Perfil profissional em construção")
         if cand.get("area"):
             subtitulo = f"{subtitulo} · {cand.get('area')}"
-        perfil_html = f"""
-        <div class="profile-panel">
-            <div class="profile-head">
-                <div class="profile-avatar">{html_lib.escape(iniciais(cand.get("nome","")))}</div>
-                <div>
-                    <p class="profile-name-main">{html_lib.escape(cand.get("nome",""))}</p>
-                    <p class="profile-sub-main">{html_lib.escape(subtitulo)}</p>
-                    <p class="cand-sub">{html_lib.escape(cand.get("email",""))}</p>
-                </div>
-            </div>
-            <div class="profile-chip-row">{selos_html}</div>
-            {disc_html}
-            {concurso_html}
-            <div class="profile-detail-grid">
-                <div class="profile-detail">
-                    <strong>Experiência total:</strong> {anos_experiencias(experiencias_view)} ano(s)<br>
-                    <strong>OAB ativa:</strong> {html_lib.escape(cand.get("oab","—"))}
-                </div>
-                <div class="profile-detail">
-                    <strong>Experiência:</strong> {html_lib.escape(resumo_experiencias(experiencias_view) or cand.get("experiencia_orgaos","—"))}<br>
-                    <strong>Sistemas:</strong> {html_lib.escape(cand.get("sistemas","—"))}
-                </div>
-            </div>
-            <div class="profile-foot">
-                <span class="profile-status {' ' if disponivel else 'profile-status-off'}">● {disponivel_txt}</span>
-                <div class="profile-actions">
-                    <a class="profile-action" href="?p=chamadas">Ver seletivos →</a>
-                    <a class="profile-action" href="?p=perfil">Editar perfil →</a>
-                </div>
-            </div>
-        </div>
-        """
-        st.markdown(textwrap.dedent(perfil_html).strip(), unsafe_allow_html=True)
+        status_class = "" if disponivel else "profile-status-off"
+        perfil_html = (
+            f'<div class="profile-panel">'
+            f'<div class="profile-head">'
+            f'<div class="profile-avatar">{html_lib.escape(iniciais(cand.get("nome","")))}</div>'
+            f'<div>'
+            f'<p class="profile-name-main">{html_lib.escape(cand.get("nome",""))}</p>'
+            f'<p class="profile-sub-main">{html_lib.escape(subtitulo)}</p>'
+            f'<p class="cand-sub">{html_lib.escape(cand.get("email",""))}</p>'
+            f'</div>'
+            f'</div>'
+            f'<div class="profile-chip-row">{selos_html}</div>'
+            f'{disc_html}'
+            f'{concurso_html}'
+            f'<div class="profile-detail-grid">'
+            f'<div class="profile-detail">'
+            f'<strong>Experiência total:</strong> {anos_experiencias(experiencias_view)} ano(s)<br>'
+            f'<strong>OAB ativa:</strong> {html_lib.escape(cand.get("oab","—"))}'
+            f'</div>'
+            f'<div class="profile-detail">'
+            f'<strong>Experiência:</strong> {html_lib.escape(resumo_experiencias(experiencias_view) or cand.get("experiencia_orgaos","—"))}<br>'
+            f'<strong>Sistemas:</strong> {html_lib.escape(cand.get("sistemas","—"))}'
+            f'</div>'
+            f'</div>'
+            f'<div class="profile-foot">'
+            f'<span class="profile-status {status_class}">● {disponivel_txt}</span>'
+            f'<div class="profile-actions">'
+            f'<a class="profile-action" href="?p=chamadas">Ver seletivos →</a>'
+            f'<a class="profile-action" href="?p=perfil">Editar perfil →</a>'
+            f'</div>'
+            f'</div>'
+            f'</div>'
+        )
+        st.markdown(perfil_html, unsafe_allow_html=True)
         st.session_state.editar_perfil_candidato = False
 
         editando = st.session_state.get("editar_perfil_candidato", False)
