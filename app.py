@@ -239,10 +239,10 @@ aba_recomendacoes = abas["recomendacoes"]
 
 # ── Navegação por URL ─────────────────────────────────────────────────────────
 params = st.query_params
-p = params.get("p","candidatos")
+p = params.get("p","inicio")
 if isinstance(p,list): p = p[0]
-if p not in ["candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
-    p = "candidatos"
+if p not in ["inicio","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
+    p = "inicio"
 if "pagina" not in st.session_state or params.get("p"):
     st.session_state.pagina = p
 pagina = st.session_state.pagina
@@ -298,6 +298,9 @@ def hash_senha(s): return hashlib.sha256(s.encode()).hexdigest()
 def rec_logado(): return "rec_logado" in st.session_state and st.session_state.rec_logado
 def cand_logado(): return "cand_logado" in st.session_state and st.session_state.cand_logado
 def gerar_id(): return f"ch_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+def anos_num(v):
+    m = re.search(r"\d+", str(v or ""))
+    return int(m.group()) if m else 0
 def ch_aberta(ch):
     if ch.get("status","").lower()!="aberto": return False
     try: return datetime.strptime(ch.get("prazo",""),"%d/%m/%Y").date()>=date.today()
@@ -343,6 +346,21 @@ def extrair_campos(txt):
 
 def calc_selos(oab,anos,carta,aval):
     return {"verificado":"Sim" if oab=="Sim" else "Não","recomendado":"Sim" if carta else "Não","destaque":"Sim" if aval else "Não","experiente":"Sim" if anos>=2 else "Não"}
+
+def linha_candidato(email):
+    todos = aba_candidatos.get_all_records()
+    email = str(email or "").strip().lower()
+    for i, cand in enumerate(todos):
+        if str(cand.get("email","")).strip().lower() == email:
+            return i + 2, cand
+    return None, None
+
+def login_candidato(email):
+    _, cand = linha_candidato(email)
+    if cand:
+        st.session_state.cand_logado = cand
+        return cand
+    return None
 
 def html_selos(c):
     h=""
@@ -450,9 +468,9 @@ def email_recomendador(nome_candidato, email_recomendador, link):
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
 nav_pages = [
+    ("inicio","Área do Candidato"),
     ("candidatos","Candidatos"),
     ("chamadas","Chamadas"),
-    ("cadastro","Cadastrar"),
 ]
 
 nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
@@ -469,8 +487,169 @@ else:
 nav_html += '</div></div>'
 st.markdown(nav_html, unsafe_allow_html=True)
 
+# ── PÁGINA: INÍCIO / ÁREA DO CANDIDATO ────────────────────────────────────────
+if pagina == "inicio":
+    if cand_logado():
+        cand = st.session_state.cand_logado
+        abertos = [ch for ch in aba_chamadas.get_all_records() if ch_aberta(ch)]
+        st.markdown(f"""<div class="hero-card">
+            <h1 class="page-title">Olá, <em>{cand.get('nome','candidato').split()[0]}!</em></h1>
+            <p class="page-sub">Acompanhe seu perfil, seus selos e os Seletivos disponíveis.</p>
+            <div class="stats-row">
+                <div class="stat-pill">{cand.get('area','Área não informada')}</div>
+                <div class="stat-pill">{len(abertos)} seletivos abertos</div>
+                <div class="stat-pill">DISC {cand.get('disc','pendente')}</div>
+            </div>
+        </div>""", unsafe_allow_html=True)
+
+        c1, c2 = st.columns([8,2])
+        with c1:
+            st.markdown(f'<div class="info-box"><strong>{cand.get("nome","")}</strong><br>{cand.get("email","")}</div>', unsafe_allow_html=True)
+        with c2:
+            if st.button("Sair", key="sair_candidato_inicio"):
+                del st.session_state.cand_logado
+                st.rerun()
+
+        c1, c2, _ = st.columns([2,2,6])
+        with c1:
+            if st.button("Ver Seletivos", key="btn_cand_seletivos"):
+                ir("chamadas")
+        with c2:
+            if st.button("Editar perfil", key="editar_perfil_btn_topo"):
+                st.session_state.editar_perfil_candidato = True
+                st.rerun()
+
+        st.markdown('<p class="section-label">Selos</p>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-card">{html_selos(cand) or "Nenhum selo ativo no momento."}</div>', unsafe_allow_html=True)
+
+        if cand.get("disc"):
+            st.markdown('<p class="section-label">Perfil DISC</p>', unsafe_allow_html=True)
+            st.markdown(render_disc(cand["disc"]), unsafe_allow_html=True)
+
+        st.markdown('<p class="section-label">Resumo do perfil</p>', unsafe_allow_html=True)
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown(f"""<div class="info-card">
+                <strong>Formação:</strong> {cand.get('formacao','—')}<br>
+                <strong>Instituição:</strong> {cand.get('instituicao','—')}<br>
+                <strong>Área:</strong> {cand.get('area','—')}<br>
+                <strong>Disponível:</strong> {cand.get('disponibilidade','—')}
+            </div>""", unsafe_allow_html=True)
+        with c2:
+            st.markdown(f"""<div class="info-card">
+                <strong>OAB ativa:</strong> {cand.get('oab','—')}<br>
+                <strong>Experiência:</strong> {cand.get('experiencia_orgaos','—')}<br>
+                <strong>Sistemas:</strong> {cand.get('sistemas','—')}<br>
+                <strong>Concurso:</strong> {cand.get('concurso','—')}
+            </div>""", unsafe_allow_html=True)
+
+        if cand.get("resumo"):
+            st.markdown(f'<div class="info-card" style="margin-top:10px">{cand.get("resumo","")}</div>', unsafe_allow_html=True)
+
+        editando = st.session_state.get("editar_perfil_candidato", False)
+        if editando and st.button("Fechar edição", key="editar_perfil_btn"):
+            st.session_state.editar_perfil_candidato = False
+            st.rerun()
+
+        if st.session_state.get("editar_perfil_candidato"):
+            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+            st.markdown('<p class="section-label">Editar perfil</p>', unsafe_allow_html=True)
+            with st.form("form_editar_candidato"):
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    formacao = st.selectbox("Formação", ["Bacharel em Direito","Pós-graduado em Direito","Mestre em Direito","Doutor em Direito"], index=(["Bacharel em Direito","Pós-graduado em Direito","Mestre em Direito","Doutor em Direito"].index(cand.get("formacao")) if cand.get("formacao") in ["Bacharel em Direito","Pós-graduado em Direito","Mestre em Direito","Doutor em Direito"] else 0))
+                with c2:
+                    instituicao = st.text_input("Instituição", value=cand.get("instituicao",""))
+                with c3:
+                    area = st.selectbox("Área", ["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"], index=(["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"].index(cand.get("area")) if cand.get("area") in ["Tribunal","MP","Procuradoria","Defensoria","TCU/TCE"] else 0))
+
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    oab = st.radio("OAB ativa?", ["Sim","Não"], index=0 if cand.get("oab") == "Sim" else 1, horizontal=True)
+                with c2:
+                    anos = st.number_input("Anos em órgão público", min_value=0, max_value=40, value=anos_num(cand.get("experiencia_orgaos","")))
+                with c3:
+                    disponibilidade = st.radio("Disponível?", ["Sim","Não"], index=0 if cand.get("disponibilidade") == "Sim" else 1, horizontal=True)
+
+                experiencia = st.text_input("Órgãos de atuação", value=cand.get("experiencia_orgaos",""))
+                sistemas = st.text_input("Sistemas dominados", value=cand.get("sistemas",""))
+                pos = st.text_input("Pós-graduação", value=cand.get("pos_graduacao",""))
+                email_ref = st.text_input("E-mail do recomendador", value=cand.get("email_referencia",""))
+                resumo = st.text_area("Resumo profissional", value=cand.get("resumo",""), height=120)
+                concurso = st.selectbox("Estudando para algum concurso?", CONCURSOS, index=(CONCURSOS.index(cand.get("concurso")) if cand.get("concurso") in CONCURSOS else 0))
+                salvar = st.form_submit_button("Salvar alterações")
+
+            if salvar:
+                linha, atual = linha_candidato(cand.get("email"))
+                if not linha:
+                    st.error("Não encontrei seu cadastro na planilha.")
+                else:
+                    experiencia_final = experiencia.strip()
+                    if anos and str(anos) not in experiencia_final:
+                        experiencia_final = f"{anos} ano(s) em órgão público" + (f" — {experiencia_final}" if experiencia_final else "")
+                    selo_verificado = "Sim" if oab == "Sim" else "Não"
+                    selo_experiente = "Sim" if anos >= 2 else "Não"
+                    atual.update({
+                        "formacao": formacao,
+                        "instituicao": instituicao,
+                        "area": area,
+                        "disponibilidade": disponibilidade,
+                        "oab": oab,
+                        "experiencia_orgaos": experiencia_final,
+                        "sistemas": sistemas,
+                        "pos_graduacao": pos,
+                        "email_referencia": email_ref,
+                        "resumo": resumo,
+                        "selo_verificado": selo_verificado,
+                        "selo_experiente": selo_experiente,
+                        "concurso": concurso,
+                    })
+                    aba_candidatos.update_cell(linha, 3, formacao)
+                    aba_candidatos.update_cell(linha, 4, instituicao)
+                    aba_candidatos.update_cell(linha, 5, area)
+                    aba_candidatos.update_cell(linha, 6, disponibilidade)
+                    aba_candidatos.update_cell(linha, 7, oab)
+                    aba_candidatos.update_cell(linha, 8, experiencia_final)
+                    aba_candidatos.update_cell(linha, 9, sistemas)
+                    aba_candidatos.update_cell(linha, 10, pos)
+                    aba_candidatos.update_cell(linha, 11, resumo)
+                    aba_candidatos.update_cell(linha, 12, email_ref)
+                    aba_candidatos.update_cell(linha, 13, selo_verificado)
+                    aba_candidatos.update_cell(linha, 16, selo_experiente)
+                    aba_candidatos.update_cell(linha, 18, concurso)
+                    st.session_state.cand_logado = atual
+                    st.session_state.editar_perfil_candidato = False
+                    st.success("Perfil atualizado com sucesso.")
+                    st.rerun()
+
+    else:
+        st.markdown("""<div class="hero-card">
+            <h1 class="page-title">Área do<br><em>Candidato.</em></h1>
+            <p class="page-sub">Entre para acompanhar seu perfil ou comece seu cadastro no JurisBank.</p>
+        </div>""", unsafe_allow_html=True)
+        tabs = st.tabs(["Já tenho cadastro","Cadastrar-me"])
+        with tabs[0]:
+            st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Entrar no meu perfil</p>', unsafe_allow_html=True)
+            email_login = st.text_input("E-mail cadastrado", key="login_candidato_inicio")
+            if st.button("Entrar", key="btn_login_candidato_inicio"):
+                if not email_login:
+                    st.error("Informe seu e-mail.")
+                elif login_candidato(email_login):
+                    st.success("Bem-vindo ao JurisBank.")
+                    st.rerun()
+                else:
+                    st.error("E-mail não encontrado.")
+        with tabs[1]:
+            st.markdown("""<div class="info-card">
+                <strong>Cadastre seu currículo jurídico</strong><br>
+                Crie seu perfil, solicite selos de certificação, responda ao DISC e apareça no banco de talentos.
+            </div>""", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("Começar cadastro →", key="btn_ir_cadastro_candidato"):
+                ir("cadastro")
+
 # ── PÁGINA: CANDIDATOS ────────────────────────────────────────────────────────
-if pagina == "candidatos":
+elif pagina == "candidatos":
     dados = aba_candidatos.get_all_records()
     if "cand_sel" not in st.session_state: st.session_state.cand_sel = None
 
@@ -576,9 +755,8 @@ elif pagina == "chamadas":
         with st.expander("🔑 Sou candidato cadastrado — quero me inscrever"):
             em=st.text_input("Seu e-mail cadastrado",key="cl")
             if st.button("Acessar",key="bcl"):
-                tc=aba_candidatos.get_all_records()
-                cf=next((c for c in tc if c.get("email","").lower()==em.lower()),None)
-                if cf: st.session_state.cand_logado=cf; st.success(f"Bem-vindo, {cf['nome'].split()[0]}!"); st.rerun()
+                cf=login_candidato(em)
+                if cf: st.success(f"Bem-vindo, {cf['nome'].split()[0]}!"); st.rerun()
                 else: st.error("E-mail não encontrado.")
 
     if cand_logado():
