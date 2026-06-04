@@ -1,4 +1,4 @@
-﻿import streamlit as st
+﻿﻿import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 import fitz
@@ -725,12 +725,7 @@ if pagina == "inicio":
         disc_html = ""
         if cand.get("disc"):
             det_disc = DISC_DETALHES.get(cand["disc"], {})
-            disc_html = f"""
-                <div class="profile-disc-card">
-                    <div class="profile-disc-letter">{html_lib.escape(cand["disc"])}</div>
-                    <p class="profile-disc-text">{html_lib.escape(det_disc.get("resumo",""))}</p>
-                </div>
-            """
+            disc_html = f'<div class="profile-disc-card"><div class="profile-disc-letter">{html_lib.escape(cand["disc"])}</div><p class="profile-disc-text">{html_lib.escape(det_disc.get("resumo",""))}</p></div>'
         concurso_val = cand.get("concurso","Não estou estudando para concurso") or "Não estou estudando para concurso"
         concurso_html = ""
         if concurso_val != "Não estou estudando para concurso":
@@ -738,7 +733,7 @@ if pagina == "inicio":
         subtitulo = resumo_formacoes(formacoes_view) or cand.get("instituicao","Perfil profissional em construção")
         if cand.get("area"):
             subtitulo = f"{subtitulo} · {cand.get('area')}"
-        st.markdown(f"""
+        perfil_html = f"""
         <div class="profile-panel">
             <div class="profile-head">
                 <div class="profile-avatar">{html_lib.escape(iniciais(cand.get("nome","")))}</div>
@@ -769,7 +764,8 @@ if pagina == "inicio":
                 </div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(textwrap.dedent(perfil_html).strip(), unsafe_allow_html=True)
         st.session_state.editar_perfil_candidato = False
 
         editando = st.session_state.get("editar_perfil_candidato", False)
