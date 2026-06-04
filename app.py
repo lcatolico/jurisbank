@@ -371,13 +371,16 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
 .stSelectbox [data-baseweb="select"] div,
 .stSelectbox [data-baseweb="select"] span,
 .stMultiSelect [data-baseweb="select"] div,
-.stMultiSelect [data-baseweb="select"] span,
-[data-baseweb="popover"] div,
-[data-baseweb="popover"] span,
-[data-baseweb="menu"] div,
-[data-baseweb="menu"] span,
-[data-baseweb="select-dropdown"] div,
-[data-baseweb="select-dropdown"] span {
+.stMultiSelect [data-baseweb="select"] span {
+    color: #1e1e1e !important;
+    -webkit-text-fill-color: #1e1e1e !important;
+}
+[data-baseweb="popover"] [role="option"],
+[data-baseweb="popover"] [role="option"] *,
+[data-baseweb="menu"] [role="option"],
+[data-baseweb="menu"] [role="option"] *,
+[data-baseweb="select-dropdown"] [role="option"],
+[data-baseweb="select-dropdown"] [role="option"] * {
     background-color: #ffffff !important;
     color: #1e1e1e !important;
     -webkit-text-fill-color: #1e1e1e !important;
@@ -413,8 +416,15 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
     -webkit-text-fill-color: #1e1e1e !important;
     overflow: visible !important;
     text-indent: 0 !important;
-    padding-left: 0 !important;
+    padding-left: 4px !important;
     margin-left: 0 !important;
+    clip-path: none !important;
+    mask-image: none !important;
+    transform: none !important;
+}
+.stMultiSelect [data-baseweb="tag"] > div:first-child,
+.stMultiSelect [data-baseweb="tag"] span:first-child {
+    padding-left: 8px !important;
 }
 .stMultiSelect [data-baseweb="tag"] svg {
     color: #1e1e1e !important;
