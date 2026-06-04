@@ -395,6 +395,32 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
     background-color: #f2efe9 !important;
     color: #1e1e1e !important;
 }
+.stMultiSelect [data-baseweb="tag"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-height: 28px !important;
+    padding: 3px 8px 3px 10px !important;
+    margin: 2px 4px 2px 0 !important;
+    border: 1px solid #ddd8ce !important;
+    border-radius: 7px !important;
+    overflow: visible !important;
+}
+.stMultiSelect [data-baseweb="tag"] div,
+.stMultiSelect [data-baseweb="tag"] span {
+    background: transparent !important;
+    color: #1e1e1e !important;
+    -webkit-text-fill-color: #1e1e1e !important;
+    overflow: visible !important;
+    text-indent: 0 !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+.stMultiSelect [data-baseweb="tag"] svg {
+    color: #1e1e1e !important;
+    fill: #1e1e1e !important;
+    flex-shrink: 0 !important;
+}
 .stTabs [data-baseweb="tab-list"] { background: #f2efe9 !important; border-color: #ddd8ce !important; }
 .stTabs [data-baseweb="tab"] { color: #6a6a6a !important; }
 .stTabs [aria-selected="true"] { color: #1e1e1e !important; box-shadow: 0 6px 14px rgba(30,30,30,0.08) !important; }
