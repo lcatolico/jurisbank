@@ -166,9 +166,9 @@ header[data-testid="stHeader"] { display: none !important; }
 }
 .stButton button:hover { opacity: 0.96 !important; transform: translateY(-1px) !important; box-shadow: 0 10px 22px rgba(217,165,20,0.24) !important; }
 div[data-testid="column"]:last-child .stButton button,
-div[data-testid="column"]:nth-last-child(2) .stButton button { background: #e8f0fe !important; color: #1a3a8f !important; border: 1.5px solid #c5d5f5 !important; border-radius: 10px !important; padding: 0.4rem 1rem !important; font-size: 12px !important; font-weight: 700 !important; width: 100%; }
+div[data-testid="column"]:nth-last-child(2) .stButton button { background: #ffffff !important; color: #0d1f4e !important; border: 1.5px solid #c5d5f5 !important; border-radius: 10px !important; padding: 0.58rem 1rem !important; font-size: 13px !important; font-weight: 800 !important; width: 100%; box-shadow: 0 6px 16px rgba(13,31,78,0.08) !important; }
 div[data-testid="column"]:last-child .stButton button:hover,
-div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background: #4070f4 !important; border-color: #4070f4 !important; color: #ffffff !important; }
+div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background: #e8f0fe !important; border-color: #4070f4 !important; color: #0d1f4e !important; }
 .stTextInput input, .stTextArea textarea { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Sora',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
 .stTextInput input:focus, .stTextArea textarea:focus { border-color: #4070f4 !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
 .stTextInput input::placeholder, .stTextArea textarea::placeholder { color: #4a6080 !important; opacity: 1 !important; font-weight: 500 !important; }
@@ -178,6 +178,8 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background:
 .stMultiSelect > div > div { background: #ffffff !important; border-color: #d0dcfa !important; border-radius: 10px !important; }
 .stMultiSelect [data-baseweb="select"] * { color: #0d1f4e !important; font-weight: 500 !important; }
 label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 700 !important; }
+.form-item-title { font-size: 12px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid #d0dcfa; }
+.add-hint { font-size: 12px; color: #4a6080; font-weight: 600; margin: -2px 0 10px; }
 .stTabs [data-baseweb="tab-list"] {
     background: #dfeaff !important;
     border-radius: 12px !important;
@@ -272,6 +274,8 @@ CARGOS = ["Juiz de Direito","Juiz Federal","Desembargador","Promotor de Justiça
 AREAS = ["Criminal","Cível","Família e Sucessões","Execução Penal","Infância e Juventude","Fazenda Pública","Meio Ambiente","Moralidade Administrativa","Violência Doméstica","Direito Público","Direito Tributário","Consumidor","Saúde","Todas as áreas"]
 FORMACOES = ["Bacharel em Direito","Mestrado","Doutorado"]
 INSTITUICOES_INTERESSE = ["Tribunais de Justiça","Ministérios Públicos","Defensorias Públicas","Procuradorias","Tribunais Regionais Federais","Ministério Público Federal","Advocacia Pública","Tribunais de Contas"]
+MESES = ["01","02","03","04","05","06","07","08","09","10","11","12"]
+ANOS_PERIODO = [str(a) for a in range(date.today().year, 1979, -1)]
 REGIMES = ["Integral","Parcial","Remoto","Híbrido"]
 FORMAS_SELECAO = ["Análise de currículo","Análise de currículo + entrevista","Entrevista","Análise de portfólio + entrevista","Processo simplificado"]
 PERGUNTAS_DISC = [
@@ -434,19 +438,45 @@ def sistemas_experiencias(exps):
 def anos_experiencias(exps):
     total = 0.0
     for e in exps:
-        try:
-            ini = datetime.strptime(e.get("inicio",""), "%d/%m/%Y")
-            fim_txt = e.get("fim","").strip()
-            fim = datetime.strptime(fim_txt, "%d/%m/%Y") if fim_txt else datetime.today()
-            if fim >= ini:
-                total += (fim - ini).days / 365.25
-        except Exception:
+        ini = parse_data_periodo(e.get("inicio",""))
+        fim_txt = e.get("fim","").strip()
+        fim = parse_data_periodo(fim_txt) if fim_txt else datetime.today()
+        if not ini or not fim:
             continue
+        if fim >= ini:
+            total += (fim - ini).days / 365.25
     return int(total)
 
 def lista_selecionada(valor, opcoes):
     atuais = [v.strip() for v in str(valor or "").split(",") if v.strip()]
     return [v for v in atuais if v in opcoes]
+
+def parse_data_periodo(valor):
+    valor = str(valor or "").strip()
+    if not valor:
+        return None
+    for formato in ("%m/%Y", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(valor, formato)
+        except ValueError:
+            pass
+    return None
+
+def dividir_periodo(valor):
+    valor = str(valor or "").replace(" até ", " a ").replace("-", " a ").strip()
+    partes = [p.strip() for p in valor.split(" a ") if p.strip()]
+    ini = partes[0] if partes else ""
+    fim = partes[1] if len(partes) > 1 else ""
+    return ini, fim
+
+def mes_ano(valor):
+    dt = parse_data_periodo(valor)
+    if dt:
+        return f"{dt.month:02d}", str(dt.year)
+    return MESES[0], str(date.today().year)
+
+def texto_periodo(mes_inicio, ano_inicio, mes_fim, ano_fim):
+    return f"{mes_inicio}/{ano_inicio} a {mes_fim}/{ano_fim}"
 
 def html_selos(c):
     h=""
@@ -633,7 +663,7 @@ if pagina == "inicio":
             st.markdown(f'<div class="info-card" style="margin-top:10px">{cand.get("resumo","")}</div>', unsafe_allow_html=True)
 
         editando = st.session_state.get("editar_perfil_candidato", False)
-        if editando and st.button("Fechar edição", key="editar_perfil_btn"):
+        if editando and st.button("Fechar", key="editar_perfil_btn"):
             st.session_state.editar_perfil_candidato = False
             st.rerun()
 
@@ -642,6 +672,19 @@ if pagina == "inicio":
             st.markdown('<p class="section-label">Editar perfil</p>', unsafe_allow_html=True)
             formacoes_base = formacoes_candidato(cand) or [{"grau":"Bacharel em Direito","instituicao":"","periodo":""}]
             experiencias_base = experiencias_candidato(cand) or [{"orgao":"","supervisor":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":""}]
+            if "edit_qtd_form" not in st.session_state:
+                st.session_state.edit_qtd_form = max(1, len(formacoes_base))
+            if "edit_qtd_exp" not in st.session_state:
+                st.session_state.edit_qtd_exp = max(1, len(experiencias_base))
+            b1, b2, _ = st.columns([2,2,6])
+            with b1:
+                if st.button("+ Adicionar formação", key="add_form_edit"):
+                    st.session_state.edit_qtd_form = min(8, st.session_state.edit_qtd_form + 1)
+                    st.rerun()
+            with b2:
+                if st.button("+ Adicionar experiência", key="add_exp_edit"):
+                    st.session_state.edit_qtd_exp = min(10, st.session_state.edit_qtd_exp + 1)
+                    st.rerun()
             with st.form("form_editar_candidato"):
                 st.markdown('<p class="section-label">Fotografia de perfil</p>', unsafe_allow_html=True)
                 foto = st.file_uploader("Fotografia de perfil", type=["jpg","jpeg","png"], key="foto_edit_cand")
@@ -650,17 +693,28 @@ if pagina == "inicio":
                     st.caption("Prévia da foto. Para manter a imagem após reiniciar o app, será necessário configurar armazenamento permanente.")
 
                 st.markdown('<p class="section-label">Formação acadêmica</p>', unsafe_allow_html=True)
-                qtd_form = st.number_input("Quantas formações deseja informar?", min_value=1, max_value=5, value=len(formacoes_base), key="qtd_form_edit")
                 formacoes = []
-                for i in range(qtd_form):
+                for i in range(st.session_state.edit_qtd_form):
                     base = formacoes_base[i] if i < len(formacoes_base) else {"grau":"Bacharel em Direito","instituicao":"","periodo":""}
-                    c1, c2, c3 = st.columns([2,3,2])
+                    ini_base, fim_base = dividir_periodo(base.get("periodo",""))
+                    mi, ai = mes_ano(ini_base)
+                    mf, af = mes_ano(fim_base)
+                    st.markdown(f'<div class="form-item-title">Formação {i+1}</div>', unsafe_allow_html=True)
+                    c1, c2 = st.columns([2,3])
                     with c1:
-                        grau = st.selectbox(f"Formação {i+1}", FORMACOES, index=(FORMACOES.index(base.get("grau")) if base.get("grau") in FORMACOES else 0), key=f"edit_grau_{i}")
+                        grau = st.selectbox("Formação", FORMACOES, index=(FORMACOES.index(base.get("grau")) if base.get("grau") in FORMACOES else 0), key=f"edit_grau_{i}")
                     with c2:
-                        instituicao = st.text_input(f"Instituição de ensino {i+1}", value=base.get("instituicao",""), key=f"edit_inst_{i}")
-                    with c3:
-                        periodo = st.text_input(f"Período {i+1}", value=base.get("periodo",""), placeholder="mm/aaaa a mm/aaaa", key=f"edit_periodo_{i}")
+                        instituicao = st.text_input("Instituição de ensino", value=base.get("instituicao",""), key=f"edit_inst_{i}")
+                    p1, p2, p3, p4 = st.columns(4)
+                    with p1:
+                        mes_inicio = st.selectbox("Mês de início", MESES, index=MESES.index(mi), key=f"edit_form_mi_{i}")
+                    with p2:
+                        ano_inicio = st.selectbox("Ano de início", ANOS_PERIODO, index=ANOS_PERIODO.index(ai) if ai in ANOS_PERIODO else 0, key=f"edit_form_ai_{i}")
+                    with p3:
+                        mes_fim = st.selectbox("Mês final", MESES, index=MESES.index(mf), key=f"edit_form_mf_{i}")
+                    with p4:
+                        ano_fim = st.selectbox("Ano final", ANOS_PERIODO, index=ANOS_PERIODO.index(af) if af in ANOS_PERIODO else 0, key=f"edit_form_af_{i}")
+                    periodo = texto_periodo(mes_inicio, ano_inicio, mes_fim, ano_fim)
                     formacoes.append({"grau":grau,"instituicao":instituicao,"periodo":periodo})
 
                 st.markdown('<p class="section-label">Instituições de Interesse</p>', unsafe_allow_html=True)
@@ -675,26 +729,32 @@ if pagina == "inicio":
                     estuda_concurso = st.radio("Estuda para concurso?", ["Não","Sim"], index=1 if cand.get("concurso") and cand.get("concurso")!="Não estou estudando para concurso" else 0, horizontal=True)
 
                 st.markdown('<p class="section-label">Experiência profissional</p>', unsafe_allow_html=True)
-                qtd_exp = st.number_input("Quantas experiências deseja informar?", min_value=0, max_value=8, value=len(experiencias_base), key="qtd_exp_edit")
                 experiencias = []
-                for i in range(qtd_exp):
+                for i in range(st.session_state.edit_qtd_exp):
                     base = experiencias_base[i] if i < len(experiencias_base) else {"orgao":"","supervisor":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":""}
-                    st.markdown(f'<div class="info-box">Experiência {i+1}</div>', unsafe_allow_html=True)
+                    mi, ai = mes_ano(base.get("inicio",""))
+                    mf, af = mes_ano(base.get("fim",""))
+                    st.markdown(f'<div class="form-item-title">Experiência {i+1}</div>', unsafe_allow_html=True)
                     c1, c2 = st.columns(2)
                     with c1:
                         orgao = st.text_input("Órgão de atuação", value=base.get("orgao",""), key=f"edit_exp_orgao_{i}")
                     with c2:
                         supervisor = st.text_input("Supervisor", value=base.get("supervisor",""), key=f"edit_exp_supervisor_{i}")
-                    c1, c2, c3 = st.columns(3)
+                    c1, c2, c3, c4 = st.columns(4)
                     with c1:
-                        inicio = st.text_input("Início", value=base.get("inicio",""), placeholder="dd/mm/aaaa", key=f"edit_exp_inicio_{i}")
+                        mes_inicio = st.selectbox("Mês de início", MESES, index=MESES.index(mi), key=f"edit_exp_mi_{i}")
                     with c2:
-                        fim = st.text_input("Fim", value=base.get("fim",""), placeholder="dd/mm/aaaa ou atual", key=f"edit_exp_fim_{i}")
+                        ano_inicio = st.selectbox("Ano de início", ANOS_PERIODO, index=ANOS_PERIODO.index(ai) if ai in ANOS_PERIODO else 0, key=f"edit_exp_ai_{i}")
                     with c3:
-                        area_exp = st.text_input("Área de atuação", value=base.get("area",""), key=f"edit_exp_area_{i}")
+                        mes_fim = st.selectbox("Mês final", MESES, index=MESES.index(mf), key=f"edit_exp_mf_{i}")
+                    with c4:
+                        ano_fim = st.selectbox("Ano final", ANOS_PERIODO, index=ANOS_PERIODO.index(af) if af in ANOS_PERIODO else 0, key=f"edit_exp_af_{i}")
+                    inicio = f"{mes_inicio}/{ano_inicio}"
+                    fim = f"{mes_fim}/{ano_fim}"
+                    area_exp = st.multiselect("Área de atuação", AREAS, default=lista_selecionada(base.get("area",""), AREAS), key=f"edit_exp_area_{i}")
                     atribuicoes = st.text_area("Atribuições desenvolvidas", value=base.get("atribuicoes",""), height=80, key=f"edit_exp_atr_{i}")
-                    sistemas_exp = st.text_input("Sistemas de trabalho", value=base.get("sistemas",""), placeholder="Ex: Eproc, SAJ, SEEU", key=f"edit_exp_sis_{i}")
-                    experiencias.append({"orgao":orgao,"supervisor":supervisor,"inicio":inicio,"fim":fim,"area":area_exp,"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
+                    sistemas_exp = st.text_input("Sistemas de trabalho utilizados no período da experiência profissional", value=base.get("sistemas",""), placeholder="Ex: Eproc, SAJ, SEEU", key=f"edit_exp_sis_{i}")
+                    experiencias.append({"orgao":orgao,"supervisor":supervisor,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
 
                 st.markdown('<p class="section-label">Outras informações acadêmicas e profissionais</p>', unsafe_allow_html=True)
                 st.caption("Use este campo para cursos livres, publicações, produção acadêmica, idiomas, atividades docentes, projetos, voluntariado jurídico, premiações e outras informações que ajudem o recrutador a entender sua trajetória.")
@@ -1034,13 +1094,23 @@ elif pagina == "cadastro":
             st.caption("Prévia da foto. Para manter a imagem após reiniciar o app, será necessário configurar armazenamento permanente.")
 
         st.markdown('<p class="section-label">Formação acadêmica</p>', unsafe_allow_html=True)
-        qtd_form = st.number_input("Quantas formações deseja informar?", min_value=1, max_value=5, value=1, key="qtd_form_cad")
+        if "cad_qtd_form" not in st.session_state:
+            st.session_state.cad_qtd_form = 1
+        if st.button("+ Adicionar formação", key="add_form_cad"):
+            st.session_state.cad_qtd_form = min(8, st.session_state.cad_qtd_form + 1)
+            st.rerun()
         formacoes = []
-        for i in range(qtd_form):
-            c1,c2,c3=st.columns([2,3,2])
-            with c1: grau=st.selectbox(f"Formação {i+1} *",FORMACOES,key=f"cad_grau_{i}")
-            with c2: inst=st.text_input(f"Instituição de ensino {i+1} *",key=f"cad_inst_{i}")
-            with c3: periodo=st.text_input(f"Período {i+1}",placeholder="mm/aaaa a mm/aaaa",key=f"cad_periodo_{i}")
+        for i in range(st.session_state.cad_qtd_form):
+            st.markdown(f'<div class="form-item-title">Formação {i+1}</div>', unsafe_allow_html=True)
+            c1,c2=st.columns([2,3])
+            with c1: grau=st.selectbox("Formação *",FORMACOES,key=f"cad_grau_{i}")
+            with c2: inst=st.text_input("Instituição de ensino *",key=f"cad_inst_{i}")
+            p1,p2,p3,p4=st.columns(4)
+            with p1: mes_inicio=st.selectbox("Mês de início",MESES,key=f"cad_form_mi_{i}")
+            with p2: ano_inicio=st.selectbox("Ano de início",ANOS_PERIODO,key=f"cad_form_ai_{i}")
+            with p3: mes_fim=st.selectbox("Mês final",MESES,key=f"cad_form_mf_{i}")
+            with p4: ano_fim=st.selectbox("Ano final",ANOS_PERIODO,key=f"cad_form_af_{i}")
+            periodo=texto_periodo(mes_inicio,ano_inicio,mes_fim,ano_fim)
             formacoes.append({"grau":grau,"instituicao":inst,"periodo":periodo})
 
         st.markdown('<p class="section-label">Instituições de Interesse</p>', unsafe_allow_html=True)
@@ -1052,20 +1122,28 @@ elif pagina == "cadastro":
         with c3: estuda_concurso=st.radio("Estuda para concurso?",["Não","Sim"],horizontal=True)
 
         st.markdown('<p class="section-label">Experiência profissional</p>', unsafe_allow_html=True)
-        qtd_exp = st.number_input("Quantas experiências deseja informar?", min_value=0, max_value=8, value=1, key="qtd_exp_cad")
+        if "cad_qtd_exp" not in st.session_state:
+            st.session_state.cad_qtd_exp = 1
+        if st.button("+ Adicionar experiência", key="add_exp_cad"):
+            st.session_state.cad_qtd_exp = min(10, st.session_state.cad_qtd_exp + 1)
+            st.rerun()
         experiencias = []
-        for i in range(qtd_exp):
-            st.markdown(f'<div class="info-box">Experiência {i+1}</div>', unsafe_allow_html=True)
+        for i in range(st.session_state.cad_qtd_exp):
+            st.markdown(f'<div class="form-item-title">Experiência {i+1}</div>', unsafe_allow_html=True)
             c1,c2=st.columns(2)
             with c1: orgao=st.text_input("Órgão de atuação",value=campos.get("experiencia_orgaos","") if i==0 else "",key=f"cad_exp_orgao_{i}")
             with c2: supervisor=st.text_input("Supervisor",key=f"cad_exp_supervisor_{i}")
-            c1,c2,c3=st.columns(3)
-            with c1: inicio=st.text_input("Início",placeholder="dd/mm/aaaa",key=f"cad_exp_inicio_{i}")
-            with c2: fim=st.text_input("Fim",placeholder="dd/mm/aaaa ou atual",key=f"cad_exp_fim_{i}")
-            with c3: area_exp=st.text_input("Área de atuação",key=f"cad_exp_area_{i}")
+            c1,c2,c3,c4=st.columns(4)
+            with c1: mes_inicio=st.selectbox("Mês de início",MESES,key=f"cad_exp_mi_{i}")
+            with c2: ano_inicio=st.selectbox("Ano de início",ANOS_PERIODO,key=f"cad_exp_ai_{i}")
+            with c3: mes_fim=st.selectbox("Mês final",MESES,key=f"cad_exp_mf_{i}")
+            with c4: ano_fim=st.selectbox("Ano final",ANOS_PERIODO,key=f"cad_exp_af_{i}")
+            inicio=f"{mes_inicio}/{ano_inicio}"
+            fim=f"{mes_fim}/{ano_fim}"
+            area_exp=st.multiselect("Área de atuação",AREAS,key=f"cad_exp_area_{i}")
             atribuicoes=st.text_area("Atribuições desenvolvidas",height=80,key=f"cad_exp_atr_{i}")
-            sistemas_exp=st.text_input("Sistemas de trabalho",value=campos.get("sistemas","") if i==0 else "",placeholder="Ex: Eproc, SAJ, SEEU",key=f"cad_exp_sis_{i}")
-            experiencias.append({"orgao":orgao,"supervisor":supervisor,"inicio":inicio,"fim":fim,"area":area_exp,"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
+            sistemas_exp=st.text_input("Sistemas de trabalho utilizados no período da experiência profissional",value=campos.get("sistemas","") if i==0 else "",placeholder="Ex: Eproc, SAJ, SEEU",key=f"cad_exp_sis_{i}")
+            experiencias.append({"orgao":orgao,"supervisor":supervisor,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
 
         st.markdown('<p class="section-label">Outras informações acadêmicas e profissionais</p>', unsafe_allow_html=True)
         st.caption("Use este campo para cursos livres, publicações, produção acadêmica, idiomas, atividades docentes, projetos, voluntariado jurídico, premiações e outras informações que ajudem o recrutador a entender sua trajetória.")
