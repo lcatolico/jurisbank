@@ -678,60 +678,60 @@ if pagina == "inicio":
             </div>
         </div>""", unsafe_allow_html=True)
 
-        st.markdown('<div class="profile-shell"><p class="profile-shell-title">Perfil do Candidato</p>', unsafe_allow_html=True)
-        st.markdown(f"""<div class="info-card">
-            <p class="profile-name">{cand.get("nome","")}</p>
-            <p class="cand-sub">{cand.get("email","")}</p>
-        </div>""", unsafe_allow_html=True)
-
-        disponivel_txt = "Sim" if cand.get("disponibilidade") == "Sim" else "Não"
-        st.markdown(f'<div class="highlight-panel">Disponível para seleção: {disponivel_txt}</div>', unsafe_allow_html=True)
-
-        c1, c2, _ = st.columns([3,2,5])
-        with c1:
-            if st.button("Ver Seletivos abertos", key="btn_cand_seletivos"):
-                ir("chamadas")
-        with c2:
-            if st.button("Editar perfil", key="editar_perfil_btn_topo"):
-                st.session_state.editar_perfil_candidato = True
-                st.rerun()
-
-        st.markdown('<p class="section-label">Selos</p>', unsafe_allow_html=True)
-        st.markdown(f'<div class="info-card">{html_selos(cand) or "Nenhum selo ativo no momento."}</div>', unsafe_allow_html=True)
-
-        if cand.get("disc"):
-            st.markdown('<p class="section-label">Perfil DISC</p>', unsafe_allow_html=True)
-            st.markdown(render_disc(cand["disc"]), unsafe_allow_html=True)
-
         formacoes_view = formacoes_candidato(cand)
         experiencias_view = experiencias_candidato(cand)
 
-        st.markdown('<p class="section-label">Resumo do perfil</p>', unsafe_allow_html=True)
-        c1, c2 = st.columns(2)
-        with c1:
+        with st.container(border=True):
+            st.markdown('<p class="profile-shell-title">Perfil do Candidato</p>', unsafe_allow_html=True)
             st.markdown(f"""<div class="info-card">
-                <strong>Formação:</strong> {resumo_formacoes(formacoes_view) or '—'}<br>
-                <strong>Experiência total:</strong> {anos_experiencias(experiencias_view)} ano(s)
-            </div>""", unsafe_allow_html=True)
-        with c2:
-            st.markdown(f"""<div class="info-card">
-                <strong>OAB ativa:</strong> {cand.get('oab','—')}<br>
-                <strong>Experiência:</strong> {resumo_experiencias(experiencias_view) or cand.get('experiencia_orgaos','—')}<br>
-                <strong>Sistemas:</strong> {cand.get('sistemas','—')}
+                <p class="profile-name">{cand.get("nome","")}</p>
+                <p class="cand-sub">{cand.get("email","")}</p>
             </div>""", unsafe_allow_html=True)
 
-        if cand.get("resumo"):
-            st.markdown('<p class="section-label">Outras informações acadêmicas e profissionais</p>', unsafe_allow_html=True)
-            st.markdown(f'<div class="info-card" style="margin-top:10px">{cand.get("resumo","")}</div>', unsafe_allow_html=True)
+            disponivel_txt = "Sim" if cand.get("disponibilidade") == "Sim" else "Não"
+            st.markdown(f'<div class="highlight-panel">Disponível para seleção: {disponivel_txt}</div>', unsafe_allow_html=True)
 
-        st.markdown('<p class="section-label">Concurso</p>', unsafe_allow_html=True)
-        st.markdown(f'<div class="info-card">{cand.get("concurso","Não estou estudando para concurso") or "Não estou estudando para concurso"}</div>', unsafe_allow_html=True)
+            c1, c2, _ = st.columns([3,2,5])
+            with c1:
+                if st.button("Ver Seletivos abertos", key="btn_cand_seletivos"):
+                    ir("chamadas")
+            with c2:
+                if st.button("Editar perfil", key="editar_perfil_btn_topo"):
+                    st.session_state.editar_perfil_candidato = True
+                    st.rerun()
 
-        st.markdown('<p class="section-label">Instituições de interesse para trabalhar</p>', unsafe_allow_html=True)
-        st.markdown(f'<div class="info-card">{cand.get("area","—")}</div>', unsafe_allow_html=True)
+            st.markdown('<p class="section-label">Selos</p>', unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card">{html_selos(cand) or "Nenhum selo ativo no momento."}</div>', unsafe_allow_html=True)
+
+            if cand.get("disc"):
+                st.markdown('<p class="section-label">Perfil DISC</p>', unsafe_allow_html=True)
+                st.markdown(render_disc(cand["disc"]), unsafe_allow_html=True)
+
+            st.markdown('<p class="section-label">Resumo do perfil</p>', unsafe_allow_html=True)
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown(f"""<div class="info-card">
+                    <strong>Formação:</strong> {resumo_formacoes(formacoes_view) or '—'}<br>
+                    <strong>Experiência total:</strong> {anos_experiencias(experiencias_view)} ano(s)
+                </div>""", unsafe_allow_html=True)
+            with c2:
+                st.markdown(f"""<div class="info-card">
+                    <strong>OAB ativa:</strong> {cand.get('oab','—')}<br>
+                    <strong>Experiência:</strong> {resumo_experiencias(experiencias_view) or cand.get('experiencia_orgaos','—')}<br>
+                    <strong>Sistemas:</strong> {cand.get('sistemas','—')}
+                </div>""", unsafe_allow_html=True)
+
+            if cand.get("resumo"):
+                st.markdown('<p class="section-label">Outras informações acadêmicas e profissionais</p>', unsafe_allow_html=True)
+                st.markdown(f'<div class="info-card" style="margin-top:10px">{cand.get("resumo","")}</div>', unsafe_allow_html=True)
+
+            st.markdown('<p class="section-label">Concurso</p>', unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card">{cand.get("concurso","Não estou estudando para concurso") or "Não estou estudando para concurso"}</div>', unsafe_allow_html=True)
+
+            st.markdown('<p class="section-label">Instituições de interesse para trabalhar</p>', unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card">{cand.get("area","—")}</div>', unsafe_allow_html=True)
 
         editando = st.session_state.get("editar_perfil_candidato", False)
-        st.markdown('</div>', unsafe_allow_html=True)
         if editando and st.button("Fechar", key="editar_perfil_btn"):
             st.session_state.editar_perfil_candidato = False
             st.rerun()
