@@ -9,6 +9,7 @@ import urllib.request
 import urllib.parse
 import json
 import html as html_lib
+import base64
 from datetime import datetime, date
 
 st.set_page_config(
@@ -61,7 +62,8 @@ header[data-testid="stHeader"] { display: none !important; }
     flex-wrap: wrap; gap: 12px;
     background: #0d1f4e;
 }
-.topbar-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 190px; }
+.topbar-logo, .topbar-logo *, .topbar a, .topbar a * { text-decoration: none !important; }
+.topbar-logo { display: flex; align-items: center; gap: 12px; min-width: 190px; }
 .topbar-logo-icon {
     width: 38px; height: 38px;
     background: linear-gradient(135deg,#d9a514,#f0c040);
@@ -115,6 +117,7 @@ header[data-testid="stHeader"] { display: none !important; }
 .profile-panel { background: #ffffff; border: 1.5px solid #c5d5f5; border-radius: 22px; padding: 34px 38px; margin: 0 0 1.5rem; box-shadow: 0 12px 30px rgba(13,31,78,0.08); width: 100%; }
 .profile-head { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
 .profile-avatar { width: 68px; height: 68px; border-radius: 14px; background: #247b56; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; flex-shrink: 0; }
+.profile-photo { width: 68px; height: 68px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 1px solid #d0dcfa; }
 .profile-name-main { font-size: 24px; font-weight: 900; color: #0d1f4e; margin: 0 0 2px; }
 .profile-sub-main { font-size: 15px; font-weight: 700; color: #587bd6; margin: 0; line-height: 1.35; }
 .profile-chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; }
@@ -148,6 +151,8 @@ header[data-testid="stHeader"] { display: none !important; }
 .chamada-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 10px; transition: all 0.2s; }
 .chamada-card:hover { border-color: #4070f4; box-shadow: 0 6px 24px rgba(64,112,244,0.1); }
 .avatar { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; color: white; }
+.cand-photo { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 1px solid #d0dcfa; }
+.cand-photo-lg { width: 60px; height: 60px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 1px solid #d0dcfa; }
 .cand-name { font-size: 15px; font-weight: 700; color: #0d1f4e; margin: 0 0 3px; }
 .cand-sub { font-size: 12px; color: #4a6080; margin: 0; font-weight: 500; }
 .badge-sim { background: #e6f4ea; color: #1a7a4a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
@@ -216,8 +221,8 @@ div[data-testid="column"]:last-child .stButton button,
 div[data-testid="column"]:nth-last-child(2) .stButton button { background: #ffffff !important; color: #0d1f4e !important; border: 1.5px solid #c5d5f5 !important; border-radius: 10px !important; padding: 0.58rem 1rem !important; font-size: 13px !important; font-weight: 800 !important; width: 100%; box-shadow: 0 6px 16px rgba(13,31,78,0.08) !important; }
 div[data-testid="column"]:last-child .stButton button:hover,
 div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background: #e8f0fe !important; border-color: #4070f4 !important; color: #0d1f4e !important; }
-.stTextInput input, .stTextArea textarea { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Sora',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
-.stTextInput input:focus, .stTextArea textarea:focus { border-color: #4070f4 !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
+.stTextInput input, .stTextArea textarea, .stDateInput input { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Sora',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
+.stTextInput input:focus, .stTextArea textarea:focus, .stDateInput input:focus { border-color: #4070f4 !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
 .stTextInput input::placeholder, .stTextArea textarea::placeholder { color: #4a6080 !important; opacity: 1 !important; font-weight: 500 !important; }
 .stSelectbox > div > div { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; }
 .stSelectbox [data-baseweb="select"] * { color: #0d1f4e !important; font-weight: 500 !important; }
@@ -233,8 +238,8 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background:
 }
 .stMultiSelect [data-baseweb="select"] svg { fill: #0d1f4e !important; color: #0d1f4e !important; }
 .stMultiSelect [data-baseweb="tag"] { background: #e8effe !important; color: #0d1f4e !important; border: 1px solid #c5d5f5 !important; }
-[data-baseweb="popover"], [data-baseweb="menu"], [role="listbox"] { background: #ffffff !important; color: #0d1f4e !important; }
-[role="option"], [role="option"] * { background: #ffffff !important; color: #0d1f4e !important; }
+[data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"], [role="listbox"] { background: #ffffff !important; color: #0d1f4e !important; }
+[role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #0d1f4e !important; }
 [role="option"]:hover, [role="option"][aria-selected="true"] { background: #e8f0fe !important; color: #0d1f4e !important; }
 label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 700 !important; }
 .form-item-title { font-size: 12px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid #d0dcfa; }
@@ -276,6 +281,96 @@ label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 700 !impor
     color: #0d1f4e !important;
     font-weight: 600;
 }
+
+/* ── Camada visual neutra inspirada na nova landing ── */
+[data-testid="stAppViewContainer"] { background: #f9f8f6 !important; }
+html, body, [class*="css"] { color: #1e1e1e !important; }
+.main .block-container { max-width: 1120px; }
+.topbar {
+    background: #1e1e1e !important;
+    border-bottom: 1px solid #ddd8ce !important;
+    box-shadow: 0 8px 24px rgba(30,30,30,0.08);
+}
+.topbar-logo-icon, .topbar-nav a.btn-rec {
+    background: linear-gradient(135deg,#b8973a,#e8d48a) !important;
+    color: #1e1e1e !important;
+}
+.topbar .topbar-logo-name { color: #ffffff !important; }
+.topbar .topbar-logo-sub, .topbar-nav a.active { color: #e8d48a !important; }
+.topbar-nav a.active { border-color: rgba(232,212,138,.45) !important; background: rgba(232,212,138,.1) !important; }
+.hero-card, .profile-shell, .profile-panel, .edit-hero, .cand-card, .chamada-card, .metric-box,
+.info-card, .lock-box, .profile-detail, [data-testid="stFileUploader"] section {
+    background: #ffffff !important;
+    border-color: #ddd8ce !important;
+    box-shadow: 0 14px 36px rgba(30,30,30,0.06) !important;
+}
+.page-title, .edit-title, .profile-name-main, .profile-name, .cand-name,
+.metric-value, .section-label, .profile-shell-title, .form-item-title {
+    color: #1e1e1e !important;
+}
+.page-title em, .edit-title em {
+    background: none !important;
+    -webkit-text-fill-color: #b8973a !important;
+    color: #b8973a !important;
+}
+.page-sub, .edit-sub, .cand-sub, .doc-body, .add-hint,
+[data-testid="stCaptionContainer"], .stCaptionContainer {
+    color: #6a6a6a !important;
+}
+.stButton button, [data-testid="stFormSubmitButton"] button {
+    background: #b8973a !important;
+    color: #1e1e1e !important;
+    border-color: rgba(30,30,30,.1) !important;
+    box-shadow: 0 10px 22px rgba(184,151,58,.18) !important;
+}
+.stButton button:hover, [data-testid="stFormSubmitButton"] button:hover {
+    background: #e8d48a !important;
+    color: #1e1e1e !important;
+}
+div[data-testid="column"]:last-child .stButton button,
+div[data-testid="column"]:nth-last-child(2) .stButton button {
+    background: #ffffff !important;
+    color: #1e1e1e !important;
+    border-color: #ddd8ce !important;
+}
+div[data-testid="column"]:last-child .stButton button:hover,
+div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
+    background: #f2efe9 !important;
+    border-color: #b8973a !important;
+}
+.profile-action {
+    background: #faf6ec !important;
+    border-color: #e8d48a !important;
+    color: #8a6a16 !important;
+}
+.profile-action:hover { background: #e8d48a !important; color: #1e1e1e !important; }
+.highlight-panel, .profile-concurso {
+    background: #faf6ec !important;
+    border-color: #e8d48a !important;
+    color: #1e1e1e !important;
+}
+.stat-pill, .profile-chip, .badge-inscrito {
+    background: #f2efe9 !important;
+    color: #1e1e1e !important;
+    border-color: #ddd8ce !important;
+}
+.custom-divider, .form-item-title { border-color: #ddd8ce !important; background: #ddd8ce !important; }
+.stTextInput input, .stTextArea textarea, .stDateInput input,
+.stSelectbox > div > div, .stMultiSelect > div > div,
+[data-baseweb="input"], [data-baseweb="select"] {
+    background: #ffffff !important;
+    color: #1e1e1e !important;
+    border-color: #ddd8ce !important;
+}
+[data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"], [role="listbox"] {
+    background: #ffffff !important;
+    color: #1e1e1e !important;
+}
+[role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #1e1e1e !important; }
+[role="option"]:hover, [role="option"][aria-selected="true"] { background: #f2efe9 !important; color: #1e1e1e !important; }
+.stTabs [data-baseweb="tab-list"] { background: #f2efe9 !important; border-color: #ddd8ce !important; }
+.stTabs [data-baseweb="tab"] { color: #6a6a6a !important; }
+.stTabs [aria-selected="true"] { color: #1e1e1e !important; box-shadow: 0 6px 14px rgba(30,30,30,0.08) !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -303,6 +398,20 @@ aba_recrutadores = abas["recrutadores"]
 aba_chamadas = abas["chamadas"]
 aba_interesses = abas["interesses"]
 aba_recomendacoes = abas["recomendacoes"]
+
+CAND_COL_SENHA = 19
+CAND_COL_FOTO = 20
+
+def garantir_coluna(aba, nome, posicao):
+    try:
+        cabecalhos = aba.row_values(1)
+        if nome not in cabecalhos:
+            aba.update_cell(1, posicao, nome)
+    except Exception:
+        pass
+
+garantir_coluna(aba_candidatos, "senha", CAND_COL_SENHA)
+garantir_coluna(aba_candidatos, "foto", CAND_COL_FOTO)
 
 # ── Navegação por URL ─────────────────────────────────────────────────────────
 params = st.query_params
@@ -342,7 +451,14 @@ INSTITUICOES_INTERESSE = ["Tribunais de Justiça","Ministérios Públicos","Defe
 MESES = ["01","02","03","04","05","06","07","08","09","10","11","12"]
 ANOS_PERIODO = [str(a) for a in range(date.today().year, 1979, -1)]
 REGIMES = ["Integral","Parcial","Remoto","Híbrido"]
-FORMAS_SELECAO = ["Análise de currículo","Análise de currículo + entrevista","Entrevista","Análise de portfólio + entrevista","Processo simplificado"]
+FORMAS_SELECAO = [
+    "Análise curricular",
+    "Análise curricular + entrevista estruturada",
+    "Análise curricular + teste de escrita",
+    "Análise curricular + entrevista + teste",
+    "Seleção com período de experiência",
+    "Processo simplificado"
+]
 PERGUNTAS_DISC = [
     ("Em situações de pressão no trabalho, você tende a:",["Tomar decisões rápidas e assumir o controle","Motivar a equipe e buscar soluções criativas","Manter a calma e seguir o processo estabelecido","Analisar os dados antes de agir"]),
     ("Quando recebe uma tarefa nova, você prefere:",["Ter autonomia total para decidir como fazer","Conversar com a equipe e trocar ideias","Entender bem o processo antes de começar","Ter instruções detalhadas e critérios claros"]),
@@ -356,7 +472,16 @@ PERGUNTAS_DISC = [
     ("Quando comete um erro, você:",["Assume, corrige rapidamente e segue em frente","Conversa com alguém para processar e superar","Reflete com calma antes de agir diferente","Analisa o que deu errado para não repetir"]),
     ("Sua maior dificuldade no trabalho é:",["Paciência com processos lentos","Manter o foco em tarefas repetitivas","Lidar com mudanças repentinas","Trabalhar sem informações suficientes"]),
     ("Como você prefere receber feedback:",["Direto e objetivo, sem rodeios","De forma encorajadora e positiva","Com calma, em conversa reservada","Com dados e exemplos concretos"]),
+    ("Quando há uma demanda urgente no gabinete, você primeiro:",["Define prioridades e distribui tarefas","Alinha expectativas com as pessoas envolvidas","Mantém a rotina e evita desorganização","Confere critérios, prazos e riscos"]),
+    ("Em uma minuta complexa, você se destaca por:",["Chegar rapidamente a uma solução prática","Articular informações com clareza para todos","Garantir continuidade e consistência no fluxo","Pesquisar com profundidade e revisar detalhes"]),
+    ("Ao lidar com atendimento ao público, você tende a:",["Resolver objetivamente o problema apresentado","Criar vínculo e deixar a pessoa à vontade","Escutar com paciência e acolhimento","Registrar informações com precisão"]),
+    ("Quando precisa aprender um novo sistema, você prefere:",["Explorar sozinho e testar caminhos","Aprender com alguém e trocar dicas","Receber passo a passo e praticar com calma","Ler orientações e validar cada procedimento"]),
+    ("Em tarefas de alto volume, você costuma:",["Acelerar decisões para entregar resultado","Manter energia e engajamento do grupo","Organizar uma rotina constante de produção","Criar controles para reduzir erros"]),
+    ("Quando discorda de uma orientação, você:",["Apresenta sua posição de forma direta","Tenta persuadir com boa comunicação","Evita tensão e busca consenso","Fundamenta a discordância com dados e normas"]),
+    ("Você se sente mais confortável em ambientes:",["Com autonomia, metas claras e decisões rápidas","Com interação, reconhecimento e troca constante","Com previsibilidade, cooperação e estabilidade","Com regras claras, qualidade técnica e precisão"]),
+    ("Na entrega final de um trabalho, você valoriza mais:",["Impacto e resultado dentro do prazo","Boa apresentação e aceitação pelas pessoas","Confiabilidade e continuidade do serviço","Correção técnica e ausência de falhas"]),
 ]
+DISC_AVISO = "O perfil DISC é um indicador comportamental de apoio. Ele não substitui análise curricular, entrevista estruturada, prova prática ou avaliação técnica do trabalho."
 LETRAS_DISC = ["D","I","S","C"]
 DISCLAIMER = "⚠️ O JurisBank atua exclusivamente como plataforma de aproximação. A publicação desta Chamada não configura processo seletivo vinculante, concurso público ou compromisso de contratação. O uso do ius indicandum é de responsabilidade exclusiva do recrutador, que deve observar as normas de impessoalidade e vedação ao nepotismo aplicáveis ao seu órgão."
 
@@ -388,6 +513,12 @@ def ir(p):
 def extrair_pdf(f):
     doc=fitz.open(stream=f.read(),filetype="pdf")
     return "".join(p.get_text() for p in doc)
+
+def imagem_data_url(upload):
+    if not upload:
+        return ""
+    mime = getattr(upload, "type", None) or "image/png"
+    return f"data:{mime};base64,{base64.b64encode(upload.getvalue()).decode('utf-8')}"
 
 def extrair_campos(txt):
     c={"nome":"","email":"","oab":"Não","experiencia_orgaos":"","sistemas":"","pos_graduacao":"","resumo":""}
@@ -426,9 +557,21 @@ def linha_candidato(email):
             return i + 2, cand
     return None, None
 
-def login_candidato(email):
+def senha_candidato(cand):
+    for campo in ["senha", "senha_hash", "password"]:
+        valor = str(cand.get(campo, "") or "").strip()
+        if valor:
+            return valor
+    return ""
+
+def login_candidato(email, senha=None, permitir_sem_senha=True):
     _, cand = linha_candidato(email)
     if cand:
+        senha_salva = senha_candidato(cand)
+        if senha_salva and hash_senha(senha or "") != senha_salva:
+            return None
+        if not senha_salva and senha and not permitir_sem_senha:
+            return None
         st.session_state.cand_logado = cand
         return cand
     return None
@@ -696,8 +839,9 @@ def email_recomendador(nome_candidato, email_recomendador, link):
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
 nav_pages = [
     ("inicio","Área do Candidato"),
-    ("candidatos","Candidatos"),
-    ("chamadas","Chamadas"),
+    ("perfil","Editar Perfil"),
+    ("chamadas","Seletivos"),
+    ("candidatos","Banco de Talentos"),
 ]
 
 nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
@@ -754,12 +898,14 @@ if pagina == "inicio":
             subtitulo = f"{subtitulo} · {cand.get('area')}"
         status_class = "" if disponivel else "profile-status-off"
         email_link = urllib.parse.quote(cand.get("email",""))
+        foto_url = str(cand.get("foto","") or "").strip()
+        avatar_html = f'<img class="profile-photo" src="{html_lib.escape(foto_url)}" alt="Foto de perfil">' if foto_url else f'<div class="profile-avatar">{html_lib.escape(iniciais(cand.get("nome","")))}</div>'
         perfil_html = (
             f'<div class="profile-panel">'
             f'<h1 class="page-title" style="font-size:36px;margin-bottom:6px">Olá, <em>{html_lib.escape(cand.get("nome","candidato").split()[0])}!</em></h1>'
             f'<p class="page-sub" style="margin-bottom:22px">Acompanhe seu perfil, seus selos e os Seletivos disponíveis.</p>'
             f'<div class="profile-head">'
-            f'<div class="profile-avatar">{html_lib.escape(iniciais(cand.get("nome","")))}</div>'
+            f'{avatar_html}'
             f'<div>'
             f'<p class="profile-name-main">{html_lib.escape(cand.get("nome",""))}</p>'
             f'<p class="profile-sub-main">{html_lib.escape(subtitulo)}</p>'
@@ -805,14 +951,15 @@ if pagina == "inicio":
         with tabs[0]:
             st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Entrar no meu perfil</p>', unsafe_allow_html=True)
             email_login = st.text_input("E-mail cadastrado", key="login_candidato_inicio")
+            senha_login = st.text_input("Senha", type="password", key="senha_candidato_inicio", help="Perfis antigos sem senha ainda podem entrar apenas com o e-mail.")
             if st.button("Entrar", key="btn_login_candidato_inicio"):
                 if not email_login:
                     st.error("Informe seu e-mail.")
-                elif login_candidato(email_login):
+                elif login_candidato(email_login, senha_login, permitir_sem_senha=True):
                     st.success("Bem-vindo ao JurisBank.")
                     st.rerun()
                 else:
-                    st.error("E-mail não encontrado.")
+                    st.error("E-mail ou senha inválidos.")
         with tabs[1]:
             st.markdown("""<div class="info-card">
                 <strong>Cadastre seu currículo jurídico</strong><br>
@@ -828,14 +975,26 @@ elif pagina == "perfil":
     if isinstance(email_param, list):
         email_param = email_param[0]
     if not cand_logado() and email_param:
-        login_candidato(email_param)
+        login_candidato(email_param, permitir_sem_senha=True)
     if not cand_logado():
         st.markdown("""<div class="edit-hero">
             <h1 class="edit-title">Editar <em>Perfil.</em></h1>
-            <p class="page-sub">Entre na Área do Candidato para acessar seu perfil.</p>
+            <p class="page-sub">Entre com e-mail e senha para alterar suas informações profissionais.</p>
         </div>""", unsafe_allow_html=True)
-        if st.button("Ir para login do candidato"):
-            ir("inicio")
+        email_editar = st.text_input("E-mail cadastrado", value=email_param, key="login_editar_email")
+        senha_editar = st.text_input("Senha", type="password", key="login_editar_senha")
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("Entrar e editar perfil", key="btn_login_editar_perfil"):
+                if not email_editar:
+                    st.error("Informe seu e-mail.")
+                elif login_candidato(email_editar, senha_editar, permitir_sem_senha=True):
+                    st.rerun()
+                else:
+                    st.error("E-mail ou senha inválidos.")
+        with c2:
+            if st.button("Voltar à Área do Candidato", key="btn_voltar_login_cand"):
+                ir("inicio")
     else:
         cand = st.session_state.cand_logado
         formacoes_base = formacoes_candidato(cand) or [{"grau":"Bacharel em Direito","instituicao":"","periodo":""}]
@@ -862,6 +1021,7 @@ elif pagina == "perfil":
             if foto:
                 st.image(foto, width=120)
                 st.caption("Prévia da foto. Para manter a imagem após reiniciar o app, será necessário configurar armazenamento permanente.")
+            foto_data = imagem_data_url(foto) if foto else cand.get("foto","")
 
             st.markdown('<p class="section-label">Formação acadêmica</p>', unsafe_allow_html=True)
             formacoes = []
@@ -983,6 +1143,7 @@ elif pagina == "perfil":
                     "oab": oab,
                     "experiencia_orgaos": experiencia_final,
                     "sistemas": sistemas,
+                    "foto": foto_data,
                     "resumo": resumo,
                     "selo_verificado": selo_verificado,
                     "selo_experiente": selo_experiente,
@@ -999,6 +1160,7 @@ elif pagina == "perfil":
                 aba_candidatos.update_cell(linha, 13, selo_verificado)
                 aba_candidatos.update_cell(linha, 16, selo_experiente)
                 aba_candidatos.update_cell(linha, 18, concurso)
+                aba_candidatos.update_cell(linha, CAND_COL_FOTO, foto_data)
                 st.session_state.cand_logado = atual
                 st.success("Perfil atualizado com sucesso.")
                 ir("inicio")
@@ -1015,10 +1177,12 @@ elif pagina == "candidatos":
         if st.button("← Voltar"):
             st.session_state.cand_sel = None; st.rerun()
 
+        foto_detalhe = str(c.get("foto","") or "").strip()
+        avatar_detalhe = f'<img class="cand-photo-lg" src="{html_lib.escape(foto_detalhe)}" alt="Foto de perfil">' if foto_detalhe else f'<div class="avatar" style="width:60px;height:60px;border-radius:14px;background:{cor};font-size:20px">{iniciais(c["nome"])}</div>'
         st.markdown(f"""
         <div class="hero-card">
             <div style="display:flex;align-items:center;gap:16px">
-                <div class="avatar" style="width:60px;height:60px;border-radius:14px;background:{cor};font-size:20px">{iniciais(c['nome'])}</div>
+                {avatar_detalhe}
                 <div>
                     <div class="profile-name">{c['nome']}</div>
                     <div style="font-size:13px;color:#4a6080;margin-bottom:6px">{resumo_formacoes(formacoes_view) or c.get('instituicao','—')}</div>
@@ -1085,12 +1249,14 @@ elif pagina == "candidatos":
             cor=cor_avatar(cand["nome"]); dsp=cand.get("disponibilidade","Não")
             formacao_res = resumo_formacoes(formacoes_candidato(cand)) or cand.get("instituicao","—")
             bdg='<span class="badge-sim">● Disponível</span>' if dsp=="Sim" else '<span class="badge-nao">● Indisponível</span>'
+            foto_card = str(cand.get("foto","") or "").strip()
+            avatar_card = f'<img class="cand-photo" src="{html_lib.escape(foto_card)}" alt="Foto de perfil">' if foto_card else f'<div class="avatar" style="background:{cor}">{iniciais(cand["nome"])}</div>'
             cc,cb=st.columns([11,2])
             with cc:
                 st.markdown(f"""<div class="cand-card">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
                         <div style="display:flex;align-items:center;gap:12px;flex:1">
-                            <div class="avatar" style="background:{cor}">{iniciais(cand['nome'])}</div>
+                            {avatar_card}
                             <div>
                                 <p class="cand-name">{cand['nome']}</p>
                                 <p class="cand-sub">{formacao_res} · {cand.get('area','—')}</p>
@@ -1110,12 +1276,13 @@ elif pagina == "chamadas":
     todas = aba_chamadas.get_all_records()
 
     if not cand_logado() and not rec_logado():
-        with st.expander("🔑 Sou candidato cadastrado — quero me inscrever"):
+        with st.expander("Sou candidato cadastrado — quero me inscrever"):
             em=st.text_input("Seu e-mail cadastrado",key="cl")
+            sn=st.text_input("Senha",type="password",key="cl_senha")
             if st.button("Acessar",key="bcl"):
-                cf=login_candidato(em)
+                cf=login_candidato(em, sn, permitir_sem_senha=True)
                 if cf: st.success(f"Bem-vindo, {cf['nome'].split()[0]}!"); st.rerun()
-                else: st.error("E-mail não encontrado.")
+                else: st.error("E-mail ou senha inválidos.")
 
     if cand_logado():
         cand=st.session_state.cand_logado
@@ -1160,9 +1327,9 @@ elif pagina == "chamadas":
                     <p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:0 0 4px">{ch.get('titulo','—')}</p>
                     <p style="font-size:13px;color:#4a6080;font-weight:500;margin:0 0 8px">{ch.get('orgao','—')} · {ch.get('municipio','—')}/{ch.get('estado','—')}</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
-                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:rgba(168,197,255,0.1);color:#a8c5ff">{ch.get('area','—')}</span>
-                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:rgba(196,181,253,0.1);color:#c4b5fd">{ch.get('regime','—')}</span>
-                        <span style="font-size:11px;font-weight:600;padding:2px 10px;border-radius:99px;background:rgba(110,231,183,0.1);color:#6ee7b7">{ch.get('vagas','—')} vaga(s)</span>
+                        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f;border:1px solid #c5d5f5">{ch.get('area','—')}</span>
+                        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#f4f7fe;color:#0d1f4e;border:1px solid #d0dcfa">{ch.get('regime','—')}</span>
+                        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#e6f4ea;color:#1a7a4a;border:1px solid #b0dfc0">{ch.get('vagas','—')} vaga(s)</span>
                     </div>
                 </div>
             </div>
@@ -1228,7 +1395,7 @@ elif pagina == "cadastro":
     if "campos" not in st.session_state: st.session_state.campos={}
     if "dc" not in st.session_state: st.session_state.dc={}
     et=st.session_state.et
-    ts=[("Seus dados\nprofissionais.","Upload do currículo ou preenchimento manual"),("Certificação e\nreferências.","Documentos que geram selos"),("Perfil\ncomportamental.","12 perguntas — 3 minutos")]
+    ts=[("Seus dados\nprofissionais.","Upload do currículo ou preenchimento manual"),("Certificação e\nreferências.","Documentos que geram selos"),("Perfil\ncomportamental.",f"{len(PERGUNTAS_DISC)} perguntas — uso como apoio técnico")]
     tt,ts_=ts[et-1]
     st.markdown(f'<div class="hero-card"><h1 class="page-title">{tt}</h1><p class="page-sub">{ts_}</p></div>',unsafe_allow_html=True)
     st.markdown(barra(et,3),unsafe_allow_html=True)
@@ -1248,11 +1415,15 @@ elif pagina == "cadastro":
         c1,c2=st.columns(2)
         with c1: nome=st.text_input("Nome completo *",value=campos.get("nome",""))
         with c2: email=st.text_input("E-mail *",value=campos.get("email",""))
+        c1,c2=st.columns(2)
+        with c1: senha_cad=st.text_input("Senha de acesso *",type="password",key="senha_candidato_cad")
+        with c2: senha_conf=st.text_input("Confirmar senha *",type="password",key="senha_candidato_conf")
 
         foto = st.file_uploader("Fotografia de perfil (opcional)", type=["jpg","jpeg","png"], key="foto_cadastro_cand")
         if foto:
             st.image(foto, width=120)
             st.caption("Prévia da foto. Para manter a imagem após reiniciar o app, será necessário configurar armazenamento permanente.")
+        foto_data = imagem_data_url(foto) if foto else st.session_state.dc.get("foto","")
 
         st.markdown('<p class="section-label">Formação acadêmica</p>', unsafe_allow_html=True)
         if "cad_qtd_form" not in st.session_state:
@@ -1337,11 +1508,13 @@ elif pagina == "cadastro":
             formacoes_validas=[f for f in formacoes if f.get("grau") or f.get("instituicao") or f.get("periodo")]
             experiencias_validas=[e for e in experiencias if e.get("instituicao") or e.get("orgao") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas") or e.get("ferramenta_ia")]
             if not nome or not email or not formacoes_validas or not formacoes_validas[0].get("instituicao"): st.error("Preencha nome, e-mail e ao menos uma formação com instituição.")
+            elif len(senha_cad) < 6: st.error("Crie uma senha com pelo menos 6 caracteres.")
+            elif senha_cad != senha_conf: st.error("As senhas não coincidem.")
             elif not inst_interesse: st.error("Selecione ao menos uma instituição de interesse.")
             elif not cons: st.error("Aceite os Termos para continuar.")
             else:
                 anos=anos_experiencias(experiencias_validas)
-                st.session_state.dc.update({"nome":nome,"email":email,"formacao":salvar_lista_json(formacoes_validas),"instituicao":resumo_formacoes(formacoes_validas),"area":", ".join(inst_interesse),"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":salvar_lista_json(experiencias_validas),"sistemas":sistemas_experiencias(experiencias_validas),"pos":"","resumo":res,"concurso":conc})
+                st.session_state.dc.update({"nome":nome,"email":email,"senha":hash_senha(senha_cad),"foto":foto_data,"formacao":salvar_lista_json(formacoes_validas),"instituicao":resumo_formacoes(formacoes_validas),"area":", ".join(inst_interesse),"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":salvar_lista_json(experiencias_validas),"sistemas":sistemas_experiencias(experiencias_validas),"pos":"","resumo":res,"concurso":conc})
                 st.session_state.et=2; st.rerun()
 
     elif et==2:
@@ -1374,7 +1547,8 @@ elif pagina == "cadastro":
                 st.session_state.et=3; st.rerun()
 
     elif et==3:
-        st.markdown('<p style="font-size:14px;color:#4a6080;font-weight:500;margin-bottom:1.5rem">Não há respostas certas ou erradas.</p>',unsafe_allow_html=True)
+        st.markdown(f'<div class="info-box">{DISC_AVISO}</div>',unsafe_allow_html=True)
+        st.markdown('<p style="font-size:14px;color:#4a6080;font-weight:500;margin-bottom:1.5rem">Não há respostas certas ou erradas. Responda pensando na forma como você costuma atuar no trabalho.</p>',unsafe_allow_html=True)
         rd=[]
         for j,(perg,ops) in enumerate(PERGUNTAS_DISC):
             r=st.radio(f"**{j+1}.** {perg}",ops,key=f"dq{j}",index=None)
@@ -1385,12 +1559,12 @@ elif pagina == "cadastro":
             if st.button("← Voltar"): st.session_state.et=2; st.rerun()
         with c2:
             if st.button("Cadastrar no JurisBank →"):
-                if None in rd: st.error("Responda todas as 12 perguntas.")
+                if None in rd: st.error(f"Responda todas as {len(PERGUNTAS_DISC)} perguntas.")
                 else:
                     d=st.session_state.dc
                     selos=calc_selos(d["oab"],d["anos_experiencia"],d.get("carta",False),d.get("avaliacao",False))
                     pd_,_,desc=calc_disc(rd)
-                    aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Não estou estudando para concurso")])
+                    aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Não estou estudando para concurso"),d.get("senha",""),d.get("foto","")])
                     st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}
                     st.success("Bem-vindo ao JurisBank!")
                     st.markdown(f'<div class="info-box">Perfil: <strong>{pd_} — {desc}</strong></div>',unsafe_allow_html=True)
@@ -1526,7 +1700,7 @@ elif pagina == "recrutador":
                     with c1: ach=st.selectbox("Área *",["Selecione..."]+AREAS)
                     with c2: ech=st.selectbox("Estado *",["Selecione..."]+ESTADOS,index=ESTADOS.index(rec.get("estado","SC"))+1 if rec.get("estado","") in ESTADOS else 0)
                     with c3: mch_=st.text_input("Município *",value=ra.get("municipio",""))
-                    rch=st.text_area("Requisitos *",height=80)
+                    rch=st.text_area("Requisitos mínimos *",height=80,placeholder="Ex: Bacharelado em Direito, experiência em gabinete, domínio de Eproc/SAJ, disponibilidade integral.")
                     c1,c2,c3=st.columns(3)
                     with c1: remch=st.text_input("Remuneração *",placeholder="Ex: R$ 4.500,00")
                     with c2: regch=st.selectbox("Regime *",["Selecione..."]+REGIMES)
@@ -1534,6 +1708,20 @@ elif pagina == "recrutador":
                     c1,c2=st.columns(2)
                     with c1: fsch=st.selectbox("Forma de seleção *",["Selecione..."]+FORMAS_SELECAO)
                     with c2: prch=st.date_input("Prazo *",min_value=date.today())
+                    st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
+                    st.markdown('<p class="section-label">Critérios e etapas do seletivo</p>',unsafe_allow_html=True)
+                    etapas=st.multiselect(
+                        "Etapas previstas",
+                        ["Triagem por currículo","Entrevista estruturada","Teste de escrita","Prova prática/minuta","Checagem de referências","Período de experiência no órgão"],
+                        default=["Triagem por currículo"]
+                    )
+                    criterios=st.text_area("Critérios objetivos de triagem",height=80,placeholder="Ex: experiência comprovada na área, clareza de redação, domínio dos sistemas, disponibilidade e aderência ao órgão.")
+                    c1,c2=st.columns(2)
+                    with c1: roteiro=st.text_area("Pontos para entrevista",height=80,placeholder="Ex: experiência em minutas, gestão de prazos, postura em atendimento, trabalho sob pressão.")
+                    with c2: teste=st.text_area("Teste ou prova de escrita",height=80,placeholder="Se houver, descreva o tipo de peça, tempo estimado e critérios de correção.")
+                    matriz=st.text_area("Matriz de pontuação sugerida",height=80,placeholder="Ex: experiência específica 40%, redação técnica 30%, entrevista estruturada 20%, disponibilidade 10%.")
+                    periodo_exp=st.text_input("Período de experiência, se houver",placeholder="Ex: 30 dias, com acompanhamento do gabinete.")
+                    comunicacao=st.text_area("Mensagem aos candidatos compatíveis",height=70,placeholder="Texto breve que será usado como base para aviso aos candidatos ativos quando houver automação de notificações.")
                     st.markdown("<br>",unsafe_allow_html=True)
                     c1,c2=st.columns(2)
                     with c1:
@@ -1543,7 +1731,18 @@ elif pagina == "recrutador":
                             ok=all([tch,och,toch!="Selecione...",ach!="Selecione...",ech!="Selecione...",mch_,rch,remch,regch!="Selecione...",fsch!="Selecione..."])
                             if not ok: st.error("Preencha todos os campos.")
                             else:
-                                aba_chamadas.append_row([gerar_id(),tch,och,toch,ach,ech,mch_,rch,remch,regch,fsch,str(vch),prch.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
+                                plano_seletivo = [
+                                    rch.strip(),
+                                    "",
+                                    "Etapas: " + (", ".join(etapas) if etapas else "Não informado"),
+                                    "Critérios de triagem: " + (criterios.strip() or "Não informado"),
+                                    "Entrevista: " + (roteiro.strip() or "Não informado"),
+                                    "Teste/prova: " + (teste.strip() or "Não informado"),
+                                    "Matriz de pontuação: " + (matriz.strip() or "Não informado"),
+                                    "Período de experiência: " + (periodo_exp.strip() or "Não informado"),
+                                    "Mensagem aos candidatos: " + (comunicacao.strip() or "Não informado"),
+                                ]
+                                aba_chamadas.append_row([gerar_id(),tch,och,toch,ach,ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prch.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
                                 del st.session_state["criar_ch"]; st.success("Chamada publicada!"); st.rerun()
 
             if not mch: st.info("Nenhuma Chamada publicada ainda.")
