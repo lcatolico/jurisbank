@@ -368,6 +368,33 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
 }
 [role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #1e1e1e !important; }
 [role="option"]:hover, [role="option"][aria-selected="true"] { background: #f2efe9 !important; color: #1e1e1e !important; }
+.stSelectbox [data-baseweb="select"] div,
+.stSelectbox [data-baseweb="select"] span,
+.stMultiSelect [data-baseweb="select"] div,
+.stMultiSelect [data-baseweb="select"] span,
+[data-baseweb="popover"] div,
+[data-baseweb="popover"] span,
+[data-baseweb="menu"] div,
+[data-baseweb="menu"] span,
+[data-baseweb="select-dropdown"] div,
+[data-baseweb="select-dropdown"] span {
+    background-color: #ffffff !important;
+    color: #1e1e1e !important;
+    -webkit-text-fill-color: #1e1e1e !important;
+}
+[data-baseweb="popover"] [aria-selected="true"],
+[data-baseweb="menu"] [aria-selected="true"],
+[data-baseweb="select-dropdown"] [aria-selected="true"],
+[data-baseweb="popover"] [role="option"]:hover,
+[data-baseweb="menu"] [role="option"]:hover {
+    background-color: #f2efe9 !important;
+    color: #1e1e1e !important;
+}
+.stMultiSelect [data-baseweb="tag"],
+.stMultiSelect [data-baseweb="tag"] span {
+    background-color: #f2efe9 !important;
+    color: #1e1e1e !important;
+}
 .stTabs [data-baseweb="tab-list"] { background: #f2efe9 !important; border-color: #ddd8ce !important; }
 .stTabs [data-baseweb="tab"] { color: #6a6a6a !important; }
 .stTabs [aria-selected="true"] { color: #1e1e1e !important; box-shadow: 0 6px 14px rgba(30,30,30,0.08) !important; }
@@ -660,6 +687,29 @@ def sistemas_experiencias(exps):
             sis.append(f"IA: {ia}")
     return ", ".join(sis)
 
+def primeira_formacao(c):
+    forms = formacoes_candidato(c)
+    if forms:
+        f = forms[0]
+        return " · ".join([x for x in [f.get("grau","").strip(), f.get("instituicao","").strip()] if x]) or "Formação não informada"
+    return c.get("instituicao","") or c.get("formacao","") or "Formação não informada"
+
+def resumo_card_candidato(c):
+    exps = experiencias_candidato(c)
+    exp_txt = resumo_experiencias(exps)
+    if len(exp_txt) > 120:
+        exp_txt = exp_txt[:117].rstrip() + "..."
+    sistemas = str(c.get("sistemas","") or "").strip()
+    if len(sistemas) > 90:
+        sistemas = sistemas[:87].rstrip() + "..."
+    return {
+        "formacao": primeira_formacao(c),
+        "interesse": c.get("area","") or "Interesse não informado",
+        "experiencia": exp_txt or "Experiência não informada",
+        "sistemas": sistemas or "Sistemas não informados",
+        "anos": anos_experiencias(exps),
+    }
+
 def anos_experiencias(exps):
     total = 0.0
     for e in exps:
@@ -847,12 +897,23 @@ def email_recomendador(nome_candidato, email_recomendador, link):
     return enviar_email(email_recomendador, assunto, corpo)
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
-nav_pages = [
-    ("inicio","Área do Candidato"),
-    ("perfil","Editar Perfil"),
-    ("chamadas","Seletivos"),
-    ("candidatos","Banco de Talentos"),
-]
+if rec_logado():
+    nav_pages = [
+        ("chamadas","Seletivos"),
+        ("candidatos","Banco de Talentos"),
+    ]
+elif pagina in ["inicio","perfil","cadastro","chamadas"] or cand_logado():
+    nav_pages = [
+        ("inicio","Área do Candidato"),
+        ("perfil","Editar Perfil"),
+        ("chamadas","Ver Seletivos"),
+    ]
+else:
+    nav_pages = [
+        ("inicio","Área do Candidato"),
+        ("chamadas","Seletivos"),
+        ("candidatos","Banco de Talentos"),
+    ]
 
 nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
 for pg, lb in nav_pages:
@@ -862,7 +923,7 @@ for pg, lb in nav_pages:
 if rec_logado():
     rec = st.session_state.rec_logado
     nav_html += f'<a href="?p=recrutador" class="{"active" if pagina=="recrutador" else ""}">{rec["nome"].split()[0]}</a>'
-else:
+elif not (pagina in ["inicio","perfil","cadastro"] or cand_logado()):
     nav_html += '<a href="?p=recrutador" class="btn-rec">Recrutador</a>'
 
 nav_html += '</div></div>'
@@ -979,6 +1040,30 @@ if pagina == "inicio":
             <h1 class="page-title">Área do<br><em>Candidato.</em></h1>
             <p class="page-sub">Entre para acompanhar seu perfil ou comece seu cadastro no JurisBank.</p>
         </div>""", unsafe_allow_html=True)
+        with st.expander("Receba avisos sobre Seletivos de seu interesse", expanded=True):
+            st.markdown('<div class="info-box">Faça um cadastro básico para ser avisado quando surgir um Seletivo compatível com suas preferências. Para participar, será necessário fazer o cadastro completo, inscrever-se no Seletivo e realizar o pagamento quando a funcionalidade estiver ativa.</div>', unsafe_allow_html=True)
+            c1, c2 = st.columns(2)
+            with c1:
+                aviso_email = st.text_input("E-mail para avisos", key="aviso_email_inicio")
+            with c2:
+                aviso_inst = st.multiselect("Instituições de interesse", INSTITUICOES_INTERESSE, key="aviso_inst_inicio")
+            c1, c2 = st.columns(2)
+            with c1:
+                aviso_areas = st.multiselect("Áreas de interesse", AREAS, key="aviso_areas_inicio")
+            with c2:
+                aviso_estados = st.multiselect("Estados de interesse", ESTADOS, key="aviso_estados_inicio")
+            if st.button("Quero receber avisos", key="btn_aviso_inicio"):
+                if not aviso_email or not aviso_areas:
+                    st.error("Informe o e-mail e ao menos uma área de interesse.")
+                else:
+                    preferencias = []
+                    if aviso_inst:
+                        preferencias.append("Instituições: " + ", ".join(aviso_inst))
+                    if aviso_estados:
+                        preferencias.append("Estados: " + ", ".join(aviso_estados))
+                    aba_interesses.append_row([aviso_email, ", ".join(aviso_areas), " | ".join(preferencias), datetime.now().strftime("%d/%m/%Y")])
+                    st.success("Pronto. Você será avisado quando surgir um Seletivo compatível.")
+        st.markdown("<br>", unsafe_allow_html=True)
         tabs = st.tabs(["Já tenho cadastro","Cadastrar-me"])
         with tabs[0]:
             st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Entrar no meu perfil</p>', unsafe_allow_html=True)
@@ -1409,18 +1494,6 @@ elif pagina == "chamadas":
                     st.markdown(f'<div class="info-card">{ch["requisitos"]}</div>',unsafe_allow_html=True)
                 st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>',unsafe_allow_html=True)
 
-    st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-    st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:4px">Receba avisos de novas Chamadas</p>',unsafe_allow_html=True)
-    c1,c2,c3=st.columns(3)
-    with c1: ei=st.text_input("Seu e-mail",key="ei")
-    with c2: ai=st.multiselect("Áreas",AREAS,key="ai")
-    with c3: si=st.multiselect("Estados",ESTADOS,key="si")
-    if st.button("Quero receber avisos",key="bint"):
-        if not ei or not ai: st.error("Preencha e-mail e área.")
-        else:
-            aba_interesses.append_row([ei,", ".join(ai),", ".join(si),datetime.now().strftime("%d/%m/%Y")])
-            st.success("Pronto! Você será avisado quando surgir uma Chamada compatível.")
-
 # ── PÁGINA: CADASTRO ──────────────────────────────────────────────────────────
 elif pagina == "cadastro":
     if "et" not in st.session_state: st.session_state.et=1
@@ -1669,18 +1742,27 @@ elif pagina == "recrutador":
                 cor=cor_avatar(cand["nome"]); dc=cand.get("disponibilidade","Não")
                 bdg='<span class="badge-sim">● Disponível</span>' if dc=="Sim" else '<span class="badge-nao">● Indisponível</span>'
                 ec=cand.get("email",""); ifav=ec in favs; fi_i="★" if ifav else "☆"
+                resumo_c = resumo_card_candidato(cand)
+                foto_card = str(cand.get("foto","") or "").strip()
+                avatar_card = f'<img class="cand-photo" src="{html_lib.escape(foto_card)}" alt="Foto de perfil">' if foto_card else f'<div class="avatar" style="background:{cor}">{iniciais(cand["nome"])}</div>'
                 with st.container():
                     st.markdown(f"""<div class="cand-card">
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                            <div style="display:flex;align-items:center;gap:12px;flex:1">
-                                <div class="avatar" style="background:{cor}">{iniciais(cand['nome'])}</div>
-                                <div>
+                            <div style="display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0">
+                                {avatar_card}
+                                <div style="min-width:0;flex:1">
                                     <p class="cand-name">{cand['nome']}</p>
-                                    <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('instituicao','—')} · {cand.get('area','—')}</p>
+                                    <p class="cand-sub"><strong>Formação:</strong> {html_lib.escape(resumo_c['formacao'])}</p>
+                                    <p class="cand-sub"><strong>Interesse:</strong> {html_lib.escape(resumo_c['interesse'])}</p>
+                                    <p class="cand-sub"><strong>Experiência:</strong> {html_lib.escape(resumo_c['experiencia'])}</p>
+                                    <p class="cand-sub"><strong>Sistemas:</strong> {html_lib.escape(resumo_c['sistemas'])}</p>
                                     <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}{html_conc(cand)}</div>
                                 </div>
                             </div>
-                            <div>{bdg}</div>
+                            <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                                {bdg}
+                                <span class="profile-chip">{resumo_c['anos']} ano(s)</span>
+                            </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
                     ca,cb,cc=st.columns([6,2,2])
