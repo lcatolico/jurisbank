@@ -180,6 +180,12 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background:
 label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 700 !important; }
 .form-item-title { font-size: 12px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid #d0dcfa; }
 .add-hint { font-size: 12px; color: #4a6080; font-weight: 600; margin: -2px 0 10px; }
+.highlight-panel { background: #fff8e6; border: 1.5px solid #f0c040; border-radius: 12px; padding: 12px 16px; margin: 10px 0 14px; color: #0d1f4e; font-weight: 800; }
+.stTextInput input:disabled { background: #f4f7fe !important; color: #1a3a8f !important; -webkit-text-fill-color: #1a3a8f !important; border-color: #c5d5f5 !important; font-weight: 800 !important; opacity: 1 !important; }
+[data-baseweb="input"], [data-baseweb="select"] { background: #ffffff !important; color: #0d1f4e !important; }
+[data-baseweb="input"] button, [data-testid="stFileUploader"] button { background: #ffffff !important; color: #0d1f4e !important; border-color: #c5d5f5 !important; }
+[data-testid="stFileUploader"] section { background: #ffffff !important; border-color: #c5d5f5 !important; border-radius: 12px !important; }
+[data-testid="stFileUploader"] * { color: #0d1f4e !important; }
 .stTabs [data-baseweb="tab-list"] {
     background: #dfeaff !important;
     border-radius: 12px !important;
@@ -396,6 +402,7 @@ def experiencias_candidato(c):
         return [{
             "orgao": c.get("experiencia_orgaos",""),
             "supervisor": "",
+            "supervisor_email": "",
             "inicio": "",
             "fim": "",
             "area": "",
@@ -473,10 +480,29 @@ def mes_ano(valor):
     dt = parse_data_periodo(valor)
     if dt:
         return f"{dt.month:02d}", str(dt.year)
-    return MESES[0], str(date.today().year)
+    return f"{date.today().month:02d}", str(date.today().year)
 
 def texto_periodo(mes_inicio, ano_inicio, mes_fim, ano_fim):
     return f"{mes_inicio}/{ano_inicio} a {mes_fim}/{ano_fim}"
+
+def meses_periodo(mes_inicio, ano_inicio, mes_fim, ano_fim):
+    try:
+        inicio = int(ano_inicio) * 12 + int(mes_inicio)
+        fim = int(ano_fim) * 12 + int(mes_fim)
+        return max(0, fim - inicio + 1)
+    except Exception:
+        return 0
+
+def texto_duracao(mes_inicio, ano_inicio, mes_fim, ano_fim):
+    meses = meses_periodo(mes_inicio, ano_inicio, mes_fim, ano_fim)
+    anos = meses // 12
+    resto = meses % 12
+    partes = []
+    if anos:
+        partes.append(f"{anos} ano{'s' if anos != 1 else ''}")
+    if resto:
+        partes.append(f"{resto} mês{'es' if resto != 1 else ''}")
+    return " e ".join(partes) if partes else "0 mês"
 
 def html_selos(c):
     h=""
@@ -623,6 +649,9 @@ if pagina == "inicio":
             <p class="cand-sub">{cand.get("email","")}</p>
         </div>""", unsafe_allow_html=True)
 
+        disponivel_txt = "Sim" if cand.get("disponibilidade") == "Sim" else "Não"
+        st.markdown(f'<div class="highlight-panel">Disponível para seleção: {disponivel_txt}</div>', unsafe_allow_html=True)
+
         c1, c2, _ = st.columns([3,2,5])
         with c1:
             if st.button("Ver Seletivos abertos", key="btn_cand_seletivos"):
@@ -647,20 +676,24 @@ if pagina == "inicio":
         with c1:
             st.markdown(f"""<div class="info-card">
                 <strong>Formação:</strong> {resumo_formacoes(formacoes_view) or '—'}<br>
-                <strong>Instituições de Interesse:</strong> {cand.get('area','—')}<br>
-                <strong>Disponível:</strong> {cand.get('disponibilidade','—')}
+                <strong>Experiência total:</strong> {anos_experiencias(experiencias_view)} ano(s)
             </div>""", unsafe_allow_html=True)
         with c2:
             st.markdown(f"""<div class="info-card">
                 <strong>OAB ativa:</strong> {cand.get('oab','—')}<br>
                 <strong>Experiência:</strong> {resumo_experiencias(experiencias_view) or cand.get('experiencia_orgaos','—')}<br>
-                <strong>Sistemas:</strong> {cand.get('sistemas','—')}<br>
-                <strong>Concurso:</strong> {cand.get('concurso','—')}
+                <strong>Sistemas:</strong> {cand.get('sistemas','—')}
             </div>""", unsafe_allow_html=True)
 
         if cand.get("resumo"):
             st.markdown('<p class="section-label">Outras informações acadêmicas e profissionais</p>', unsafe_allow_html=True)
             st.markdown(f'<div class="info-card" style="margin-top:10px">{cand.get("resumo","")}</div>', unsafe_allow_html=True)
+
+        st.markdown('<p class="section-label">Concurso</p>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-card">{cand.get("concurso","Não estou estudando para concurso") or "Não estou estudando para concurso"}</div>', unsafe_allow_html=True)
+
+        st.markdown('<p class="section-label">Instituições de interesse para trabalhar</p>', unsafe_allow_html=True)
+        st.markdown(f'<div class="info-card">{cand.get("area","—")}</div>', unsafe_allow_html=True)
 
         editando = st.session_state.get("editar_perfil_candidato", False)
         if editando and st.button("Fechar", key="editar_perfil_btn"):
@@ -671,7 +704,7 @@ if pagina == "inicio":
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
             st.markdown('<p class="section-label">Editar perfil</p>', unsafe_allow_html=True)
             formacoes_base = formacoes_candidato(cand) or [{"grau":"Bacharel em Direito","instituicao":"","periodo":""}]
-            experiencias_base = experiencias_candidato(cand) or [{"orgao":"","supervisor":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":""}]
+            experiencias_base = experiencias_candidato(cand) or [{"orgao":"","supervisor":"","supervisor_email":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":""}]
             if "edit_qtd_form" not in st.session_state:
                 st.session_state.edit_qtd_form = max(1, len(formacoes_base))
             if "edit_qtd_exp" not in st.session_state:
@@ -686,6 +719,9 @@ if pagina == "inicio":
                     st.session_state.edit_qtd_exp = min(10, st.session_state.edit_qtd_exp + 1)
                     st.rerun()
             with st.form("form_editar_candidato"):
+                st.markdown('<div class="highlight-panel">Disponível para seleção</div>', unsafe_allow_html=True)
+                disponibilidade = st.radio("Disponível para seleção?", ["Sim","Não"], index=0 if cand.get("disponibilidade") == "Sim" else 1, horizontal=True)
+
                 st.markdown('<p class="section-label">Fotografia de perfil</p>', unsafe_allow_html=True)
                 foto = st.file_uploader("Fotografia de perfil", type=["jpg","jpeg","png"], key="foto_edit_cand")
                 if foto:
@@ -705,65 +741,70 @@ if pagina == "inicio":
                         grau = st.selectbox("Formação", FORMACOES, index=(FORMACOES.index(base.get("grau")) if base.get("grau") in FORMACOES else 0), key=f"edit_grau_{i}")
                     with c2:
                         instituicao = st.text_input("Instituição de ensino", value=base.get("instituicao",""), key=f"edit_inst_{i}")
-                    p1, p2, p3, p4 = st.columns(4)
+                    p1, p2, p3, p4, p5 = st.columns([1,1,1,1,1.4])
                     with p1:
-                        mes_inicio = st.selectbox("Mês de início", MESES, index=MESES.index(mi), key=f"edit_form_mi_{i}")
+                        mes_inicio = st.selectbox("Início mês", MESES, index=MESES.index(mi), key=f"edit_form_mi_{i}")
                     with p2:
-                        ano_inicio = st.selectbox("Ano de início", ANOS_PERIODO, index=ANOS_PERIODO.index(ai) if ai in ANOS_PERIODO else 0, key=f"edit_form_ai_{i}")
+                        ano_inicio = st.selectbox("Início ano", ANOS_PERIODO, index=ANOS_PERIODO.index(ai) if ai in ANOS_PERIODO else 0, key=f"edit_form_ai_{i}")
                     with p3:
-                        mes_fim = st.selectbox("Mês final", MESES, index=MESES.index(mf), key=f"edit_form_mf_{i}")
+                        mes_fim = st.selectbox("Final mês", MESES, index=MESES.index(mf), key=f"edit_form_mf_{i}")
                     with p4:
-                        ano_fim = st.selectbox("Ano final", ANOS_PERIODO, index=ANOS_PERIODO.index(af) if af in ANOS_PERIODO else 0, key=f"edit_form_af_{i}")
+                        ano_fim = st.selectbox("Final ano", ANOS_PERIODO, index=ANOS_PERIODO.index(af) if af in ANOS_PERIODO else 0, key=f"edit_form_af_{i}")
+                    with p5:
+                        st.text_input("Duração", value=texto_duracao(mes_inicio, ano_inicio, mes_fim, ano_fim), disabled=True, key=f"edit_form_dur_{i}")
                     periodo = texto_periodo(mes_inicio, ano_inicio, mes_fim, ano_fim)
                     formacoes.append({"grau":grau,"instituicao":instituicao,"periodo":periodo})
 
-                st.markdown('<p class="section-label">Instituições de Interesse</p>', unsafe_allow_html=True)
-                inst_interesse = st.multiselect("Selecione uma ou mais instituições de interesse", INSTITUICOES_INTERESSE, default=lista_selecionada(cand.get("area",""), INSTITUICOES_INTERESSE), key="edit_inst_interesse")
-
-                c1, c2, c3 = st.columns(3)
+                c1, c2 = st.columns(2)
                 with c1:
                     oab = st.radio("OAB ativa?", ["Sim","Não"], index=0 if cand.get("oab") == "Sim" else 1, horizontal=True)
                 with c2:
-                    disponibilidade = st.radio("Disponível?", ["Sim","Não"], index=0 if cand.get("disponibilidade") == "Sim" else 1, horizontal=True)
-                with c3:
-                    estuda_concurso = st.radio("Estuda para concurso?", ["Não","Sim"], index=1 if cand.get("concurso") and cand.get("concurso")!="Não estou estudando para concurso" else 0, horizontal=True)
+                    st.text_input("Experiência total informada", value=f"{anos_experiencias(experiencias_base)} ano(s)", disabled=True, key="edit_exp_total_base")
 
                 st.markdown('<p class="section-label">Experiência profissional</p>', unsafe_allow_html=True)
                 experiencias = []
                 for i in range(st.session_state.edit_qtd_exp):
-                    base = experiencias_base[i] if i < len(experiencias_base) else {"orgao":"","supervisor":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":""}
+                    base = experiencias_base[i] if i < len(experiencias_base) else {"orgao":"","supervisor":"","supervisor_email":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":""}
                     mi, ai = mes_ano(base.get("inicio",""))
                     mf, af = mes_ano(base.get("fim",""))
                     st.markdown(f'<div class="form-item-title">Experiência {i+1}</div>', unsafe_allow_html=True)
-                    c1, c2 = st.columns(2)
+                    c1, c2, c3 = st.columns([2,2,2])
                     with c1:
                         orgao = st.text_input("Órgão de atuação", value=base.get("orgao",""), key=f"edit_exp_orgao_{i}")
                     with c2:
                         supervisor = st.text_input("Supervisor", value=base.get("supervisor",""), key=f"edit_exp_supervisor_{i}")
-                    c1, c2, c3, c4 = st.columns(4)
-                    with c1:
-                        mes_inicio = st.selectbox("Mês de início", MESES, index=MESES.index(mi), key=f"edit_exp_mi_{i}")
-                    with c2:
-                        ano_inicio = st.selectbox("Ano de início", ANOS_PERIODO, index=ANOS_PERIODO.index(ai) if ai in ANOS_PERIODO else 0, key=f"edit_exp_ai_{i}")
                     with c3:
-                        mes_fim = st.selectbox("Mês final", MESES, index=MESES.index(mf), key=f"edit_exp_mf_{i}")
+                        supervisor_email = st.text_input("E-mail de contato", value=base.get("supervisor_email",""), placeholder="nome@orgao.jus.br", key=f"edit_exp_supervisor_email_{i}")
+                    c1, c2, c3, c4, c5 = st.columns([1,1,1,1,1.4])
+                    with c1:
+                        mes_inicio = st.selectbox("Início mês", MESES, index=MESES.index(mi), key=f"edit_exp_mi_{i}")
+                    with c2:
+                        ano_inicio = st.selectbox("Início ano", ANOS_PERIODO, index=ANOS_PERIODO.index(ai) if ai in ANOS_PERIODO else 0, key=f"edit_exp_ai_{i}")
+                    with c3:
+                        mes_fim = st.selectbox("Final mês", MESES, index=MESES.index(mf), key=f"edit_exp_mf_{i}")
                     with c4:
-                        ano_fim = st.selectbox("Ano final", ANOS_PERIODO, index=ANOS_PERIODO.index(af) if af in ANOS_PERIODO else 0, key=f"edit_exp_af_{i}")
+                        ano_fim = st.selectbox("Final ano", ANOS_PERIODO, index=ANOS_PERIODO.index(af) if af in ANOS_PERIODO else 0, key=f"edit_exp_af_{i}")
+                    with c5:
+                        st.text_input("Duração", value=texto_duracao(mes_inicio, ano_inicio, mes_fim, ano_fim), disabled=True, key=f"edit_exp_dur_{i}")
                     inicio = f"{mes_inicio}/{ano_inicio}"
                     fim = f"{mes_fim}/{ano_fim}"
                     area_exp = st.multiselect("Área de atuação", AREAS, default=lista_selecionada(base.get("area",""), AREAS), key=f"edit_exp_area_{i}")
                     atribuicoes = st.text_area("Atribuições desenvolvidas", value=base.get("atribuicoes",""), height=80, key=f"edit_exp_atr_{i}")
                     sistemas_exp = st.text_input("Sistemas de trabalho utilizados no período da experiência profissional", value=base.get("sistemas",""), placeholder="Ex: Eproc, SAJ, SEEU", key=f"edit_exp_sis_{i}")
-                    experiencias.append({"orgao":orgao,"supervisor":supervisor,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
+                    experiencias.append({"orgao":orgao,"supervisor":supervisor,"supervisor_email":supervisor_email,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
 
                 st.markdown('<p class="section-label">Outras informações acadêmicas e profissionais</p>', unsafe_allow_html=True)
                 st.caption("Use este campo para cursos livres, publicações, produção acadêmica, idiomas, atividades docentes, projetos, voluntariado jurídico, premiações e outras informações que ajudem o recrutador a entender sua trajetória.")
-                pos = st.text_input("Pós-graduação ou especializações adicionais", value=cand.get("pos_graduacao",""))
-                email_ref = st.text_input("E-mail do recomendador", value=cand.get("email_referencia",""))
                 resumo = st.text_area("Outras informações", value=cand.get("resumo",""), height=120)
+
+                st.markdown('<p class="section-label">Concurso</p>', unsafe_allow_html=True)
+                estuda_concurso = st.radio("Estuda para concurso?", ["Não","Sim"], index=1 if cand.get("concurso") and cand.get("concurso")!="Não estou estudando para concurso" else 0, horizontal=True)
                 concurso = "Não estou estudando para concurso"
                 if estuda_concurso == "Sim":
                     concurso = st.text_input("Qual concurso?", value="" if cand.get("concurso")=="Não estou estudando para concurso" else cand.get("concurso",""))
+
+                st.markdown('<p class="section-label">Instituições de interesse para trabalhar</p>', unsafe_allow_html=True)
+                inst_interesse = st.multiselect("Selecione uma ou mais instituições", INSTITUICOES_INTERESSE, default=lista_selecionada(cand.get("area",""), INSTITUICOES_INTERESSE), key="edit_inst_interesse")
                 salvar = st.form_submit_button("Salvar alterações")
 
             if salvar:
@@ -772,7 +813,7 @@ if pagina == "inicio":
                     st.error("Não encontrei seu cadastro na planilha.")
                 else:
                     formacoes_validas = [f for f in formacoes if f.get("grau") or f.get("instituicao") or f.get("periodo")]
-                    experiencias_validas = [e for e in experiencias if e.get("orgao") or e.get("supervisor") or e.get("area") or e.get("atribuicoes") or e.get("sistemas")]
+                    experiencias_validas = [e for e in experiencias if e.get("orgao") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas")]
                     formacao_final = salvar_lista_json(formacoes_validas)
                     instituicao_final = resumo_formacoes(formacoes_validas)
                     area_final = ", ".join(inst_interesse)
@@ -789,8 +830,8 @@ if pagina == "inicio":
                         "oab": oab,
                         "experiencia_orgaos": experiencia_final,
                         "sistemas": sistemas,
-                        "pos_graduacao": pos,
-                        "email_referencia": email_ref,
+                        "pos_graduacao": atual.get("pos_graduacao",""),
+                        "email_referencia": atual.get("email_referencia",""),
                         "resumo": resumo,
                         "selo_verificado": selo_verificado,
                         "selo_experiente": selo_experiente,
@@ -803,9 +844,7 @@ if pagina == "inicio":
                     aba_candidatos.update_cell(linha, 7, oab)
                     aba_candidatos.update_cell(linha, 8, experiencia_final)
                     aba_candidatos.update_cell(linha, 9, sistemas)
-                    aba_candidatos.update_cell(linha, 10, pos)
                     aba_candidatos.update_cell(linha, 11, resumo)
-                    aba_candidatos.update_cell(linha, 12, email_ref)
                     aba_candidatos.update_cell(linha, 13, selo_verificado)
                     aba_candidatos.update_cell(linha, 16, selo_experiente)
                     aba_candidatos.update_cell(linha, 18, concurso)
@@ -1084,6 +1123,9 @@ elif pagina == "cadastro":
         if pdf is None: st.session_state.campos={}
         campos=st.session_state.campos
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
+        st.markdown('<div class="highlight-panel">Disponível para seleção</div>', unsafe_allow_html=True)
+        disp=st.radio("Disponível para seleção?",["Sim","Não"],horizontal=True)
+
         c1,c2=st.columns(2)
         with c1: nome=st.text_input("Nome completo *",value=campos.get("nome",""))
         with c2: email=st.text_input("E-mail *",value=campos.get("email",""))
@@ -1105,21 +1147,16 @@ elif pagina == "cadastro":
             c1,c2=st.columns([2,3])
             with c1: grau=st.selectbox("Formação *",FORMACOES,key=f"cad_grau_{i}")
             with c2: inst=st.text_input("Instituição de ensino *",key=f"cad_inst_{i}")
-            p1,p2,p3,p4=st.columns(4)
-            with p1: mes_inicio=st.selectbox("Mês de início",MESES,key=f"cad_form_mi_{i}")
-            with p2: ano_inicio=st.selectbox("Ano de início",ANOS_PERIODO,key=f"cad_form_ai_{i}")
-            with p3: mes_fim=st.selectbox("Mês final",MESES,key=f"cad_form_mf_{i}")
-            with p4: ano_fim=st.selectbox("Ano final",ANOS_PERIODO,key=f"cad_form_af_{i}")
+            p1,p2,p3,p4,p5=st.columns([1,1,1,1,1.4])
+            with p1: mes_inicio=st.selectbox("Início mês",MESES,key=f"cad_form_mi_{i}")
+            with p2: ano_inicio=st.selectbox("Início ano",ANOS_PERIODO,key=f"cad_form_ai_{i}")
+            with p3: mes_fim=st.selectbox("Final mês",MESES,key=f"cad_form_mf_{i}")
+            with p4: ano_fim=st.selectbox("Final ano",ANOS_PERIODO,key=f"cad_form_af_{i}")
+            with p5: st.text_input("Duração",value=texto_duracao(mes_inicio,ano_inicio,mes_fim,ano_fim),disabled=True,key=f"cad_form_dur_{i}")
             periodo=texto_periodo(mes_inicio,ano_inicio,mes_fim,ano_fim)
             formacoes.append({"grau":grau,"instituicao":inst,"periodo":periodo})
 
-        st.markdown('<p class="section-label">Instituições de Interesse</p>', unsafe_allow_html=True)
-        inst_interesse=st.multiselect("Selecione uma ou mais instituições de interesse *",INSTITUICOES_INTERESSE,key="cad_inst_interesse")
-
-        c1,c2,c3=st.columns(3)
-        with c1: oab=st.radio("OAB ativa?",["Sim","Não"],index=0 if campos.get("oab")=="Sim" else 1,horizontal=True)
-        with c2: disp=st.radio("Disponível?",["Sim","Não"],horizontal=True)
-        with c3: estuda_concurso=st.radio("Estuda para concurso?",["Não","Sim"],horizontal=True)
+        oab=st.radio("OAB ativa?",["Sim","Não"],index=0 if campos.get("oab")=="Sim" else 1,horizontal=True)
 
         st.markdown('<p class="section-label">Experiência profissional</p>', unsafe_allow_html=True)
         if "cad_qtd_exp" not in st.session_state:
@@ -1130,41 +1167,47 @@ elif pagina == "cadastro":
         experiencias = []
         for i in range(st.session_state.cad_qtd_exp):
             st.markdown(f'<div class="form-item-title">Experiência {i+1}</div>', unsafe_allow_html=True)
-            c1,c2=st.columns(2)
+            c1,c2,c3=st.columns([2,2,2])
             with c1: orgao=st.text_input("Órgão de atuação",value=campos.get("experiencia_orgaos","") if i==0 else "",key=f"cad_exp_orgao_{i}")
             with c2: supervisor=st.text_input("Supervisor",key=f"cad_exp_supervisor_{i}")
-            c1,c2,c3,c4=st.columns(4)
-            with c1: mes_inicio=st.selectbox("Mês de início",MESES,key=f"cad_exp_mi_{i}")
-            with c2: ano_inicio=st.selectbox("Ano de início",ANOS_PERIODO,key=f"cad_exp_ai_{i}")
-            with c3: mes_fim=st.selectbox("Mês final",MESES,key=f"cad_exp_mf_{i}")
-            with c4: ano_fim=st.selectbox("Ano final",ANOS_PERIODO,key=f"cad_exp_af_{i}")
+            with c3: supervisor_email=st.text_input("E-mail de contato",placeholder="nome@orgao.jus.br",key=f"cad_exp_supervisor_email_{i}")
+            c1,c2,c3,c4,c5=st.columns([1,1,1,1,1.4])
+            with c1: mes_inicio=st.selectbox("Início mês",MESES,key=f"cad_exp_mi_{i}")
+            with c2: ano_inicio=st.selectbox("Início ano",ANOS_PERIODO,key=f"cad_exp_ai_{i}")
+            with c3: mes_fim=st.selectbox("Final mês",MESES,key=f"cad_exp_mf_{i}")
+            with c4: ano_fim=st.selectbox("Final ano",ANOS_PERIODO,key=f"cad_exp_af_{i}")
+            with c5: st.text_input("Duração",value=texto_duracao(mes_inicio,ano_inicio,mes_fim,ano_fim),disabled=True,key=f"cad_exp_dur_{i}")
             inicio=f"{mes_inicio}/{ano_inicio}"
             fim=f"{mes_fim}/{ano_fim}"
             area_exp=st.multiselect("Área de atuação",AREAS,key=f"cad_exp_area_{i}")
             atribuicoes=st.text_area("Atribuições desenvolvidas",height=80,key=f"cad_exp_atr_{i}")
             sistemas_exp=st.text_input("Sistemas de trabalho utilizados no período da experiência profissional",value=campos.get("sistemas","") if i==0 else "",placeholder="Ex: Eproc, SAJ, SEEU",key=f"cad_exp_sis_{i}")
-            experiencias.append({"orgao":orgao,"supervisor":supervisor,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
+            experiencias.append({"orgao":orgao,"supervisor":supervisor,"supervisor_email":supervisor_email,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp})
 
         st.markdown('<p class="section-label">Outras informações acadêmicas e profissionais</p>', unsafe_allow_html=True)
         st.caption("Use este campo para cursos livres, publicações, produção acadêmica, idiomas, atividades docentes, projetos, voluntariado jurídico, premiações e outras informações que ajudem o recrutador a entender sua trajetória.")
-        pos=st.text_input("Pós-graduação ou especializações adicionais",value=campos.get("pos_graduacao",""))
         res=st.text_area("Outras informações",value=campos.get("resumo",""),height=100)
-        st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
+
+        st.markdown('<p class="section-label">Concurso</p>', unsafe_allow_html=True)
+        estuda_concurso=st.radio("Estuda para concurso?",["Não","Sim"],horizontal=True)
         conc="Não estou estudando para concurso"
         if estuda_concurso=="Sim":
             conc=st.text_input("Qual concurso?",placeholder="Ex: Promotor de Justiça (MP Estadual)")
+
+        st.markdown('<p class="section-label">Instituições de interesse para trabalhar</p>', unsafe_allow_html=True)
+        inst_interesse=st.multiselect("Selecione uma ou mais instituições *",INSTITUICOES_INTERESSE,key="cad_inst_interesse")
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
         cons=st.checkbox("Li e aceito a Política de Privacidade e os Termos de Uso. Consinto com o tratamento dos meus dados nos termos da LGPD (Lei nº 13.709/2018).")
         st.markdown("<br>",unsafe_allow_html=True)
         if st.button("Próximo →"):
             formacoes_validas=[f for f in formacoes if f.get("grau") or f.get("instituicao") or f.get("periodo")]
-            experiencias_validas=[e for e in experiencias if e.get("orgao") or e.get("supervisor") or e.get("area") or e.get("atribuicoes") or e.get("sistemas")]
+            experiencias_validas=[e for e in experiencias if e.get("orgao") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas")]
             if not nome or not email or not formacoes_validas or not formacoes_validas[0].get("instituicao"): st.error("Preencha nome, e-mail e ao menos uma formação com instituição.")
             elif not inst_interesse: st.error("Selecione ao menos uma instituição de interesse.")
             elif not cons: st.error("Aceite os Termos para continuar.")
             else:
                 anos=anos_experiencias(experiencias_validas)
-                st.session_state.dc.update({"nome":nome,"email":email,"formacao":salvar_lista_json(formacoes_validas),"instituicao":resumo_formacoes(formacoes_validas),"area":", ".join(inst_interesse),"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":salvar_lista_json(experiencias_validas),"sistemas":sistemas_experiencias(experiencias_validas),"pos":pos,"resumo":res,"concurso":conc})
+                st.session_state.dc.update({"nome":nome,"email":email,"formacao":salvar_lista_json(formacoes_validas),"instituicao":resumo_formacoes(formacoes_validas),"area":", ".join(inst_interesse),"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":salvar_lista_json(experiencias_validas),"sistemas":sistemas_experiencias(experiencias_validas),"pos":"","resumo":res,"concurso":conc})
                 st.session_state.et=2; st.rerun()
 
     elif et==2:
@@ -1177,35 +1220,6 @@ elif pagina == "cadastro":
             st.markdown('<p style="font-weight:600;color:#f0c040;margin-bottom:4px">◆ Avaliação de desempenho</p>',unsafe_allow_html=True)
             st.markdown('<p style="font-size:12px;color:#4a6080;font-weight:500;margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
             aval=st.file_uploader("",type="pdf",key="aval",label_visibility="collapsed")
-        st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-        st.markdown('<p style="font-weight:700;color:#0d1f4e;margin-bottom:4px">E-mail do recomendador</p>',unsafe_allow_html=True)
-        er=st.text_input("",placeholder="nome@mpsc.mp.br",key="er",label_visibility="collapsed")
-        dv=["mpsc.mp.br","tjsc.jus.br","sc.def.br","pge.sc.gov.br","trf4.jus.br","jfsc.jus.br","mpf.mp.br","agu.gov.br"]
-        if er and "@" in er:
-            if er.split("@")[-1] in dv: st.markdown('<div class="info-box">✓ E-mail institucional reconhecido.</div>',unsafe_allow_html=True)
-            else: st.warning("Domínio não reconhecido.")
-
-        if er and "@" in er:
-            st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-            st.markdown('<p style="font-weight:700;color:#0d1f4e;margin-bottom:4px">Solicitar avaliação direta na plataforma</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#4a6080;font-weight:500;margin-bottom:8px">O recomendador receberá um link exclusivo para preencher uma avaliação do seu perfil diretamente no JurisBank.</p>',unsafe_allow_html=True)
-            if st.button("Gerar link de avaliação →", key="gerar_link"):
-                email_cand_temp = st.session_state.dc.get("email","")
-                if not email_cand_temp:
-                    st.error("Preencha seu e-mail na etapa anterior primeiro.")
-                else:
-                    token = secrets.token_urlsafe(24)
-                    aba_recomendacoes.append_row([token, email_cand_temp, er, "pendente", datetime.now().strftime("%d/%m/%Y %H:%M"), "", ""])
-                    link = f"https://jurisbank.streamlit.app/?p=recomendar&token={token}"
-                    nome_cand_temp = st.session_state.dc.get("nome", "candidato")
-                    # Enviar e-mail ao recomendador
-                    enviado = email_recomendador(nome_cand_temp, er, link)
-                    if enviado:
-                        st.markdown(f'<div class="info-box">✓ E-mail enviado para <strong>{er}</strong>!<br><span style="font-size:12px;opacity:0.8">O recomendador receberá o link para preencher a avaliação.</span></div>',unsafe_allow_html=True)
-                    else:
-                        st.markdown(f'<div class="info-box">✓ Link gerado! Caso o e-mail não chegue, compartilhe o link manualmente:<br><strong style="font-size:12px;word-break:break-all">{link}</strong></div>',unsafe_allow_html=True)
-                    st.session_state.dc["token_recomendacao"] = token
-                    st.info("Quando o recomendador preencher a avaliação, o selo ★ Recomendado será ativado automaticamente no seu perfil.")
 
         d=st.session_state.dc; sp=[]
         if d.get("oab")=="Sim": sp.append("✓ Verificado")
@@ -1222,7 +1236,7 @@ elif pagina == "cadastro":
             if st.button("← Voltar"): st.session_state.et=1; st.rerun()
         with c2:
             if st.button("Próximo →"):
-                st.session_state.dc.update({"carta":carta is not None,"avaliacao":aval is not None,"email_ref":er})
+                st.session_state.dc.update({"carta":carta is not None,"avaliacao":aval is not None,"email_ref":""})
                 st.session_state.et=3; st.rerun()
 
     elif et==3:
