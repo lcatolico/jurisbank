@@ -547,6 +547,7 @@ def inscritos(ch):
 
 def ir(p):
     st.session_state.pagina=p
+    st.query_params.clear()
     st.query_params["p"]=p
     st.rerun()
 
@@ -559,6 +560,9 @@ def imagem_data_url(upload):
         return ""
     mime = getattr(upload, "type", None) or "image/png"
     return f"data:{mime};base64,{base64.b64encode(upload.getvalue()).decode('utf-8')}"
+
+def html_texto(valor):
+    return html_lib.escape(str(valor or "")).replace("\n", "<br>")
 
 def extrair_campos(txt):
     c={"nome":"","email":"","oab":"Não","experiencia_orgaos":"","sistemas":"","pos_graduacao":"","resumo":""}
@@ -1393,8 +1397,8 @@ elif pagina == "candidatos":
             <div style="display:flex;align-items:center;gap:16px">
                 {avatar_detalhe}
                 <div>
-                    <div class="profile-name">{c['nome']}</div>
-                    <div style="font-size:13px;color:#4a6080;margin-bottom:6px">{resumo_formacoes(formacoes_view) or c.get('instituicao','—')}</div>
+                    <div class="profile-name">{html_texto(c.get('nome','—'))}</div>
+                    <div style="font-size:13px;color:#4a6080;margin-bottom:6px">{html_texto(resumo_formacoes(formacoes_view) or c.get('instituicao','—'))}</div>
                     <div>{html_selos(c)}</div>
                 </div>
             </div>
@@ -1402,27 +1406,27 @@ elif pagina == "candidatos":
 
         col1,col2,col3,col4=st.columns(4)
         for col,lb,vl in [(col1,"Interesse",c.get("area","—")),(col2,"OAB",c.get("oab","—")),(col3,"Disponível",c.get("disponibilidade","—")),(col4,"Experiência",resumo_experiencias(experiencias_view) or "—")]:
-            with col: st.markdown(f'<div class="metric-box"><p class="metric-label">{lb}</p><p class="metric-value">{vl}</p></div>',unsafe_allow_html=True)
+            with col: st.markdown(f'<div class="metric-box"><p class="metric-label">{lb}</p><p class="metric-value">{html_texto(vl)}</p></div>',unsafe_allow_html=True)
 
         if c.get("disc"):
             st.markdown('<p class="section-label">Perfil DISC</p>',unsafe_allow_html=True)
             st.markdown(render_disc(c["disc"]),unsafe_allow_html=True)
         if c.get("concurso") and c.get("concurso")!="Não estou estudando para concurso":
             st.markdown('<p class="section-label">Concurso</p>',unsafe_allow_html=True)
-            st.markdown(f'<div class="info-card">📚 {c["concurso"]}</div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card">📚 {html_texto(c["concurso"])}</div>',unsafe_allow_html=True)
         if c.get("sistemas"):
             st.markdown('<p class="section-label">Sistemas</p>',unsafe_allow_html=True)
-            st.markdown(f'<div class="info-card">{c["sistemas"]}</div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card">{html_texto(c["sistemas"])}</div>',unsafe_allow_html=True)
         if c.get("resumo"):
             st.markdown('<p class="section-label">Resumo</p>',unsafe_allow_html=True)
             if rec_logado():
-                st.markdown(f'<div class="info-card">{c["resumo"]}</div>',unsafe_allow_html=True)
+                st.markdown(f'<div class="info-card">{html_texto(c["resumo"])}</div>',unsafe_allow_html=True)
             else:
                 prev=c["resumo"][:150]+"..." if len(c["resumo"])>150 else c["resumo"]
-                st.markdown(f'<div class="info-card">{prev}<br><br><span style="color:#f0c040;font-size:12px">🔐 Resumo completo disponível para recrutadores.</span></div>',unsafe_allow_html=True)
+                st.markdown(f'<div class="info-card">{html_texto(prev)}<br><br><span style="color:#f0c040;font-size:12px">🔐 Resumo completo disponível para recrutadores.</span></div>',unsafe_allow_html=True)
         st.markdown('<p class="section-label">Contato</p>',unsafe_allow_html=True)
         if rec_logado():
-            st.markdown(f'<div class="info-card">✉ {c.get("email","—")}</div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card">✉ {html_texto(c.get("email","—"))}</div>',unsafe_allow_html=True)
         else:
             st.markdown('<div class="lock-box">🔐 Disponível apenas para recrutadores aprovados.</div>',unsafe_allow_html=True)
     else:
@@ -1555,7 +1559,9 @@ elif pagina == "chamadas":
                 if st.button("Inscrever-se →",key=f"i{i}"):
                     st.session_state[f"ci{i}"]=True; st.rerun()
             elif ja: st.markdown('<span class="badge-inscrito">✓ Inscrito</span>',unsafe_allow_html=True)
-            elif not cand_logado() and ab: st.markdown('<span style="font-size:11px;color:#4a6080;font-weight:600">Login para se inscrever</span>',unsafe_allow_html=True)
+            elif not cand_logado() and ab:
+                if st.button("Entrar para se inscrever", key=f"login_insc_{i}"):
+                    ir("inicio")
 
         if st.session_state.get(f"ci{i}"):
             st.markdown(f'<div class="info-card" style="margin-top:8px"><strong style="color:#0d1f4e">Inscrever em: {ch.get("titulo","")}</strong></div>',unsafe_allow_html=True)
@@ -1580,12 +1586,12 @@ elif pagina == "chamadas":
         if st.session_state.get(f"vd{i}"):
             with st.expander("Detalhes",expanded=True):
                 c1,c2,c3=st.columns(3)
-                with c1: st.markdown(f'<div class="metric-box"><p class="metric-label">Remuneração</p><p class="metric-value" style="font-size:13px">{ch.get("remuneracao","—")}</p></div>',unsafe_allow_html=True)
-                with c2: st.markdown(f'<div class="metric-box"><p class="metric-label">Regime</p><p class="metric-value" style="font-size:13px">{ch.get("regime","—")}</p></div>',unsafe_allow_html=True)
-                with c3: st.markdown(f'<div class="metric-box"><p class="metric-label">Seleção</p><p class="metric-value" style="font-size:13px">{ch.get("forma_selecao","—")}</p></div>',unsafe_allow_html=True)
+                with c1: st.markdown(f'<div class="metric-box"><p class="metric-label">Remuneração</p><p class="metric-value" style="font-size:13px">{html_texto(ch.get("remuneracao","—"))}</p></div>',unsafe_allow_html=True)
+                with c2: st.markdown(f'<div class="metric-box"><p class="metric-label">Regime</p><p class="metric-value" style="font-size:13px">{html_texto(ch.get("regime","—"))}</p></div>',unsafe_allow_html=True)
+                with c3: st.markdown(f'<div class="metric-box"><p class="metric-label">Seleção</p><p class="metric-value" style="font-size:13px">{html_texto(ch.get("forma_selecao","—"))}</p></div>',unsafe_allow_html=True)
                 if ch.get("requisitos"):
                     st.markdown('<p class="section-label">Requisitos</p>',unsafe_allow_html=True)
-                    st.markdown(f'<div class="info-card">{ch["requisitos"]}</div>',unsafe_allow_html=True)
+                    st.markdown(f'<div class="info-card">{html_texto(ch["requisitos"])}</div>',unsafe_allow_html=True)
                 st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>',unsafe_allow_html=True)
 
 # ── PÁGINA: CADASTRO ──────────────────────────────────────────────────────────
@@ -1932,15 +1938,15 @@ elif pagina == "recrutador":
                     with cc:
                         if st.button("Ver →",key=f"rb{i}"):
                             st.session_state.cr=cand; st.rerun()
-                if ec in anots: st.markdown(f'<div class="info-card" style="margin-top:-6px;margin-bottom:8px;font-size:12px">📝 {anots[ec]}</div>',unsafe_allow_html=True)
+                if ec in anots: st.markdown(f'<div class="info-card" style="margin-top:-6px;margin-bottom:8px;font-size:12px">📝 {html_texto(anots[ec])}</div>',unsafe_allow_html=True)
                 if st.session_state.get("cr")==cand:
                     with st.expander("Perfil completo",expanded=True):
                         c1,c2,c3=st.columns(3)
                         for cl,lb,vl in [(c1,"OAB",cand.get("oab","—")),(c2,"Órgãos",cand.get("experiencia_orgaos","—") or "—"),(c3,"Sistemas",cand.get("sistemas","—") or "—")]:
-                            with cl: st.markdown(f'<div class="metric-box"><p class="metric-label">{lb}</p><p class="metric-value" style="font-size:12px">{vl}</p></div>',unsafe_allow_html=True)
+                            with cl: st.markdown(f'<div class="metric-box"><p class="metric-label">{lb}</p><p class="metric-value" style="font-size:12px">{html_texto(vl)}</p></div>',unsafe_allow_html=True)
                         if cand.get("disc"): st.markdown(render_disc(cand["disc"]),unsafe_allow_html=True)
-                        if cand.get("resumo"): st.markdown(f'<div class="info-card" style="margin-top:1rem">{cand["resumo"]}</div>',unsafe_allow_html=True)
-                        st.markdown(f'<div class="info-card" style="margin-top:0.5rem">✉ {cand.get("email","—")}</div>',unsafe_allow_html=True)
+                        if cand.get("resumo"): st.markdown(f'<div class="info-card" style="margin-top:1rem">{html_texto(cand["resumo"])}</div>',unsafe_allow_html=True)
+                        st.markdown(f'<div class="info-card" style="margin-top:0.5rem">✉ {html_texto(cand.get("email","—"))}</div>',unsafe_allow_html=True)
                         na=anots.get(ec,""); nn=st.text_area("",value=na,height=70,key=f"nt{i}",placeholder="Anotação privada...")
                         cs_,cf_=st.columns(2)
                         with cs_:
@@ -1973,7 +1979,7 @@ elif pagina == "recrutador":
                     with c1: ach=st.multiselect("Áreas do Seletivo *",AREAS,key="novo_sel_areas")
                     with c2: ech=st.selectbox("Estado *",["Selecione..."]+ESTADOS,index=ESTADOS.index(rec.get("estado","SC"))+1 if rec.get("estado","") in ESTADOS else 0)
                     with c3: mch_=st.text_input("Município *",value=ra.get("municipio",""))
-                    rch=st.text_area("Requisitos mínimos *",height=80,placeholder="Ex: Bacharelado em Direito, experiência em gabinete, domínio de Eproc/SAJ, disponibilidade integral.")
+                    rch=st.text_area("Requisitos mínimos *",height=80,placeholder="Ex: Bacharelado em Direito, experiência em gabinete, domínio de Eproc/SAJ, disponibilidade presencial.")
                     c1,c2,c3=st.columns(3)
                     with c1: remch=st.text_input("Remuneração *",placeholder="Ex: R$ 4.500,00")
                     with c2: regch=st.selectbox("Regime *",["Selecione..."]+REGIMES)
