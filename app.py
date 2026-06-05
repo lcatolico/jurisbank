@@ -35,7 +35,16 @@ header[data-testid="stHeader"] { display: none !important; }
     background: #eef3fe;
     min-height: 100vh;
 }
-.main .block-container { padding: 0 2.5rem 3rem; max-width: 1100px; background: transparent; }
+.main .block-container,
+[data-testid="stAppViewContainer"] .main .block-container,
+[data-testid="stMainBlockContainer"] {
+    padding-top: 0 !important;
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+    padding-bottom: 3rem !important;
+    max-width: 1100px;
+    background: transparent;
+}
 
 [data-testid="stMarkdownContainer"],
 [data-testid="stMarkdownContainer"] p,
@@ -608,6 +617,15 @@ def login_candidato(email, senha=None, permitir_sem_senha=True):
         return cand
     return None
 
+def restaurar_recrutador_da_sessao():
+    email = str(st.session_state.get("rec_email_logado", "") or "").strip().lower()
+    if rec_logado() or not email:
+        return
+    for rec in aba_recrutadores.get_all_records():
+        if str(rec.get("email", "")).strip().lower() == email:
+            st.session_state.rec_logado = rec
+            return
+
 def carregar_lista_json(valor):
     if not valor:
         return []
@@ -924,6 +942,8 @@ def email_recomendador(nome_candidato, email_recomendador, link):
     return enviar_email(email_recomendador, assunto, corpo)
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
+restaurar_recrutador_da_sessao()
+
 if rec_logado() and pagina == "recrutador":
     dash_param = params.get("dash", "")
     if isinstance(dash_param, list):
@@ -935,6 +955,7 @@ if rec_logado() and pagina == "recrutador":
         sair_param = sair_param[0]
     if sair_param == "1":
         del st.session_state.rec_logado
+        st.session_state.pop("rec_email_logado", None)
         ir("recrutador")
 
 if rec_logado():
@@ -1770,6 +1791,7 @@ elif pagina == "recrutador":
                         aba_recrutadores.update_cell(linha,8,rec_cargo)
                         aba_recrutadores.update_cell(linha,9,", ".join(rec_areas))
                         st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
+                        st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
                         st.success("Perfil do recrutador atualizado.")
                         st.rerun()
             if st.button("Lançar Novo Seletivo", key="btn_lancar_seletivo_perfil_rec"):
@@ -1861,7 +1883,9 @@ elif pagina == "recrutador":
                             if ifav: favs.remove(ec)
                             else: favs.append(ec)
                             aba_recrutadores.update_cell(idx_r+2,12,", ".join(favs))
-                            st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]; st.rerun()
+                            st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
+                            st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
+                            st.rerun()
                     with cc:
                         if st.button("Ver →",key=f"rb{i}"):
                             st.session_state.cr=cand; st.rerun()
@@ -2048,7 +2072,10 @@ elif pagina == "recrutador":
                 if el and sl:
                     recs_=aba_recrutadores.get_all_records(); sh=hash_senha(sl)
                     enc=next((r for r in recs_ if r["email"]==el and r["senha"]==sh and r["status"]=="ativo"),None)
-                    if enc: st.session_state.rec_logado=enc; st.rerun()
+                    if enc:
+                        st.session_state.rec_logado=enc
+                        st.session_state.rec_email_logado=enc.get("email","")
+                        st.rerun()
                     else: st.error("E-mail ou senha incorretos, ou conta ainda não aprovada.")
                 else: st.error("Preencha e-mail e senha.")
         with tabs[1]:
