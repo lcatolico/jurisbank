@@ -228,16 +228,8 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background:
 .stSelectbox [data-baseweb="select"] * { color: #0d1f4e !important; font-weight: 500 !important; }
 .stRadio label, .stCheckbox label { color: #0d1f4e !important; font-weight: 600 !important; }
 .stMultiSelect > div > div { background: #ffffff !important; border-color: #d0dcfa !important; border-radius: 10px !important; }
-.stMultiSelect [data-baseweb="select"] * { color: #0d1f4e !important; font-weight: 500 !important; }
-.stMultiSelect [data-baseweb="select"],
-.stMultiSelect [data-baseweb="select"] > div,
-.stMultiSelect [data-baseweb="select"] div {
-    background: #ffffff !important;
-    color: #0d1f4e !important;
-    border-color: #d0dcfa !important;
-}
+.stMultiSelect [data-baseweb="select"] { color: #0d1f4e !important; }
 .stMultiSelect [data-baseweb="select"] svg { fill: #0d1f4e !important; color: #0d1f4e !important; }
-.stMultiSelect [data-baseweb="tag"] { background: #e8effe !important; color: #0d1f4e !important; border: 1px solid #c5d5f5 !important; }
 [data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"], [role="listbox"] { background: #ffffff !important; color: #0d1f4e !important; }
 [role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #0d1f4e !important; }
 [role="option"]:hover, [role="option"][aria-selected="true"] { background: #e8f0fe !important; color: #0d1f4e !important; }
@@ -369,9 +361,7 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
 [role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #1e1e1e !important; }
 [role="option"]:hover, [role="option"][aria-selected="true"] { background: #f2efe9 !important; color: #1e1e1e !important; }
 .stSelectbox [data-baseweb="select"] div,
-.stSelectbox [data-baseweb="select"] span,
-.stMultiSelect [data-baseweb="select"] div,
-.stMultiSelect [data-baseweb="select"] span {
+.stSelectbox [data-baseweb="select"] span {
     color: #1e1e1e !important;
     -webkit-text-fill-color: #1e1e1e !important;
 }
@@ -393,44 +383,7 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
     background-color: #f2efe9 !important;
     color: #1e1e1e !important;
 }
-.stMultiSelect [data-baseweb="tag"],
-.stMultiSelect [data-baseweb="tag"] span {
-    background-color: #f2efe9 !important;
-    color: #1e1e1e !important;
-}
-.stMultiSelect [data-baseweb="tag"] {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    min-height: 28px !important;
-    padding: 3px 8px 3px 10px !important;
-    margin: 2px 4px 2px 0 !important;
-    border: 1px solid #ddd8ce !important;
-    border-radius: 7px !important;
-    overflow: visible !important;
-}
-.stMultiSelect [data-baseweb="tag"] div,
-.stMultiSelect [data-baseweb="tag"] span {
-    background: transparent !important;
-    color: #1e1e1e !important;
-    -webkit-text-fill-color: #1e1e1e !important;
-    overflow: visible !important;
-    text-indent: 0 !important;
-    padding-left: 4px !important;
-    margin-left: 0 !important;
-    clip-path: none !important;
-    mask-image: none !important;
-    transform: none !important;
-}
-.stMultiSelect [data-baseweb="tag"] > div:first-child,
-.stMultiSelect [data-baseweb="tag"] span:first-child {
-    padding-left: 8px !important;
-}
-.stMultiSelect [data-baseweb="tag"] svg {
-    color: #1e1e1e !important;
-    fill: #1e1e1e !important;
-    flex-shrink: 0 !important;
-}
+.stMultiSelect [data-baseweb="tag"] { color: inherit !important; }
 .stTabs [data-baseweb="tab-list"] { background: #f2efe9 !important; border-color: #ddd8ce !important; }
 .stTabs [data-baseweb="tab"] { color: #6a6a6a !important; }
 .stTabs [aria-selected="true"] { color: #1e1e1e !important; box-shadow: 0 6px 14px rgba(30,30,30,0.08) !important; }
@@ -556,7 +509,7 @@ PERGUNTAS_DISC = [
 ]
 DISC_AVISO = "O perfil DISC é um indicador comportamental de apoio. Ele não substitui análise curricular, entrevista estruturada, prova prática ou avaliação técnica do trabalho."
 LETRAS_DISC = ["D","I","S","C"]
-DISCLAIMER = "⚠️ O JurisBank atua exclusivamente como plataforma de aproximação. A publicação desta Chamada não configura processo seletivo vinculante, concurso público ou compromisso de contratação. O uso do ius indicandum é de responsabilidade exclusiva do recrutador, que deve observar as normas de impessoalidade e vedação ao nepotismo aplicáveis ao seu órgão."
+DISCLAIMER = "O JurisBank atua exclusivamente como plataforma de aproximação. A publicação deste Seletivo não configura processo seletivo vinculante, concurso público ou compromisso de contratação. O uso do ius indicandum é de responsabilidade exclusiva do recrutador, que deve observar as normas de impessoalidade e vedação ao nepotismo aplicáveis ao seu órgão."
 
 # ── Funções ───────────────────────────────────────────────────────────────────
 def cor_avatar(n): return AVATAR_CORES[sum(ord(c) for c in n)%len(AVATAR_CORES)]
@@ -951,7 +904,7 @@ else:
         ("candidatos","Banco de Talentos"),
     ]
 
-nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span><span class="topbar-logo-sub">ius indicandum</span></div></a><div class="topbar-nav">'
+nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span></div></a><div class="topbar-nav">'
 for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     nav_html += f'<a href="?p={pg}" class="{active}">{lb}</a>'
@@ -959,7 +912,7 @@ for pg, lb in nav_pages:
 if rec_logado():
     rec = st.session_state.rec_logado
     nav_html += f'<a href="?p=recrutador" class="{"active" if pagina=="recrutador" else ""}">{rec["nome"].split()[0]}</a>'
-elif not (pagina in ["inicio","perfil","cadastro"] or cand_logado()):
+elif not (pagina in ["inicio","perfil","cadastro","chamadas"] or cand_logado()):
     nav_html += '<a href="?p=recrutador" class="btn-rec">Recrutador</a>'
 
 nav_html += '</div></div>'
@@ -1445,7 +1398,7 @@ elif pagina == "chamadas":
             if st.button("Sair",key="sc"): del st.session_state.cand_logado; st.rerun()
 
     st.markdown("""<div class="hero-card">
-        <h1 class="page-title">Chamadas<br><em>Abertas.</em></h1>
+        <h1 class="page-title">Seletivos<br><em>Abertos.</em></h1>
         <p class="page-sub">Vagas de cargos de livre nomeação em Tribunais, Ministérios Públicos, Defensorias e Procuradorias</p>
     </div>""",unsafe_allow_html=True)
     st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>',unsafe_allow_html=True)
@@ -1462,7 +1415,7 @@ elif pagina == "chamadas":
     if fs=="Abertas": chf=[ch for ch in chf if ch_aberta(ch)]
     elif fs=="Encerradas": chf=[ch for ch in chf if not ch_aberta(ch)]
 
-    st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin-bottom:1rem">{len(chf)} chamada(s)</p>',unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin-bottom:1rem">{len(chf)} seletivo(s)</p>',unsafe_allow_html=True)
 
     for i,ch in enumerate(chf):
         ab=ch_aberta(ch); ins_=inscritos(ch); n=len(ins_)
@@ -1501,7 +1454,7 @@ elif pagina == "chamadas":
 
         if st.session_state.get(f"ci{i}"):
             st.markdown(f'<div class="info-card" style="margin-top:8px"><strong style="color:#0d1f4e">Inscrever em: {ch.get("titulo","")}</strong></div>',unsafe_allow_html=True)
-            cons=st.checkbox("Autorizo o compartilhamento do meu perfil com o recrutador desta Chamada, nos termos da LGPD.",key=f"cs{i}")
+            cons=st.checkbox("Autorizo o compartilhamento do meu perfil com o recrutador deste Seletivo, nos termos da LGPD.",key=f"cs{i}")
             ca,cx=st.columns(2)
             with ca:
                 if st.button("Confirmar",key=f"cf{i}"):
@@ -1729,9 +1682,9 @@ elif pagina == "recrutador":
             <h1 class="page-title">Olá, <em>{rec['nome'].split()[0]}!</em></h1>
             <p class="page-sub">{ra.get('nome_orgao',rec.get('orgao',''))} · {rec.get('estado','')}</p>
             <div class="stats-row">
-                <div class="stat-pill">⚖ {len(dados)} candidatos</div>
-                <div class="stat-pill">★ {len(favs)} favoritos</div>
-                <div class="stat-pill">📢 {len(mch)} chamadas</div>
+                <div class="stat-pill">{len(dados)} candidatos</div>
+                <div class="stat-pill">{len(favs)} favoritos</div>
+                <div class="stat-pill">{len(mch)} seletivos</div>
             </div>
         </div>""",unsafe_allow_html=True)
 
@@ -1740,7 +1693,7 @@ elif pagina == "recrutador":
             if st.button("Sair da conta"):
                 del st.session_state.rec_logado; ir("recrutador")
 
-        tabs=st.tabs(["🔍 Busca","📢 Chamadas","★ Favoritos"])
+        tabs=st.tabs(["Busca","Seletivos","Favoritos"])
 
         with tabs[0]:
             c1,c2,c3=st.columns(3)
@@ -1833,13 +1786,13 @@ elif pagina == "recrutador":
 
         with tabs[1]:
             ch_col,btn_col=st.columns([8,3])
-            with ch_col: st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e">Minhas Chamadas</p>',unsafe_allow_html=True)
+            with ch_col: st.markdown('<p style="font-size:15px;font-weight:700;color:#1e1e1e">Meus Seletivos</p>',unsafe_allow_html=True)
             with btn_col:
-                if st.button("+ Nova Chamada",key="nch"):
+                if st.button("+ Novo Seletivo",key="nch"):
                     st.session_state["criar_ch"]=True; st.rerun()
 
             if st.session_state.get("criar_ch"):
-                with st.expander("Nova Chamada",expanded=True):
+                with st.expander("Novo Seletivo",expanded=True):
                     st.markdown(f'<div class="disclaimer-box">{DISCLAIMER}</div>',unsafe_allow_html=True)
                     st.markdown("<br>",unsafe_allow_html=True)
                     tch=st.text_input("Título da vaga *",placeholder="Ex: Assessor Jurídico — 3ª Promotoria")
@@ -1893,9 +1846,9 @@ elif pagina == "recrutador":
                                     "Mensagem aos candidatos: " + (comunicacao.strip() or "Não informado"),
                                 ]
                                 aba_chamadas.append_row([gerar_id(),tch,och,toch,ach,ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prch.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
-                                del st.session_state["criar_ch"]; st.success("Chamada publicada!"); st.rerun()
+                                del st.session_state["criar_ch"]; st.success("Seletivo publicado!"); st.rerun()
 
-            if not mch: st.info("Nenhuma Chamada publicada ainda.")
+            if not mch: st.info("Nenhum Seletivo publicado ainda.")
             else:
                 for i,ch in enumerate(mch):
                     ab=ch_aberta(ch); ins_=inscritos(ch); n=len(ins_)
@@ -2189,15 +2142,15 @@ elif pagina in ["privacidade","termos"]:
     if ip:
         secs=[
             ("1. Controlador",[("p","Operado por [RAZÃO SOCIAL A PREENCHER], CNPJ [A PREENCHER]. DPO: [E-MAIL A PREENCHER]")]),
-            ("2. Dados Coletados",[("l",["Nome, e-mail, formação, OAB","Histórico em órgãos públicos","Sistemas jurídicos, perfil DISC","Documentos de referência (quando fornecidos)","E-mail e senha dos recrutadores (hash SHA-256)"])]),
-            ("3. Finalidade",[("l",["Gestão de perfis e selos","Viabilizar busca por recrutadores aprovados","Gestão de inscrições em Chamadas","Melhoria dos serviços"])]),
+            ("2. Dados Coletados",[("l",["Nome, e-mail, formação, OAB","Histórico em órgãos públicos","Sistemas jurídicos, perfil DISC","Documentos de referência (quando fornecidos)","Fotografia de perfil quando enviada","Senhas de acesso armazenadas em hash SHA-256"])]),
+            ("3. Finalidade",[("l",["Gestão de perfis e selos","Viabilizar busca por recrutadores aprovados","Gestão de inscrições em Seletivos","Melhoria dos serviços"])]),
             ("4. Base Legal",[("l",["Consentimento (Art. 7º, I LGPD)","Legítimo interesse (Art. 7º, IX LGPD)"])]),
             ("5. Direitos",[("l",["Acesso, correção e eliminação","Portabilidade","Revogação do consentimento"]),("p","Contato: [E-MAIL DO DPO A PREENCHER]")]),
         ]
     else:
         secs=[
             ("1. Aceitação",[("p","Ao usar o JurisBank você concorda com estes Termos e com a Política de Privacidade.")]),
-            ("2. Chamadas",[("p","A publicação de uma Chamada não configura processo seletivo vinculante ou concurso público. O uso do ius indicandum é de responsabilidade exclusiva do recrutador.")]),
+            ("2. Seletivos",[("p","A publicação de um Seletivo não configura processo seletivo vinculante ou concurso público. O uso do ius indicandum é de responsabilidade exclusiva do recrutador.")]),
             ("3. Impessoalidade",[("l",["Princípio da impessoalidade (art. 37, CF/88)","Vedação ao nepotismo (SV nº 13 do STF)","Resolução CNJ nº 07/2005"])]),
             ("4. Responsabilidades",[("p","O JurisBank não garante contratações e não se responsabiliza por decisões dos recrutadores.")]),
             ("5. Foro",[("p","Comarca de [MUNICÍPIO A PREENCHER], Estado de [ESTADO A PREENCHER].")]),
