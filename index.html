@@ -45,9 +45,9 @@ nav{
 .btn-cand:hover{border-color:var(--dourado)!important;color:var(--dourado)!important;background:var(--dourado-bg)!important}
 
 .hero{
-  min-height:100vh;
+  min-height:72vh;
   display:flex;align-items:center;
-  padding:120px 4rem 82px;
+  padding:96px 4rem 58px;
   background:var(--off);
   position:relative;overflow:hidden;
 }
@@ -58,23 +58,23 @@ nav{
 }
 .hero-inner{
   max-width:1120px;margin:0 auto;width:100%;
-  display:grid;grid-template-columns:1fr 440px;gap:76px;align-items:center;
+  display:grid;grid-template-columns:1fr 420px;gap:64px;align-items:center;
   position:relative;z-index:1;
 }
 .hero-tag{
   display:inline-flex;align-items:center;gap:6px;
   background:var(--dourado-bg);border:1px solid var(--dourado-claro);
   color:var(--dourado);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  padding:5px 13px;border-radius:99px;margin-bottom:1.5rem;
+  padding:5px 13px;border-radius:99px;margin-bottom:1rem;
 }
 .hero-title{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(44px,5vw,68px);
+  font-size:clamp(40px,4.4vw,58px);
   font-weight:600;line-height:.98;letter-spacing:-1.8px;
-  color:var(--grafite);margin-bottom:1.3rem;
+  color:var(--grafite);margin-bottom:1rem;
 }
 .hero-title em{font-style:italic;color:var(--dourado)}
-.hero-sub{font-size:16px;color:var(--grafite-suave);line-height:1.75;font-weight:400;margin-bottom:2.5rem;max-width:470px}
+.hero-sub{font-size:15px;color:var(--grafite-suave);line-height:1.65;font-weight:400;margin-bottom:1.8rem;max-width:470px}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap}
 .btn-p,.btn-s,.btn-cw,.btn-co{
   padding:13px 26px;border-radius:8px;font-size:14px;font-weight:700;font-family:'Inter',sans-serif;
@@ -193,8 +193,8 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
 @media(max-width:900px){
   nav{padding:1rem 1.5rem;align-items:flex-start}
   .nav-links{justify-content:flex-end}
-  .hero{padding:112px 1.5rem 64px}
-  .hero-inner{grid-template-columns:1fr;gap:42px}
+  .hero{min-height:auto;padding:78px 1.5rem 48px}
+  .hero-inner{grid-template-columns:1fr;gap:34px}
   .steps,.selos-grid,.disc-row,.tools{grid-template-columns:1fr}
   .interest-form{grid-template-columns:1fr}
   .stats-bar{gap:32px;padding:34px 1.5rem}
@@ -203,9 +203,9 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
 }
 @media(max-width:560px){
   nav{position:relative}
-  .hero{padding-top:48px}
+  .hero{padding-top:42px}
   .nav-links a:not(.btn-rec):not(.btn-cand){display:none}
-  .hero-title{font-size:44px}
+  .hero-title{font-size:40px}
 }
 </style>
 </head>
@@ -227,8 +227,8 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
   <div class="hero-inner">
     <div>
       <div class="hero-tag fu fu1">Sistema de Justiça</div>
-      <h1 class="hero-title fu fu1">A indicação que<br><em>você precisava.</em></h1>
-      <p class="hero-sub fu fu2">Banco de talentos jurídicos para oportunidades de livre nomeação, com perfis estruturados, selos verificáveis e critérios que apoiam escolhas responsáveis.</p>
+      <h1 class="hero-title fu fu1">Uma ponte.<br><em>Novas oportunidades.</em></h1>
+      <p class="hero-sub fu fu2">Ligando candidatos a cargos de assessoria jurídica em Tribunais, Ministérios Públicos, Defensorias e Procuradorias.</p>
       <div class="hero-btns fu fu2">
         <a href="https://jurisbank.streamlit.app/?p=cadastro" target="_blank" class="btn-p">Cadastrar meu perfil</a>
         <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank" class="btn-s">Sou recrutador</a>
