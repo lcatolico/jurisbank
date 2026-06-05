@@ -918,6 +918,19 @@ def email_recomendador(nome_candidato, email_recomendador, link):
     return enviar_email(email_recomendador, assunto, corpo)
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
+if rec_logado() and pagina == "recrutador":
+    dash_param = params.get("dash", "")
+    if isinstance(dash_param, list):
+        dash_param = dash_param[0]
+    if dash_param in ["perfil","seletivos","banco"]:
+        st.session_state.rec_dashboard = dash_param
+    sair_param = params.get("sair", "")
+    if isinstance(sair_param, list):
+        sair_param = sair_param[0]
+    if sair_param == "1":
+        del st.session_state.rec_logado
+        ir("recrutador")
+
 if rec_logado():
     nav_pages = []
 elif pagina in ["inicio","perfil","cadastro","chamadas"] or cand_logado():
@@ -938,7 +951,13 @@ for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     nav_html += f'<a href="?p={pg}" class="{active}">{lb}</a>'
 
-if not rec_logado() and not (pagina in ["inicio","perfil","cadastro","chamadas","recrutador"] or cand_logado()):
+if rec_logado():
+    dash_atual = st.session_state.get("rec_dashboard","perfil")
+    for dash, lb in [("perfil","Perfil"),("seletivos","Seletivos"),("banco","Banco de Candidatos")]:
+        active = "active" if pagina == "recrutador" and dash_atual == dash else ""
+        nav_html += f'<a href="?p=recrutador&dash={dash}" class="{active}">{lb}</a>'
+    nav_html += '<a href="?p=recrutador&sair=1" class="btn-rec">Sair</a>'
+elif not (pagina in ["inicio","perfil","cadastro","chamadas","recrutador"] or cand_logado()):
     nav_html += '<a href="?p=recrutador" class="btn-rec">Recrutador</a>'
 
 nav_html += '</div></div>'
@@ -1716,19 +1735,6 @@ elif pagina == "recrutador":
 
         if "rec_dashboard" not in st.session_state:
             st.session_state.rec_dashboard = "perfil"
-        m1,m2,m3,m4=st.columns([1.2,1.2,1.8,1])
-        with m1:
-            if st.button("Perfil", key="rec_menu_perfil"):
-                st.session_state.rec_dashboard = "perfil"; st.rerun()
-        with m2:
-            if st.button("Seletivos", key="rec_menu_seletivos"):
-                st.session_state.rec_dashboard = "seletivos"; st.rerun()
-        with m3:
-            if st.button("Banco de Candidatos", key="rec_menu_banco"):
-                st.session_state.rec_dashboard = "banco"; st.rerun()
-        with m4:
-            if st.button("Sair", key="rec_menu_sair"):
-                del st.session_state.rec_logado; ir("recrutador")
 
         if st.session_state.rec_dashboard == "perfil":
             st.markdown('<p class="section-label">Perfil do Recrutador</p>',unsafe_allow_html=True)
@@ -1738,6 +1744,34 @@ elif pagina == "recrutador":
                 <div class="profile-section-card"><p class="profile-section-title">Responsável</p><div class="profile-list-item">{html_lib.escape(rec.get('nome','—'))}</div></div>
                 <div class="profile-section-card"><p class="profile-section-title">E-mail</p><div class="profile-list-item">{html_lib.escape(rec.get('email','—'))}</div></div>
             </div>""",unsafe_allow_html=True)
+            with st.expander("Editar Perfil do Recrutador", expanded=False):
+                with st.form("form_editar_recrutador"):
+                    c1,c2=st.columns(2)
+                    with c1:
+                        rec_nome=st.text_input("Nome do responsável",value=ra.get("nome",rec.get("nome","")))
+                        rec_estado=st.selectbox("Estado",ESTADOS,index=ESTADOS.index(ra.get("estado",rec.get("estado","SC"))) if ra.get("estado",rec.get("estado","")) in ESTADOS else 0)
+                        rec_orgao=st.selectbox("Tipo de órgão",ORGAOS,index=ORGAOS.index(ra.get("orgao","")) if ra.get("orgao","") in ORGAOS else 0)
+                    with c2:
+                        rec_municipio=st.text_input("Município",value=ra.get("municipio",""))
+                        rec_nome_orgao=st.text_input("Nome do órgão",value=ra.get("nome_orgao",rec.get("orgao","")))
+                        rec_cargo=st.selectbox("Cargo",CARGOS,index=CARGOS.index(ra.get("cargo","")) if ra.get("cargo","") in CARGOS else 0)
+                    rec_areas=st.multiselect("Áreas de interesse do órgão",AREAS,default=lista_selecionada(ra.get("areas",""),AREAS))
+                    salvar_rec=st.form_submit_button("Salvar perfil")
+                if salvar_rec:
+                    if idx_r is None:
+                        st.error("Não encontrei seu cadastro de recrutador.")
+                    else:
+                        linha=idx_r+2
+                        aba_recrutadores.update_cell(linha,1,rec_nome)
+                        aba_recrutadores.update_cell(linha,4,rec_estado)
+                        aba_recrutadores.update_cell(linha,5,rec_municipio)
+                        aba_recrutadores.update_cell(linha,6,rec_orgao)
+                        aba_recrutadores.update_cell(linha,7,rec_nome_orgao)
+                        aba_recrutadores.update_cell(linha,8,rec_cargo)
+                        aba_recrutadores.update_cell(linha,9,", ".join(rec_areas))
+                        st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
+                        st.success("Perfil do recrutador atualizado.")
+                        st.rerun()
 
         if st.session_state.rec_dashboard == "banco":
             st.markdown('<p class="section-label">Dashboard do Banco de Candidatos</p>',unsafe_allow_html=True)
