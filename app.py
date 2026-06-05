@@ -155,6 +155,8 @@ header[data-testid="stHeader"] { display: none !important; }
 .cand-photo-lg { width: 60px; height: 60px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 1px solid #d0dcfa; }
 .cand-name { font-size: 15px; font-weight: 700; color: #0d1f4e; margin: 0 0 3px; }
 .cand-sub { font-size: 12px; color: #4a6080; margin: 0; font-weight: 500; }
+.cand-card + div[data-testid="stHorizontalBlock"] { margin-top: -8px !important; margin-bottom: 18px !important; }
+.cand-card + div[data-testid="stHorizontalBlock"] .stButton button { min-height: 36px !important; padding: 0.45rem 1rem !important; }
 .badge-sim { background: #e6f4ea; color: #1a7a4a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
 .badge-nao { background: #fff3e8; color: #c05a1a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #f0c8a0; }
 .badge-aberta { background: #e6f4ea; color: #1a7a4a; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
@@ -476,7 +478,7 @@ FORMACOES = ["Bacharel em Direito","Mestrado","Doutorado"]
 INSTITUICOES_INTERESSE = ["Tribunais de Justiça","Ministérios Públicos","Defensorias Públicas","Procuradorias","Tribunais Regionais Federais","Ministério Público Federal","Advocacia Pública","Tribunais de Contas"]
 MESES = ["01","02","03","04","05","06","07","08","09","10","11","12"]
 ANOS_PERIODO = [str(a) for a in range(date.today().year, 1979, -1)]
-REGIMES = ["Integral","Parcial","Remoto","Híbrido"]
+REGIMES = ["Presencial","Parcial","Remoto","Híbrido"]
 FORMAS_SELECAO = [
     "Análise curricular",
     "Análise curricular + entrevista estruturada",
@@ -599,6 +601,7 @@ def login_candidato(email, senha=None, permitir_sem_senha=True):
         if not senha_salva and senha and not permitir_sem_senha:
             return None
         st.session_state.cand_logado = cand
+        st.session_state.cand_email_logado = cand.get("email", "")
         return cand
     return None
 
@@ -1054,19 +1057,23 @@ if pagina == "inicio":
             f'</div>'
             f'<div class="profile-foot">'
             f'<span class="profile-status {status_class}">● {disponivel_txt}</span>'
-            f'<div class="profile-actions">'
-            f'<a class="profile-action" href="?p=chamadas">Ver seletivos →</a>'
-            f'<a class="profile-action" href="?p=perfil&email={email_link}">Editar perfil →</a>'
-            f'</div>'
             f'</div>'
             f'</div>'
         )
         st.markdown(perfil_html, unsafe_allow_html=True)
+        cver, cedit, cesp = st.columns([2, 2, 5])
+        with cver:
+            if st.button("Ver seletivos →", key="btn_cand_ver_seletivos"):
+                ir("chamadas")
+        with cedit:
+            if st.button("Editar perfil →", key="btn_cand_editar_perfil"):
+                ir("perfil")
         st.session_state.editar_perfil_candidato = False
 
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
         if st.button("Sair", key="sair_candidato_inicio"):
             del st.session_state.cand_logado
+            st.session_state.pop("cand_email_logado", None)
             st.rerun()
 
     else:
@@ -1149,7 +1156,7 @@ elif pagina == "perfil":
     else:
         cand = st.session_state.cand_logado
         formacoes_base = formacoes_candidato(cand) or [{"grau":"Bacharel em Direito","instituicao":"","periodo":""}]
-        experiencias_base = experiencias_candidato(cand) or [{"instituicao":"","orgao":"","supervisor":"","supervisor_email":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":"","ferramenta_ia":""}]
+        experiencias_base = experiencias_candidato(cand) or [{"instituicao":"","orgao":"","cargo":"","supervisor":"","supervisor_email":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":"","ferramenta_ia":""}]
         if "edit_qtd_form" not in st.session_state:
             st.session_state.edit_qtd_form = max(1, len(formacoes_base))
         if "edit_qtd_exp" not in st.session_state:
@@ -1205,14 +1212,18 @@ elif pagina == "perfil":
             st.markdown('<p class="section-label">Experiência profissional</p>', unsafe_allow_html=True)
             experiencias = []
             for i in range(st.session_state.edit_qtd_exp):
-                base = experiencias_base[i] if i < len(experiencias_base) else {"instituicao":"","orgao":"","supervisor":"","supervisor_email":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":"","ferramenta_ia":""}
+                base = experiencias_base[i] if i < len(experiencias_base) else {"instituicao":"","orgao":"","cargo":"","supervisor":"","supervisor_email":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":"","ferramenta_ia":""}
                 mi, ai = mes_ano(base.get("inicio",""))
                 mf, af = mes_ano(base.get("fim",""))
                 st.markdown(f'<div class="form-item-title">Experiência {i+1}</div>', unsafe_allow_html=True)
                 inst_exp_opcoes = ["Selecione..."] + INSTITUICOES_INTERESSE
                 instituicao_sel = st.selectbox("Instituição", inst_exp_opcoes, index=(inst_exp_opcoes.index(base.get("instituicao")) if base.get("instituicao") in inst_exp_opcoes else 0), key=f"page_edit_exp_instituicao_{i}")
                 instituicao_exp = "" if instituicao_sel == "Selecione..." else instituicao_sel
-                orgao = st.text_input("Órgão de atuação", value=base.get("orgao",""), key=f"page_edit_exp_orgao_{i}")
+                c_org,c_fun=st.columns(2)
+                with c_org:
+                    orgao = st.text_input("Órgão de atuação", value=base.get("orgao",""), key=f"page_edit_exp_orgao_{i}")
+                with c_fun:
+                    cargo_exp = st.text_input("Cargo/função exercida", value=base.get("cargo",base.get("funcao","")), placeholder="Ex: Assessor jurídico, estagiário, residente", key=f"page_edit_exp_cargo_{i}")
                 area_exp = st.multiselect("Áreas de atuação", AREAS, default=lista_selecionada(base.get("area",""), AREAS), key=f"page_edit_exp_area_{i}")
                 c1, c2 = st.columns(2)
                 with c1:
@@ -1237,7 +1248,7 @@ elif pagina == "perfil":
                     supervisor = st.text_input("Supervisor", value=base.get("supervisor",""), key=f"page_edit_exp_supervisor_{i}")
                 with c2:
                     supervisor_email = st.text_input("E-mail de contato", value=base.get("supervisor_email",""), placeholder="nome@orgao.jus.br", key=f"page_edit_exp_supervisor_email_{i}")
-                experiencias.append({"instituicao":instituicao_exp,"orgao":orgao,"supervisor":supervisor,"supervisor_email":supervisor_email,"inicio":f"{mes_inicio}/{ano_inicio}","fim":f"{mes_fim}/{ano_fim}","area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp,"ferramenta_ia":ferramenta_ia})
+                experiencias.append({"instituicao":instituicao_exp,"orgao":orgao,"cargo":cargo_exp,"supervisor":supervisor,"supervisor_email":supervisor_email,"inicio":f"{mes_inicio}/{ano_inicio}","fim":f"{mes_fim}/{ano_fim}","area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp,"ferramenta_ia":ferramenta_ia})
             add_exp_submit = st.form_submit_button("+ Adicionar experiência")
 
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
@@ -1277,7 +1288,7 @@ elif pagina == "perfil":
                 st.error("Não encontrei seu cadastro na planilha.")
             else:
                 formacoes_validas = [f for f in formacoes if f.get("grau") or f.get("instituicao") or f.get("periodo")]
-                experiencias_validas = [e for e in experiencias if e.get("instituicao") or e.get("orgao") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas") or e.get("ferramenta_ia")]
+                experiencias_validas = [e for e in experiencias if e.get("instituicao") or e.get("orgao") or e.get("cargo") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas") or e.get("ferramenta_ia")]
                 formacao_final = salvar_lista_json(formacoes_validas)
                 instituicao_final = resumo_formacoes(formacoes_validas)
                 area_final = ", ".join(inst_interesse)
@@ -1425,6 +1436,11 @@ elif pagina == "candidatos":
 # ── PÁGINA: CHAMADAS ──────────────────────────────────────────────────────────
 elif pagina == "chamadas":
     todas = aba_chamadas.get_all_records()
+    email_param = params.get("email", "")
+    if isinstance(email_param, list):
+        email_param = email_param[0]
+    if email_param and not cand_logado():
+        login_candidato(email_param, permitir_sem_senha=True)
 
     if not cand_logado() and not rec_logado():
         with st.expander("Sou candidato cadastrado — quero me inscrever"):
@@ -1455,7 +1471,7 @@ elif pagina == "chamadas":
     with c3: fs=st.selectbox("Status",["Abertas","Todas","Encerradas"],key="fs")
 
     chf=todas
-    if fa!="Todas": chf=[ch for ch in chf if ch.get("area")==fa]
+    if fa!="Todas": chf=[ch for ch in chf if fa.lower() in str(ch.get("area","")).lower()]
     if fe!="Todos": chf=[ch for ch in chf if ch.get("estado")==fe]
     if fs=="Abertas": chf=[ch for ch in chf if ch_aberta(ch)]
     elif fs=="Encerradas": chf=[ch for ch in chf if not ch_aberta(ch)]
@@ -1595,7 +1611,11 @@ elif pagina == "cadastro":
             inst_exp_opcoes=["Selecione..."]+INSTITUICOES_INTERESSE
             instituicao_sel=st.selectbox("Instituição",inst_exp_opcoes,key=f"cad_exp_instituicao_{i}")
             instituicao_exp="" if instituicao_sel=="Selecione..." else instituicao_sel
-            orgao=st.text_input("Órgão de atuação",value=campos.get("experiencia_orgaos","") if i==0 else "",key=f"cad_exp_orgao_{i}")
+            c_org,c_fun=st.columns(2)
+            with c_org:
+                orgao=st.text_input("Órgão de atuação",value=campos.get("experiencia_orgaos","") if i==0 else "",key=f"cad_exp_orgao_{i}")
+            with c_fun:
+                cargo_exp=st.text_input("Cargo/função exercida",placeholder="Ex: Assessor jurídico, estagiário, residente",key=f"cad_exp_cargo_{i}")
             area_exp=st.multiselect("Áreas de atuação",AREAS,key=f"cad_exp_area_{i}")
             c1,c2=st.columns(2)
             with c1: sistemas_exp=st.text_input("Sistemas de trabalho",value=campos.get("sistemas","") if i==0 else "",placeholder="Ex: Eproc, SAJ, SEEU",key=f"cad_exp_sis_{i}")
@@ -1613,7 +1633,7 @@ elif pagina == "cadastro":
             c1,c2=st.columns(2)
             with c1: supervisor=st.text_input("Supervisor",key=f"cad_exp_supervisor_{i}")
             with c2: supervisor_email=st.text_input("E-mail de contato",placeholder="nome@orgao.jus.br",key=f"cad_exp_supervisor_email_{i}")
-            experiencias.append({"instituicao":instituicao_exp,"orgao":orgao,"supervisor":supervisor,"supervisor_email":supervisor_email,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp,"ferramenta_ia":ferramenta_ia})
+            experiencias.append({"instituicao":instituicao_exp,"orgao":orgao,"cargo":cargo_exp,"supervisor":supervisor,"supervisor_email":supervisor_email,"inicio":inicio,"fim":fim,"area":", ".join(area_exp),"atribuicoes":atribuicoes,"sistemas":sistemas_exp,"ferramenta_ia":ferramenta_ia})
         if st.button("+ Adicionar experiência", key="add_exp_cad"):
             st.session_state.cad_qtd_exp = min(10, st.session_state.cad_qtd_exp + 1)
             st.rerun()
@@ -1645,7 +1665,7 @@ elif pagina == "cadastro":
         st.markdown("<br>",unsafe_allow_html=True)
         if st.button("Próximo →"):
             formacoes_validas=[f for f in formacoes if f.get("grau") or f.get("instituicao") or f.get("periodo")]
-            experiencias_validas=[e for e in experiencias if e.get("instituicao") or e.get("orgao") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas") or e.get("ferramenta_ia")]
+            experiencias_validas=[e for e in experiencias if e.get("instituicao") or e.get("orgao") or e.get("cargo") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas") or e.get("ferramenta_ia")]
             if not nome or not email or not formacoes_validas or not formacoes_validas[0].get("instituicao"): st.error("Preencha nome, e-mail e ao menos uma formação com instituição.")
             elif len(senha_cad) < 6: st.error("Crie uma senha com pelo menos 6 caracteres.")
             elif senha_cad != senha_conf: st.error("As senhas não coincidem.")
@@ -1834,7 +1854,7 @@ elif pagina == "recrutador":
                 avatar_card = f'<img class="cand-photo" src="{html_lib.escape(foto_card)}" alt="Foto de perfil">' if foto_card else f'<div class="avatar" style="background:{cor}">{iniciais(cand["nome"])}</div>'
                 with st.container():
                     st.markdown(f"""<div class="cand-card">
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
                             <div style="display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0">
                                 {avatar_card}
                                 <div style="min-width:0;flex:1">
@@ -1843,7 +1863,6 @@ elif pagina == "recrutador":
                                     <p class="cand-sub"><strong>Interesse:</strong> {html_lib.escape(resumo_c['interesse'])}</p>
                                     <p class="cand-sub"><strong>Experiência:</strong> {html_lib.escape(resumo_c['experiencia'])}</p>
                                     <p class="cand-sub"><strong>Sistemas:</strong> {html_lib.escape(resumo_c['sistemas'])}</p>
-                                    <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}{html_conc(cand)}</div>
                                 </div>
                             </div>
                             <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
@@ -1852,7 +1871,7 @@ elif pagina == "recrutador":
                             </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
-                    ca,cb,cc=st.columns([6,2,2])
+                    ca,cb,cc=st.columns([7,1.6,1.6])
                     with cb:
                         if st.button(f"{fi_i} Fav",key=f"fv{i}"):
                             if ifav: favs.remove(ec)
@@ -1900,7 +1919,7 @@ elif pagina == "recrutador":
                     with c1: och=st.text_input("Nome do órgão *",value=ra.get("nome_orgao",""))
                     with c2: toch=st.selectbox("Tipo de órgão *",["Selecione..."]+ORGAOS)
                     c1,c2,c3=st.columns(3)
-                    with c1: ach=st.selectbox("Área *",["Selecione..."]+AREAS)
+                    with c1: ach=st.multiselect("Áreas do Seletivo *",AREAS,key="novo_sel_areas")
                     with c2: ech=st.selectbox("Estado *",["Selecione..."]+ESTADOS,index=ESTADOS.index(rec.get("estado","SC"))+1 if rec.get("estado","") in ESTADOS else 0)
                     with c3: mch_=st.text_input("Município *",value=ra.get("municipio",""))
                     rch=st.text_area("Requisitos mínimos *",height=80,placeholder="Ex: Bacharelado em Direito, experiência em gabinete, domínio de Eproc/SAJ, disponibilidade integral.")
@@ -1912,40 +1931,31 @@ elif pagina == "recrutador":
                     with c1: fsch=st.selectbox("Forma de seleção *",["Selecione..."]+FORMAS_SELECAO)
                     with c2: prch=st.date_input("Prazo *",min_value=date.today())
                     st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-                    st.markdown('<p class="section-label">Critérios e etapas do seletivo</p>',unsafe_allow_html=True)
+                    st.markdown('<p class="section-label">Etapas do Seletivo</p>',unsafe_allow_html=True)
                     etapas=st.multiselect(
                         "Etapas previstas",
-                        ["Triagem por currículo","Entrevista estruturada","Teste de escrita","Prova prática/minuta","Checagem de referências","Período de experiência no órgão"],
+                        ["Triagem por currículo","Entrevista estruturada","Teste de escrita","Prova prática/minuta","Checagem de referências"],
                         default=["Triagem por currículo"]
                     )
-                    criterios=st.text_area("Critérios objetivos de triagem",height=80,placeholder="Ex: experiência comprovada na área, clareza de redação, domínio dos sistemas, disponibilidade e aderência ao órgão.")
-                    c1,c2=st.columns(2)
-                    with c1: roteiro=st.text_area("Pontos para entrevista",height=80,placeholder="Ex: experiência em minutas, gestão de prazos, postura em atendimento, trabalho sob pressão.")
-                    with c2: teste=st.text_area("Teste ou prova de escrita",height=80,placeholder="Se houver, descreva o tipo de peça, tempo estimado e critérios de correção.")
-                    matriz=st.text_area("Matriz de pontuação sugerida",height=80,placeholder="Ex: experiência específica 40%, redação técnica 30%, entrevista estruturada 20%, disponibilidade 10%.")
-                    periodo_exp=st.text_input("Período de experiência, se houver",placeholder="Ex: 30 dias, com acompanhamento do gabinete.")
-                    comunicacao=st.text_area("Mensagem aos candidatos compatíveis",height=70,placeholder="Texto breve que será usado como base para aviso aos candidatos ativos quando houver automação de notificações.")
+                    organizacao_etapas=st.text_area("Como pretende organizar as etapas?",height=100,placeholder="Ex: primeiro análise curricular; depois entrevista com lista curta; se necessário, teste de escrita com prazo de 2 horas.")
+                    comunicacao=st.text_area("Mensagem aos candidatos compatíveis",height=70,placeholder="Texto breve para orientar candidatos sobre o Seletivo e as próximas etapas.")
                     st.markdown("<br>",unsafe_allow_html=True)
                     c1,c2=st.columns(2)
                     with c1:
                         if st.button("Cancelar",key="cch"): del st.session_state["criar_ch"]; st.rerun()
                     with c2:
                         if st.button("Publicar →",key="pch"):
-                            ok=all([tch,och,toch!="Selecione...",ach!="Selecione...",ech!="Selecione...",mch_,rch,remch,regch!="Selecione...",fsch!="Selecione..."])
+                            ok=all([tch,och,toch!="Selecione...",ach,ech!="Selecione...",mch_,rch,remch,regch!="Selecione...",fsch!="Selecione..."])
                             if not ok: st.error("Preencha todos os campos.")
                             else:
                                 plano_seletivo = [
                                     rch.strip(),
                                     "",
                                     "Etapas: " + (", ".join(etapas) if etapas else "Não informado"),
-                                    "Critérios de triagem: " + (criterios.strip() or "Não informado"),
-                                    "Entrevista: " + (roteiro.strip() or "Não informado"),
-                                    "Teste/prova: " + (teste.strip() or "Não informado"),
-                                    "Matriz de pontuação: " + (matriz.strip() or "Não informado"),
-                                    "Período de experiência: " + (periodo_exp.strip() or "Não informado"),
+                                    "Organização das etapas: " + (organizacao_etapas.strip() or "Não informado"),
                                     "Mensagem aos candidatos: " + (comunicacao.strip() or "Não informado"),
                                 ]
-                                aba_chamadas.append_row([gerar_id(),tch,och,toch,ach,ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prch.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
+                                aba_chamadas.append_row([gerar_id(),tch,och,toch,", ".join(ach),ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prch.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
                                 del st.session_state["criar_ch"]; st.success("Seletivo publicado!"); st.rerun()
 
             if not mch: st.info("Nenhum Seletivo publicado ainda.")
@@ -1966,10 +1976,13 @@ elif pagina == "recrutador":
                             </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
-                    cv,ce=st.columns([8,3])
+                    cv,ced,ce=st.columns([6,2,2])
                     with cv:
                         if st.button("Ver inscritos",key=f"vi{i}"):
                             st.session_state[f"vi{i}"]=not st.session_state.get(f"vi{i}",False); st.rerun()
+                    with ced:
+                        if st.button("Editar",key=f"edch{i}"):
+                            st.session_state[f"edch{i}"]=not st.session_state.get(f"edch{i}",False); st.rerun()
                     with ce:
                         if ab:
                             if st.button("Encerrar",key=f"enc{i}"):
@@ -1977,6 +1990,32 @@ elif pagina == "recrutador":
                                 idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
                                 if idx is not None: aba_chamadas.update_cell(idx+2,14,"encerrado")
                                 st.success("Encerrada."); st.rerun()
+                    if st.session_state.get(f"edch{i}"):
+                        with st.expander("Editar Seletivo",expanded=True):
+                            with st.form(f"form_editar_chamada_{i}"):
+                                etitulo=st.text_input("Título",value=ch.get("titulo",""),key=f"edit_ch_tit_{i}")
+                                earea=st.multiselect("Áreas",AREAS,default=[a.strip() for a in str(ch.get("area","")).split(",") if a.strip() in AREAS],key=f"edit_ch_area_{i}")
+                                ereq=st.text_area("Requisitos e organização das etapas",value=ch.get("requisitos",""),height=130,key=f"edit_ch_req_{i}")
+                                c1,c2,c3=st.columns(3)
+                                with c1: erem=st.text_input("Remuneração",value=ch.get("remuneracao",""),key=f"edit_ch_rem_{i}")
+                                with c2: ereg=st.selectbox("Regime",REGIMES,index=REGIMES.index(ch.get("regime","Presencial")) if ch.get("regime","") in REGIMES else 0,key=f"edit_ch_reg_{i}")
+                                with c3: eforma=st.selectbox("Forma de seleção",FORMAS_SELECAO,index=FORMAS_SELECAO.index(ch.get("forma_selecao","Análise curricular")) if ch.get("forma_selecao","") in FORMAS_SELECAO else 0,key=f"edit_ch_forma_{i}")
+                                salvar_ed=st.form_submit_button("Salvar alterações")
+                            if salvar_ed:
+                                tc=aba_chamadas.get_all_records()
+                                idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
+                                if idx is None:
+                                    st.error("Não encontrei este Seletivo na planilha.")
+                                else:
+                                    linha=idx+2
+                                    aba_chamadas.update_cell(linha,2,etitulo)
+                                    aba_chamadas.update_cell(linha,5,", ".join(earea))
+                                    aba_chamadas.update_cell(linha,8,ereq)
+                                    aba_chamadas.update_cell(linha,9,erem)
+                                    aba_chamadas.update_cell(linha,10,ereg)
+                                    aba_chamadas.update_cell(linha,11,eforma)
+                                    st.success("Seletivo atualizado.")
+                                    st.rerun()
                     if st.session_state.get(f"vi{i}"):
                         with st.expander("Painel de inscritos",expanded=True):
                             if not ins_: st.info("Nenhum inscrito.")
