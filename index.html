@@ -28,20 +28,22 @@ a{text-decoration:none}
 
 nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;gap:20px;
-  padding:1.05rem 4rem;
+  display:grid;grid-template-columns:190px 1fr auto;align-items:center;gap:22px;
+  padding:1rem 3.2rem;
   background:rgba(249,248,246,.94);
   backdrop-filter:blur(16px);
   border-bottom:1px solid var(--borda);
 }
-.logo{display:flex;align-items:baseline;gap:2px;color:var(--grafite)}
-.logo span{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;letter-spacing:-.6px;line-height:1}
+.logo{display:flex;align-items:baseline;gap:2px;color:var(--grafite);min-width:0}
+.logo span{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;letter-spacing:-.9px;line-height:1}
 .logo em{font-style:normal;color:var(--dourado)}
-.nav-links{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.nav-links a{padding:8px 14px;border-radius:6px;font-size:13px;font-weight:600;color:var(--grafite-suave);transition:all .15s}
+.nav-links{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;white-space:nowrap}
+.nav-links a{padding:8px 10px;border-radius:6px;font-size:13px;font-weight:600;color:var(--grafite-suave);transition:all .15s}
 .nav-links a:hover{color:var(--grafite);background:var(--creme)}
+.nav-actions{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.nav-actions a{padding:9px 14px;border-radius:7px;font-size:13px;font-weight:700;transition:all .15s}
 .btn-rec{background:var(--grafite)!important;color:var(--branco)!important;border-radius:7px!important}
-.btn-cand{border:1.5px solid var(--borda)!important;color:var(--grafite)!important;border-radius:7px!important}
+.btn-cand{border:1.5px solid var(--borda)!important;color:var(--grafite)!important;border-radius:7px!important;background:var(--branco)}
 .btn-cand:hover{border-color:var(--dourado)!important;color:var(--dourado)!important;background:var(--dourado-bg)!important}
 
 .hero{
@@ -191,8 +193,9 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
 .fu1{animation-delay:.1s}.fu2{animation-delay:.25s}.fu3{animation-delay:.4s}
 
 @media(max-width:900px){
-  nav{padding:1rem 1.5rem;align-items:flex-start}
-  .nav-links{justify-content:flex-end}
+  nav{grid-template-columns:1fr;gap:12px;padding:1rem 1.5rem;position:relative}
+  .nav-links{justify-content:flex-start;overflow-x:auto;width:100%;padding-bottom:2px}
+  .nav-actions{justify-content:flex-start}
   .hero{min-height:auto;padding:78px 1.5rem 48px}
   .hero-inner{grid-template-columns:1fr;gap:34px}
   .steps,.selos-grid,.disc-row,.tools{grid-template-columns:1fr}
@@ -202,9 +205,10 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
   footer{padding:40px 1.5rem}
 }
 @media(max-width:560px){
-  nav{position:relative}
   .hero{padding-top:42px}
-  .nav-links a:not(.btn-rec):not(.btn-cand){display:none}
+  .nav-links a:nth-child(n+4){display:none}
+  .nav-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .nav-actions a{text-align:center}
   .hero-title{font-size:40px}
 }
 </style>
@@ -218,8 +222,10 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
     <a href="#selos">Certificações</a>
     <a href="#disc">Perfil DISC</a>
     <a href="#recrutadores">Recrutadores</a>
-    <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank" class="btn-rec">Área do Recrutador</a>
+  </div>
+  <div class="nav-actions">
     <a href="https://jurisbank.streamlit.app/?p=inicio" target="_blank" class="btn-cand">Área do Candidato</a>
+    <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank" class="btn-rec">Área do Recrutador</a>
   </div>
 </nav>
 
