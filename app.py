@@ -455,10 +455,10 @@ garantir_coluna(aba_candidatos, "foto", CAND_COL_FOTO)
 
 # ── Navegação por URL ─────────────────────────────────────────────────────────
 params = st.query_params
-p = params.get("p","inicio")
+p = params.get("p", st.session_state.get("pagina", "publico"))
 if isinstance(p,list): p = p[0]
-if p not in ["inicio","perfil","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
-    p = "inicio"
+if p not in ["publico","inicio","perfil","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
+    p = "publico"
 if "pagina" not in st.session_state or params.get("p"):
     st.session_state.pagina = p
 pagina = st.session_state.pagina
@@ -944,6 +944,9 @@ def email_recomendador(nome_candidato, email_recomendador, link):
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
 restaurar_recrutador_da_sessao()
 
+PAGINAS_CANDIDATO = ["inicio","perfil","cadastro","chamadas"]
+PAGINAS_PUBLICAS = ["publico","candidatos","privacidade","termos","recomendar"]
+
 if rec_logado() and pagina == "recrutador":
     dash_param = params.get("dash", "")
     if isinstance(dash_param, list):
@@ -958,19 +961,28 @@ if rec_logado() and pagina == "recrutador":
         st.session_state.pop("rec_email_logado", None)
         ir("recrutador")
 
+if cand_logado() and pagina in PAGINAS_CANDIDATO:
+    sair_cand_param = params.get("sair_cand", "")
+    if isinstance(sair_cand_param, list):
+        sair_cand_param = sair_cand_param[0]
+    if sair_cand_param == "1":
+        del st.session_state.cand_logado
+        st.session_state.pop("cand_email_logado", None)
+        ir("publico")
+
 if rec_logado():
     nav_pages = []
-elif pagina in ["inicio","perfil","cadastro","chamadas"] or cand_logado():
+elif pagina in PAGINAS_CANDIDATO or cand_logado():
     nav_pages = [
-        ("inicio","Área do Candidato"),
+        ("inicio","Meu Perfil"),
         ("perfil","Editar Perfil"),
-        ("chamadas","Ver Seletivos"),
+        ("chamadas","Seletivos"),
     ]
 else:
     nav_pages = [
-        ("inicio","Área do Candidato"),
-        ("chamadas","Seletivos"),
-        ("candidatos","Banco de Talentos"),
+        ("publico","Início"),
+        ("inicio","Sou Candidato"),
+        ("recrutador","Sou Recrutador"),
     ]
 
 nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span></div></a><div class="topbar-nav">'
@@ -984,14 +996,41 @@ if rec_logado():
         active = "active" if pagina == "recrutador" and dash_atual == dash else ""
         nav_html += f'<a href="?p=recrutador&dash={dash}" class="{active}">{lb}</a>'
     nav_html += '<a href="?p=recrutador&sair=1" class="btn-rec">Sair</a>'
-elif not (pagina in ["inicio","perfil","cadastro","chamadas","recrutador"] or cand_logado()):
-    nav_html += '<a href="?p=recrutador" class="btn-rec">Recrutador</a>'
+elif cand_logado() and pagina in PAGINAS_CANDIDATO:
+    nav_html += '<a href="?p=inicio&sair_cand=1" class="btn-rec">Sair</a>'
 
 nav_html += '</div></div>'
 st.markdown(nav_html, unsafe_allow_html=True)
 
+# ── PÁGINA PÚBLICA ────────────────────────────────────────────────────────────
+if pagina == "publico":
+    st.markdown("""<div class="hero-card">
+        <h1 class="page-title">JurisBank<br><em>Ambientes.</em></h1>
+        <p class="page-sub">Acesse o espaço correto para consultar oportunidades, gerir seu perfil ou conduzir Seletivos.</p>
+    </div>""", unsafe_allow_html=True)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("""<div class="profile-section-card">
+            <p class="profile-section-title">Candidato</p>
+            <div class="profile-list-item">
+                Consulte Seletivos, acompanhe inscrições e mantenha seu perfil profissional atualizado.
+            </div>
+        </div>""", unsafe_allow_html=True)
+        if st.button("Entrar como candidato", key="btn_publico_candidato"):
+            ir("inicio")
+    with c2:
+        st.markdown("""<div class="profile-section-card">
+            <p class="profile-section-title">Recrutador</p>
+            <div class="profile-list-item">
+                Publique Seletivos, organize candidatos, favoritos, anotações e inscrições.
+            </div>
+        </div>""", unsafe_allow_html=True)
+        if st.button("Entrar como recrutador", key="btn_publico_recrutador"):
+            ir("recrutador")
+
 # ── PÁGINA: INÍCIO / ÁREA DO CANDIDATO ────────────────────────────────────────
-if pagina == "inicio":
+elif pagina == "inicio":
     if cand_logado():
         cand = st.session_state.cand_logado
         abertos = [ch for ch in aba_chamadas.get_all_records() if ch_aberta(ch)]
@@ -1093,12 +1132,6 @@ if pagina == "inicio":
             if st.button("Editar perfil →", key="btn_cand_editar_perfil"):
                 ir("perfil")
         st.session_state.editar_perfil_candidato = False
-
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        if st.button("Sair", key="sair_candidato_inicio"):
-            del st.session_state.cand_logado
-            st.session_state.pop("cand_email_logado", None)
-            st.rerun()
 
     else:
         st.markdown("""<div class="hero-card">
