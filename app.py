@@ -1084,29 +1084,6 @@ if pagina == "inicio":
             <h1 class="page-title">Área do<br><em>Candidato.</em></h1>
             <p class="page-sub">Entre para acompanhar seu perfil ou comece seu cadastro no JurisBank.</p>
         </div>""", unsafe_allow_html=True)
-        with st.expander("Receba avisos sobre Seletivos de seu interesse", expanded=True):
-            st.markdown('<div class="info-box">Faça um cadastro básico para ser avisado quando surgir um Seletivo compatível com suas preferências. Para participar, será necessário fazer o cadastro completo, inscrever-se no Seletivo e realizar o pagamento quando a funcionalidade estiver ativa.</div>', unsafe_allow_html=True)
-            c1, c2 = st.columns(2)
-            with c1:
-                aviso_email = st.text_input("E-mail para avisos", key="aviso_email_inicio")
-            with c2:
-                aviso_inst = st.multiselect("Instituições de interesse", INSTITUICOES_INTERESSE, key="aviso_inst_inicio")
-            c1, c2 = st.columns(2)
-            with c1:
-                aviso_areas = st.multiselect("Áreas de interesse", AREAS, key="aviso_areas_inicio")
-            with c2:
-                aviso_estados = st.multiselect("Estados de interesse", ESTADOS, key="aviso_estados_inicio")
-            if st.button("Quero receber avisos", key="btn_aviso_inicio"):
-                if not aviso_email or not aviso_areas:
-                    st.error("Informe o e-mail e ao menos uma área de interesse.")
-                else:
-                    preferencias = []
-                    if aviso_inst:
-                        preferencias.append("Instituições: " + ", ".join(aviso_inst))
-                    if aviso_estados:
-                        preferencias.append("Estados: " + ", ".join(aviso_estados))
-                    aba_interesses.append_row([aviso_email, ", ".join(aviso_areas), " | ".join(preferencias), datetime.now().strftime("%d/%m/%Y")])
-                    st.success("Pronto. Você será avisado quando surgir um Seletivo compatível.")
         st.markdown("<br>", unsafe_allow_html=True)
         tabs = st.tabs(["Já tenho cadastro","Cadastrar-me"])
         with tabs[0]:
