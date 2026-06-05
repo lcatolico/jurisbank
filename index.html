@@ -158,20 +158,19 @@ nav{
 .tags{display:flex;flex-wrap:wrap;gap:5px}
 .tag{font-size:11px;font-weight:800;padding:4px 9px;border-radius:99px;background:var(--creme);color:var(--grafite-medio)}
 
-.interest-panel{background:var(--branco);border:1px solid var(--borda);border-radius:18px;padding:28px;box-shadow:0 18px 46px rgba(30,30,30,.06);margin-top:2.4rem}
-.interest-form{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
-.field{display:flex;flex-direction:column;gap:7px}
-.field label{font-size:12px;font-weight:800;color:var(--grafite);letter-spacing:.02em}
-.field input,.field select{
-  width:100%;min-height:44px;border-radius:8px;border:1px solid var(--borda);
-  background:var(--branco);color:var(--grafite);font-family:'Inter',sans-serif;
-  font-size:14px;font-weight:500;padding:10px 12px;outline:none;
-}
-.field select[multiple]{min-height:112px}
-.field input:focus,.field select:focus{border-color:var(--dourado);box-shadow:0 0 0 3px rgba(184,151,58,.12)}
-.interest-note{background:var(--dourado-bg);border:1px solid var(--dourado-claro);border-radius:12px;padding:14px 16px;color:var(--grafite-medio);font-size:13px;font-weight:600;line-height:1.6;margin-top:18px}
-.interest-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
-.interest-small{font-size:12px;color:var(--grafite-suave);line-height:1.5}
+.capture-panel{background:var(--branco);border:1px solid var(--borda);border-radius:18px;padding:24px;box-shadow:0 18px 46px rgba(30,30,30,.06);margin-top:1.8rem;display:grid;grid-template-columns:1.25fr .9fr;gap:18px;align-items:stretch;max-width:980px}
+.capture-main,.capture-side{border-radius:14px;padding:22px;border:1px solid var(--borda)}
+.capture-main{background:var(--grafite);color:var(--branco);border-color:transparent}
+.capture-side{background:var(--off)}
+.capture-kicker{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dourado-claro);margin-bottom:10px}
+.capture-side .capture-kicker{color:var(--dourado)}
+.capture-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:650;line-height:1.05;letter-spacing:-.8px;margin-bottom:8px}
+.capture-text{font-size:14px;line-height:1.65;color:rgba(255,255,255,.68);max-width:520px}
+.capture-side .capture-text{color:var(--grafite-suave)}
+.capture-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.capture-main .btn-s{color:var(--branco);border-color:rgba(255,255,255,.28)}
+.capture-main .btn-s:hover{background:rgba(255,255,255,.08);color:var(--branco);border-color:var(--branco)}
+.capture-note{font-size:12px;color:rgba(255,255,255,.5);line-height:1.5;margin-top:12px}
 
 .cta{background:var(--grafite);text-align:center}
 .cta .sec-sub{margin:0 auto 2.5rem}
@@ -199,7 +198,7 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
   .hero{min-height:auto;padding:78px 1.5rem 48px}
   .hero-inner{grid-template-columns:1fr;gap:34px}
   .steps,.selos-grid,.disc-row,.tools{grid-template-columns:1fr}
-  .interest-form{grid-template-columns:1fr}
+  .capture-panel{grid-template-columns:1fr}
   .stats-bar{gap:32px;padding:34px 1.5rem}
   .sec{padding:64px 1.5rem}
   footer{padding:40px 1.5rem}
@@ -273,55 +272,28 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
 
 <section id="avisos" class="sec bg-off">
   <div class="sec-inner">
-    <div class="eyebrow">Avisos de Seletivos</div>
-    <h2 class="sec-title">Receba avisos sobre<br><em>Seletivos compatíveis.</em></h2>
-    <p class="sec-sub">Informe suas preferências para ser direcionado quando surgir uma oportunidade alinhada ao seu perfil. Para participar, será necessário completar o cadastro, inscrever-se no Seletivo e realizar o pagamento quando a funcionalidade estiver ativa.</p>
-    <div class="interest-panel">
-      <form class="interest-form" action="https://jurisbank.streamlit.app/" method="get" target="_blank">
-        <input type="hidden" name="p" value="inicio">
-        <div class="field">
-          <label for="aviso-email">E-mail para avisos</label>
-          <input id="aviso-email" name="email_aviso" type="email" placeholder="seuemail@exemplo.com" required>
+    <div class="eyebrow">Ponto de partida</div>
+    <h2 class="sec-title">Entre no radar<br><em>dos Seletivos.</em></h2>
+    <p class="sec-sub">O JurisBank existe para reduzir ruído: candidatos organizam um perfil profissional sério; recrutadores encontram pessoas compatíveis com critérios objetivos.</p>
+    <div class="capture-panel">
+      <div class="capture-main">
+        <div class="capture-kicker">Para candidatos</div>
+        <div class="capture-title">Receba oportunidades compatíveis e prepare seu perfil.</div>
+        <p class="capture-text">Informe seu interesse na Área do Candidato ou complete o cadastro para já aparecer no banco de talentos e poder se inscrever em Seletivos.</p>
+        <div class="capture-actions">
+          <a href="https://jurisbank.streamlit.app/?p=inicio" target="_blank" class="btn-p">Receber avisos</a>
+          <a href="https://jurisbank.streamlit.app/?p=cadastro" target="_blank" class="btn-s">Cadastrar perfil</a>
         </div>
-        <div class="field">
-          <label for="aviso-instituicoes">Instituições de interesse</label>
-          <select id="aviso-instituicoes" name="instituicoes" multiple>
-            <option>Tribunais de Justiça</option>
-            <option>Ministérios Públicos</option>
-            <option>Defensorias Públicas</option>
-            <option>Procuradorias</option>
-            <option>Tribunais Regionais Federais</option>
-            <option>Ministério Público Federal</option>
-            <option>Advocacia Pública</option>
-            <option>Tribunais de Contas</option>
-          </select>
+        <div class="capture-note">A inscrição em Seletivos exige cadastro completo e autorização de compartilhamento do perfil.</div>
+      </div>
+      <div class="capture-side">
+        <div class="capture-kicker">Para recrutadores</div>
+        <div class="capture-title">Busque com critério, não por tentativa.</div>
+        <p class="capture-text">Acesse candidatos por área, instituição de interesse, experiência, sistemas, disponibilidade e etapas de Seletivo.</p>
+        <div class="capture-actions">
+          <a href="https://jurisbank.streamlit.app/?p=recrutador" target="_blank" class="btn-s">Área do Recrutador</a>
         </div>
-        <div class="field">
-          <label for="aviso-areas">Áreas de interesse</label>
-          <select id="aviso-areas" name="areas" multiple required>
-            <option>Cível</option>
-            <option>Criminal</option>
-            <option>Fazenda Pública</option>
-            <option>Família e Sucessões</option>
-            <option>Infância e Juventude</option>
-            <option>Execução Penal</option>
-            <option>Direito Público</option>
-            <option>Direito Tributário</option>
-            <option>Saúde</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="aviso-estados">Estados de interesse</label>
-          <select id="aviso-estados" name="estados" multiple>
-            <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
-          </select>
-        </div>
-        <div class="interest-note" style="grid-column:1/-1">Este cadastro básico serve apenas para aviso de compatibilidade. A inscrição efetiva em um Seletivo exige cadastro completo e autorização de compartilhamento do perfil.</div>
-        <div class="interest-actions" style="grid-column:1/-1">
-          <button type="submit" class="btn-p">Registrar interesse</button>
-          <span class="interest-small">Você será encaminhado para a Área do Candidato para confirmar o aviso.</span>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </section>
