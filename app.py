@@ -1772,6 +1772,10 @@ elif pagina == "recrutador":
                         st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
                         st.success("Perfil do recrutador atualizado.")
                         st.rerun()
+            if st.button("Lançar Novo Seletivo", key="btn_lancar_seletivo_perfil_rec"):
+                st.session_state.rec_dashboard = "seletivos"
+                st.session_state["criar_ch"] = True
+                st.rerun()
 
         if st.session_state.rec_dashboard == "banco":
             st.markdown('<p class="section-label">Dashboard do Banco de Candidatos</p>',unsafe_allow_html=True)
