@@ -156,6 +156,21 @@ nav{
 .tags{display:flex;flex-wrap:wrap;gap:5px}
 .tag{font-size:11px;font-weight:800;padding:4px 9px;border-radius:99px;background:var(--creme);color:var(--grafite-medio)}
 
+.interest-panel{background:var(--branco);border:1px solid var(--borda);border-radius:18px;padding:28px;box-shadow:0 18px 46px rgba(30,30,30,.06);margin-top:2.4rem}
+.interest-form{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:12px;font-weight:800;color:var(--grafite);letter-spacing:.02em}
+.field input,.field select{
+  width:100%;min-height:44px;border-radius:8px;border:1px solid var(--borda);
+  background:var(--branco);color:var(--grafite);font-family:'Inter',sans-serif;
+  font-size:14px;font-weight:500;padding:10px 12px;outline:none;
+}
+.field select[multiple]{min-height:112px}
+.field input:focus,.field select:focus{border-color:var(--dourado);box-shadow:0 0 0 3px rgba(184,151,58,.12)}
+.interest-note{background:var(--dourado-bg);border:1px solid var(--dourado-claro);border-radius:12px;padding:14px 16px;color:var(--grafite-medio);font-size:13px;font-weight:600;line-height:1.6;margin-top:18px}
+.interest-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.interest-small{font-size:12px;color:var(--grafite-suave);line-height:1.5}
+
 .cta{background:var(--grafite);text-align:center}
 .cta .sec-sub{margin:0 auto 2.5rem}
 .cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
@@ -181,6 +196,7 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
   .hero{padding:112px 1.5rem 64px}
   .hero-inner{grid-template-columns:1fr;gap:42px}
   .steps,.selos-grid,.disc-row,.tools{grid-template-columns:1fr}
+  .interest-form{grid-template-columns:1fr}
   .stats-bar{gap:32px;padding:34px 1.5rem}
   .sec{padding:64px 1.5rem}
   footer{padding:40px 1.5rem}
@@ -198,6 +214,7 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
   <a href="#" class="logo" aria-label="JurisBank"><span>Juris<em>Bank</em></span></a>
   <div class="nav-links">
     <a href="#como">Como funciona</a>
+    <a href="#avisos">Avisos</a>
     <a href="#selos">Certificações</a>
     <a href="#disc">Perfil DISC</a>
     <a href="#recrutadores">Recrutadores</a>
@@ -247,6 +264,61 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
   <div><div class="stat-num">4</div><div class="stat-label">Selos de certificação</div></div>
   <div><div class="stat-num">20</div><div class="stat-label">Perguntas comportamentais</div></div>
 </div>
+
+<section id="avisos" class="sec bg-off">
+  <div class="sec-inner">
+    <div class="eyebrow">Avisos de Seletivos</div>
+    <h2 class="sec-title">Receba avisos sobre<br><em>Seletivos compatíveis.</em></h2>
+    <p class="sec-sub">Informe suas preferências para ser direcionado quando surgir uma oportunidade alinhada ao seu perfil. Para participar, será necessário completar o cadastro, inscrever-se no Seletivo e realizar o pagamento quando a funcionalidade estiver ativa.</p>
+    <div class="interest-panel">
+      <form class="interest-form" action="https://jurisbank.streamlit.app/" method="get" target="_blank">
+        <input type="hidden" name="p" value="inicio">
+        <div class="field">
+          <label for="aviso-email">E-mail para avisos</label>
+          <input id="aviso-email" name="email_aviso" type="email" placeholder="seuemail@exemplo.com" required>
+        </div>
+        <div class="field">
+          <label for="aviso-instituicoes">Instituições de interesse</label>
+          <select id="aviso-instituicoes" name="instituicoes" multiple>
+            <option>Tribunais de Justiça</option>
+            <option>Ministérios Públicos</option>
+            <option>Defensorias Públicas</option>
+            <option>Procuradorias</option>
+            <option>Tribunais Regionais Federais</option>
+            <option>Ministério Público Federal</option>
+            <option>Advocacia Pública</option>
+            <option>Tribunais de Contas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="aviso-areas">Áreas de interesse</label>
+          <select id="aviso-areas" name="areas" multiple required>
+            <option>Cível</option>
+            <option>Criminal</option>
+            <option>Fazenda Pública</option>
+            <option>Família e Sucessões</option>
+            <option>Infância e Juventude</option>
+            <option>Execução Penal</option>
+            <option>Direito Público</option>
+            <option>Direito Tributário</option>
+            <option>Saúde</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="aviso-estados">Estados de interesse</label>
+          <select id="aviso-estados" name="estados" multiple>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+          </select>
+        </div>
+        <div class="interest-note" style="grid-column:1/-1">Este cadastro básico serve apenas para aviso de compatibilidade. A inscrição efetiva em um Seletivo exige cadastro completo e autorização de compartilhamento do perfil.</div>
+        <div class="interest-actions" style="grid-column:1/-1">
+          <button type="submit" class="btn-p">Registrar interesse</button>
+          <span class="interest-small">Você será encaminhado para a Área do Candidato para confirmar o aviso.</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
 
 <section id="como" class="sec bg-dark">
   <div class="sec-inner">
