@@ -617,6 +617,14 @@ def login_candidato(email, senha=None, permitir_sem_senha=True):
         return cand
     return None
 
+def restaurar_candidato_da_sessao():
+    email = str(st.session_state.get("cand_email_logado", "") or "").strip().lower()
+    if cand_logado() or not email:
+        return
+    _, cand = linha_candidato(email)
+    if cand:
+        st.session_state.cand_logado = cand
+
 def restaurar_recrutador_da_sessao():
     email = str(st.session_state.get("rec_email_logado", "") or "").strip().lower()
     if rec_logado() or not email:
@@ -942,6 +950,7 @@ def email_recomendador(nome_candidato, email_recomendador, link):
     return enviar_email(email_recomendador, assunto, corpo)
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
+restaurar_candidato_da_sessao()
 restaurar_recrutador_da_sessao()
 
 PAGINAS_CANDIDATO = ["inicio","perfil","cadastro","chamadas"]
@@ -1361,6 +1370,7 @@ elif pagina == "perfil":
                 aba_candidatos.update_cell(linha, 18, concurso)
                 aba_candidatos.update_cell(linha, CAND_COL_FOTO, foto_data)
                 st.session_state.cand_logado = atual
+                st.session_state.cand_email_logado = atual.get("email", "")
                 st.success("Perfil atualizado com sucesso.")
                 ir("inicio")
 
@@ -1490,10 +1500,7 @@ elif pagina == "chamadas":
 
     if cand_logado():
         cand=st.session_state.cand_logado
-        c1,c2=st.columns([8,2])
-        with c1: st.markdown(f'<div class="info-box">👤 {cand["nome"]}</div>',unsafe_allow_html=True)
-        with c2:
-            if st.button("Sair",key="sc"): del st.session_state.cand_logado; st.rerun()
+        st.markdown(f'<div class="info-box">👤 {cand["nome"]}</div>',unsafe_allow_html=True)
 
     st.markdown("""<div class="hero-card">
         <h1 class="page-title">Seletivos<br><em>Abertos.</em></h1>
