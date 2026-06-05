@@ -21,9 +21,9 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-html, body, [class*="css"] { font-family: 'Sora', sans-serif; color: #0d1f4e; }
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #0d1f4e; }
 
 [data-testid="stToolbar"] { display: none !important; }
 [data-testid="stSidebarCollapsedControl"] { display: none !important; }
@@ -82,14 +82,14 @@ header[data-testid="stHeader"] { display: none !important; }
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     color: #0d1f4e !important;
-    font-family: 'Playfair Display',serif;
+    font-family: 'Cormorant Garamond',serif;
     font-size: 15px;
     font-weight: 900;
     letter-spacing: 0;
     box-shadow: 0 8px 20px rgba(200,150,12,0.28);
 }
 .topbar .topbar-logo-name {
-    font-family: 'Playfair Display',serif;
+    font-family: 'Cormorant Garamond',serif;
     font-size: 19px;
     font-weight: 900;
     color: #ffffff !important;
@@ -148,12 +148,12 @@ header[data-testid="stHeader"] { display: none !important; }
 .profile-action { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 16px; border-radius: 10px; background: #fff8e6; border: 1.5px solid #f0c040; color: #c8960c !important; text-decoration: none !important; font-size: 12px; font-weight: 900; }
 .profile-action:hover { background: #f0c040; color: #0d1f4e !important; }
 .edit-hero { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 16px; padding: 1.35rem 1.6rem; margin-bottom: 1.2rem; box-shadow: 0 8px 24px rgba(13,31,78,0.05); }
-.edit-title { font-family: 'Playfair Display',serif; font-size: 30px; font-weight: 900; color: #0d1f4e; margin: 0 0 4px; line-height: 1.1; }
+.edit-title { font-family: 'Cormorant Garamond',serif; font-size: 32px; font-weight: 700; color: #0d1f4e; margin: 0 0 4px; line-height: 1.05; }
 .edit-title em { font-style: normal; color: #d9a514; }
 .edit-sub { font-size: 13px; color: #2a4a8a; margin: 0; font-weight: 600; }
 @media (max-width: 760px) { .profile-panel { max-width: none; padding: 22px; } .profile-detail-grid { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .topbar { padding: 0.9rem 1rem; } .topbar-logo { min-width: 160px; } .topbar-nav { width: 100%; justify-content: flex-start; } }
-.page-title { font-family: 'Playfair Display',serif; font-size: clamp(30px,4vw,46px); font-weight: 900; color: #0d1f4e; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.1; }
+.page-title { font-family: 'Cormorant Garamond',serif; font-size: clamp(32px,4vw,50px); font-weight: 700; color: #0d1f4e; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.05; }
 .page-title em { font-style: normal; background: linear-gradient(135deg,#c8960c,#f0c040); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .page-sub { font-size: 15px; color: #2a4a8a; margin: 0; font-weight: 600; }
 .stats-row { display: flex; gap: 12px; margin-top: 1.5rem; flex-wrap: wrap; }
@@ -182,7 +182,7 @@ header[data-testid="stHeader"] { display: none !important; }
 .metric-box { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 14px; padding: 16px 18px; text-align: center; }
 .metric-label { font-size: 11px; font-weight: 700; color: #4a6080; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px; }
 .metric-value { font-size: 20px; font-weight: 800; color: #0d1f4e; margin: 0; }
-.profile-name { font-family: 'Playfair Display',serif; font-size: 26px; font-weight: 900; color: #0d1f4e; margin: 0 0 6px; }
+.profile-name { font-family: 'Cormorant Garamond',serif; font-size: 28px; font-weight: 700; color: #0d1f4e; margin: 0 0 6px; }
 .section-label { font-size: 11px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .1em; margin: 1.5rem 0 0.5rem; }
 .info-card { background: #f0f5ff; border: 1.5px solid #c5d5f5; border-radius: 12px; padding: 14px 18px; font-size: 14px; color: #1a3a8f; line-height: 1.6; font-weight: 500; }
 .custom-divider { height: 1px; background: #d0dcfa; margin: 1.5rem 0; }
@@ -194,7 +194,7 @@ header[data-testid="stHeader"] { display: none !important; }
 .step.active { background: linear-gradient(135deg,#c8960c,#f0c040); }
 .step.done { background: #1a7a4a; }
 .step-title { font-size: 13px; font-weight: 700; color: #2a4a8a; margin-bottom: 0.3rem; }
-.step-desc { font-family: 'Playfair Display',serif; font-size: 22px; font-weight: 700; color: #0d1f4e; margin-bottom: 1.5rem; }
+.step-desc { font-family: 'Cormorant Garamond',serif; font-size: 24px; font-weight: 700; color: #0d1f4e; margin-bottom: 1.5rem; }
 .doc-sub { font-size: 12px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .08em; margin: 1.5rem 0 0.5rem; }
 .doc-body { font-size: 14px; color: #1a3a8f; line-height: 1.8; margin-bottom: 0.8rem; font-weight: 500; }
 .doc-item { font-size: 14px; color: #1a3a8f; line-height: 1.8; padding-left: 1rem; font-weight: 500; }
@@ -206,7 +206,7 @@ header[data-testid="stHeader"] { display: none !important; }
     color: #0d1f4e !important;
     border: 1px solid rgba(13,31,78,0.08) !important;
     border-radius: 10px !important;
-    font-family: 'Sora',sans-serif !important;
+    font-family: 'Inter',sans-serif !important;
     font-weight: 800 !important;
     padding: 0.62rem 2rem !important;
     font-size: 14px !important;
@@ -220,7 +220,7 @@ header[data-testid="stHeader"] { display: none !important; }
     color: #0d1f4e !important;
     border: 1px solid rgba(13,31,78,0.08) !important;
     border-radius: 10px !important;
-    font-family: 'Sora',sans-serif !important;
+    font-family: 'Inter',sans-serif !important;
     font-weight: 800 !important;
     padding: 0.62rem 2rem !important;
     font-size: 14px !important;
@@ -235,7 +235,7 @@ div[data-testid="column"]:last-child .stButton button,
 div[data-testid="column"]:nth-last-child(2) .stButton button { background: #ffffff !important; color: #0d1f4e !important; border: 1.5px solid #c5d5f5 !important; border-radius: 10px !important; padding: 0.58rem 1rem !important; font-size: 13px !important; font-weight: 800 !important; width: 100%; box-shadow: 0 6px 16px rgba(13,31,78,0.08) !important; }
 div[data-testid="column"]:last-child .stButton button:hover,
 div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background: #e8f0fe !important; border-color: #4070f4 !important; color: #0d1f4e !important; }
-.stTextInput input, .stTextArea textarea, .stDateInput input { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Sora',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
+.stTextInput input, .stTextArea textarea, .stDateInput input { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Inter',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
 .stTextInput input:focus, .stTextArea textarea:focus, .stDateInput input:focus { border-color: #4070f4 !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
 .stTextInput input::placeholder, .stTextArea textarea::placeholder { color: #4a6080 !important; opacity: 1 !important; font-weight: 500 !important; }
 .stSelectbox > div > div { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; }
@@ -2335,3 +2335,4 @@ elif pagina in ["privacidade","termos"]:
                 for it in tx: st.markdown(f'<p class="doc-item">• {it}</p>',unsafe_allow_html=True)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
     st.markdown(f'<p style="font-size:12px;color:#4a6080;font-weight:500;text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
+
