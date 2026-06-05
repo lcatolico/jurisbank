@@ -1087,8 +1087,6 @@ elif pagina == "inicio":
         interesses_html = html_lib.escape(interesses or "Nenhuma instituição de interesse informada.")
         perfil_html = (
             f'<div class="profile-panel">'
-            f'<h1 class="page-title" style="font-size:36px;margin-bottom:6px">Olá, <em>{html_lib.escape(cand.get("nome","candidato").split()[0])}!</em></h1>'
-            f'<p class="page-sub" style="margin-bottom:22px">Acompanhe seu perfil, seus selos e os Seletivos disponíveis.</p>'
             f'<div class="profile-head">'
             f'{avatar_html}'
             f'<div>'
