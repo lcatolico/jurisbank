@@ -685,7 +685,7 @@ def primeira_formacao(c):
 
 def resumo_card_candidato(c):
     exps = experiencias_candidato(c)
-    exp_txt = resumo_experiencias(exps)
+    exp_txt = resumo_experiencia_recrutador(exps)
     if len(exp_txt) > 120:
         exp_txt = exp_txt[:117].rstrip() + "..."
     sistemas = str(c.get("sistemas","") or "").strip()
@@ -698,6 +698,38 @@ def resumo_card_candidato(c):
         "sistemas": sistemas or "Sistemas não informados",
         "anos": anos_experiencias(exps),
     }
+
+def resumo_experiencia_recrutador(exps):
+    partes = []
+    for e in exps:
+        instituicao = e.get("instituicao","").strip()
+        orgao = e.get("orgao","").strip()
+        local = instituicao or orgao
+        if not local:
+            continue
+        funcao = e.get("cargo","").strip() or e.get("funcao","").strip() or e.get("area","").strip()
+        duracao = duracao_experiencia_texto(e)
+        texto = local
+        detalhes = [x for x in [funcao, duracao] if x]
+        if detalhes:
+            texto += " (" + " · ".join(detalhes) + ")"
+        partes.append(texto)
+    return " | ".join(partes)
+
+def duracao_experiencia_texto(e):
+    ini = parse_data_periodo(e.get("inicio",""))
+    fim_txt = e.get("fim","").strip()
+    fim = parse_data_periodo(fim_txt) if fim_txt else datetime.today()
+    if not ini or not fim or fim < ini:
+        return ""
+    meses = max(1, (fim.year - ini.year) * 12 + fim.month - ini.month + 1)
+    anos = meses // 12
+    resto = meses % 12
+    if anos and resto:
+        return f"{anos} ano(s) e {resto} mês(es)"
+    if anos:
+        return f"{anos} ano(s)"
+    return f"{resto} mês(es)"
 
 def anos_experiencias(exps):
     total = 0.0
@@ -887,10 +919,7 @@ def email_recomendador(nome_candidato, email_recomendador, link):
 
 # ── TOPBAR ────────────────────────────────────────────────────────────────────
 if rec_logado():
-    nav_pages = [
-        ("chamadas","Seletivos"),
-        ("candidatos","Banco de Talentos"),
-    ]
+    nav_pages = []
 elif pagina in ["inicio","perfil","cadastro","chamadas"] or cand_logado():
     nav_pages = [
         ("inicio","Área do Candidato"),
@@ -909,10 +938,7 @@ for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     nav_html += f'<a href="?p={pg}" class="{active}">{lb}</a>'
 
-if rec_logado():
-    rec = st.session_state.rec_logado
-    nav_html += f'<a href="?p=recrutador" class="{"active" if pagina=="recrutador" else ""}">{rec["nome"].split()[0]}</a>'
-elif not (pagina in ["inicio","perfil","cadastro","chamadas"] or cand_logado()):
+if not rec_logado() and not (pagina in ["inicio","perfil","cadastro","chamadas","recrutador"] or cand_logado()):
     nav_html += '<a href="?p=recrutador" class="btn-rec">Recrutador</a>'
 
 nav_html += '</div></div>'
@@ -1688,14 +1714,34 @@ elif pagina == "recrutador":
             </div>
         </div>""",unsafe_allow_html=True)
 
-        c_sair,_=st.columns([2,8])
-        with c_sair:
-            if st.button("Sair da conta"):
+        if "rec_dashboard" not in st.session_state:
+            st.session_state.rec_dashboard = "perfil"
+        m1,m2,m3,m4=st.columns([1.2,1.2,1.8,1])
+        with m1:
+            if st.button("Perfil", key="rec_menu_perfil"):
+                st.session_state.rec_dashboard = "perfil"; st.rerun()
+        with m2:
+            if st.button("Seletivos", key="rec_menu_seletivos"):
+                st.session_state.rec_dashboard = "seletivos"; st.rerun()
+        with m3:
+            if st.button("Banco de Candidatos", key="rec_menu_banco"):
+                st.session_state.rec_dashboard = "banco"; st.rerun()
+        with m4:
+            if st.button("Sair", key="rec_menu_sair"):
                 del st.session_state.rec_logado; ir("recrutador")
 
-        tabs=st.tabs(["Busca","Seletivos","Favoritos"])
+        if st.session_state.rec_dashboard == "perfil":
+            st.markdown('<p class="section-label">Perfil do Recrutador</p>',unsafe_allow_html=True)
+            st.markdown(f"""<div class="profile-section-grid">
+                <div class="profile-section-card"><p class="profile-section-title">Órgão</p><div class="profile-list-item">{html_lib.escape(ra.get('nome_orgao',rec.get('orgao','—')))}</div></div>
+                <div class="profile-section-card"><p class="profile-section-title">Local</p><div class="profile-list-item">{html_lib.escape(rec.get('estado','—'))} {html_lib.escape(ra.get('municipio',''))}</div></div>
+                <div class="profile-section-card"><p class="profile-section-title">Responsável</p><div class="profile-list-item">{html_lib.escape(rec.get('nome','—'))}</div></div>
+                <div class="profile-section-card"><p class="profile-section-title">E-mail</p><div class="profile-list-item">{html_lib.escape(rec.get('email','—'))}</div></div>
+            </div>""",unsafe_allow_html=True)
 
-        with tabs[0]:
+        if st.session_state.rec_dashboard == "banco":
+            st.markdown('<p class="section-label">Dashboard do Banco de Candidatos</p>',unsafe_allow_html=True)
+            st.markdown('<div class="info-box">Use os filtros para montar uma lista curta de candidatos. Favoritos e anotações ficam vinculados à sua conta.</div>',unsafe_allow_html=True)
             c1,c2,c3=st.columns(3)
             with c1: busca=st.text_input("Nome",placeholder="Buscar...")
             with c2:
@@ -1711,8 +1757,21 @@ elif pagina == "recrutador":
             with c4: csel=st.selectbox("Concurso",["Todos","Concursando","Não concursando"])
             with c5: sisel=st.text_input("Sistema",placeholder="Ex: Eproc")
             with c6: emin=st.number_input("Exp. mín.",min_value=0,max_value=20,value=0)
+            fav_filter=st.checkbox("Mostrar apenas favoritos")
+            filtros_aplicados = any([
+                bool(busca.strip()),
+                asel!="Todas",
+                dsel!="Todos",
+                osel!="Todos",
+                ssel!="Todos",
+                dsc!="Todos",
+                csel!="Todos",
+                bool(sisel.strip()),
+                bool(emin),
+                fav_filter,
+            ])
 
-            fi=dados
+            fi=dados if filtros_aplicados else []
             if busca: fi=[c for c in fi if busca.lower() in c["nome"].lower()]
             if asel!="Todas": fi=[c for c in fi if c.get("area")==asel]
             if dsel!="Todos":
@@ -1725,13 +1784,18 @@ elif pagina == "recrutador":
             if csel=="Concursando": fi=[c for c in fi if c.get("concurso") and c.get("concurso")!="Não estou estudando para concurso"]
             elif csel=="Não concursando": fi=[c for c in fi if not c.get("concurso") or c.get("concurso")=="Não estou estudando para concurso"]
             if sisel: fi=[c for c in fi if sisel.lower() in str(c.get("sistemas","")).lower()]
+            if emin: fi=[c for c in fi if anos_experiencias(experiencias_candidato(c)) >= int(emin)]
+            if fav_filter: fi=[c for c in fi if c.get("email","") in favs]
 
+            if not filtros_aplicados:
+                st.markdown('<div class="info-card">Selecione ao menos um filtro para visualizar candidatos compatíveis.</div>',unsafe_allow_html=True)
             st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
             for i,cand in enumerate(fi):
                 cor=cor_avatar(cand["nome"]); dc=cand.get("disponibilidade","Não")
                 bdg='<span class="badge-sim">● Disponível</span>' if dc=="Sim" else '<span class="badge-nao">● Indisponível</span>'
                 ec=cand.get("email",""); ifav=ec in favs; fi_i="★" if ifav else "☆"
                 resumo_c = resumo_card_candidato(cand)
+                anos_chip = f'<span class="profile-chip">{resumo_c["anos"]} ano(s)</span>' if resumo_c["experiencia"] != "Experiência não informada" else ""
                 foto_card = str(cand.get("foto","") or "").strip()
                 avatar_card = f'<img class="cand-photo" src="{html_lib.escape(foto_card)}" alt="Foto de perfil">' if foto_card else f'<div class="avatar" style="background:{cor}">{iniciais(cand["nome"])}</div>'
                 with st.container():
@@ -1750,7 +1814,7 @@ elif pagina == "recrutador":
                             </div>
                             <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
                                 {bdg}
-                                <span class="profile-chip">{resumo_c['anos']} ano(s)</span>
+                                {anos_chip}
                             </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
@@ -1784,7 +1848,9 @@ elif pagina == "recrutador":
                             if st.button("Fechar",key=f"fc{i}"):
                                 del st.session_state["cr"]; st.rerun()
 
-        with tabs[1]:
+        if st.session_state.rec_dashboard == "seletivos":
+            st.markdown('<p class="section-label">Dashboard de Seletivos</p>',unsafe_allow_html=True)
+            st.markdown('<div class="info-box">Crie, acompanhe e encerre Seletivos com critérios objetivos, etapas e histórico interno.</div>',unsafe_allow_html=True)
             ch_col,btn_col=st.columns([8,3])
             with ch_col: st.markdown('<p style="font-size:15px;font-weight:700;color:#1e1e1e">Meus Seletivos</p>',unsafe_allow_html=True)
             with btn_col:
@@ -1910,27 +1976,6 @@ elif pagina == "recrutador":
                                             <div style="font-size:12px;color:#4a6080;font-weight:500">✉ {cand.get('email','—')}</div>
                                         </div>
                                     </div>""",unsafe_allow_html=True)
-
-        with tabs[2]:
-            fd=[c for c in dados if c.get("email","") in favs]
-            if not fd: st.info("Nenhum favorito ainda.")
-            else:
-                for i,cand in enumerate(fd):
-                    cor=cor_avatar(cand["nome"]); ec=cand.get("email",""); nt=anots.get(ec,"")
-                    st.markdown(f"""<div class="cand-card">
-                        <div style="display:flex;align-items:center;gap:12px">
-                            <div class="avatar" style="background:{cor}">{iniciais(cand['nome'])}</div>
-                            <div style="flex:1">
-                                <p class="cand-name">{cand['nome']}</p>
-                                <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
-                                {html_selos(cand)}
-                                {'<p style="font-size:11px;color:#4a6080;font-weight:500;margin-top:4px">📝 '+nt+'</p>' if nt else ''}
-                            </div>
-                            <div>{'<span class="badge-sim">● Disponível</span>' if cand.get('disponibilidade')=='Sim' else '<span class="badge-nao">● Indisponível</span>'}</div>
-                        </div>
-                    </div>""",unsafe_allow_html=True)
-                    if st.button("✕ Remover",key=f"rf{i}"):
-                        favs.remove(ec); aba_recrutadores.update_cell(idx_r+2,12,", ".join(favs)); st.rerun()
 
     elif "cad_rec" not in st.session_state:
         st.markdown("""<div class="hero-card">
