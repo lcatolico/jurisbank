@@ -972,7 +972,7 @@ if cand_logado() and pagina in PAGINAS_CANDIDATO:
 
 if rec_logado():
     nav_pages = []
-elif pagina in PAGINAS_CANDIDATO or cand_logado():
+elif cand_logado():
     nav_pages = [
         ("inicio","Meu Perfil"),
         ("perfil","Editar Perfil"),
@@ -988,6 +988,11 @@ else:
 nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span></div></a><div class="topbar-nav">'
 for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
+    if not rec_logado() and not cand_logado():
+        if lb == "Sou Candidato" and pagina in ["inicio","cadastro","chamadas"]:
+            active = "active"
+        elif lb == "Sou Recrutador" and pagina == "recrutador":
+            active = "active"
     nav_html += f'<a href="?p={pg}" class="{active}">{lb}</a>'
 
 if rec_logado():
