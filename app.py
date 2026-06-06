@@ -457,7 +457,7 @@ garantir_coluna(aba_candidatos, "foto", CAND_COL_FOTO)
 params = st.query_params
 p = params.get("p", st.session_state.get("pagina", "publico"))
 if isinstance(p,list): p = p[0]
-if p not in ["publico","inicio","perfil","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
+if p not in ["publico","avisos","inicio","perfil","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
     p = "publico"
 if "pagina" not in st.session_state or params.get("p"):
     st.session_state.pagina = p
@@ -965,7 +965,7 @@ restaurar_candidato_da_sessao()
 restaurar_recrutador_da_sessao()
 
 PAGINAS_CANDIDATO = ["inicio","perfil","cadastro","chamadas"]
-PAGINAS_PUBLICAS = ["publico","candidatos","privacidade","termos","recomendar"]
+PAGINAS_PUBLICAS = ["publico","avisos","candidatos","privacidade","termos","recomendar"]
 
 if rec_logado() and pagina == "recrutador":
     dash_param = params.get("dash", "")
@@ -1009,7 +1009,7 @@ nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.g
 for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     if not rec_logado() and not cand_logado():
-        if lb == "Sou Candidato" and pagina in ["inicio","cadastro","chamadas"]:
+        if lb == "Sou Candidato" and pagina in ["inicio","cadastro","chamadas","avisos"]:
             active = "active"
         elif lb == "Sou Recrutador" and pagina == "recrutador":
             active = "active"
@@ -1053,6 +1053,36 @@ if pagina == "publico":
         </div>""", unsafe_allow_html=True)
         if st.button("Entrar como recrutador", key="btn_publico_recrutador"):
             ir("recrutador")
+
+# ── PÁGINA PÚBLICA: AVISOS ───────────────────────────────────────────────────
+elif pagina == "avisos":
+    st.markdown("""<div class="hero-card">
+        <h1 class="page-title">Avisos de<br><em>Seletivos.</em></h1>
+        <p class="page-sub">Informe suas preferências para ser avisado quando houver oportunidade compatível. A participação efetiva exige cadastro completo e inscrição no Seletivo.</p>
+    </div>""", unsafe_allow_html=True)
+    with st.form("form_avisos_publico"):
+        aviso_email = st.text_input("E-mail para avisos", placeholder="seuemail@exemplo.com")
+        c1, c2 = st.columns(2)
+        with c1:
+            aviso_inst = st.multiselect("Instituições de interesse", INSTITUICOES_INTERESSE)
+        with c2:
+            aviso_areas = st.multiselect("Áreas de interesse", AREAS)
+        aviso_estados = st.multiselect("Estados de interesse", ESTADOS)
+        st.markdown('<div class="disclaimer-box">Este cadastro é apenas para aviso de compatibilidade. Para participar de um Seletivo, será necessário completar o cadastro, autorizar o compartilhamento do perfil e realizar a inscrição quando a funcionalidade estiver ativa.</div>', unsafe_allow_html=True)
+        registrar_aviso = st.form_submit_button("Registrar interesse")
+    if registrar_aviso:
+        if not aviso_email or "@" not in aviso_email:
+            st.error("Informe um e-mail válido.")
+        elif not aviso_areas:
+            st.error("Selecione ao menos uma área de interesse.")
+        else:
+            preferencias = []
+            if aviso_inst:
+                preferencias.append("Instituições: " + ", ".join(aviso_inst))
+            if aviso_estados:
+                preferencias.append("Estados: " + ", ".join(aviso_estados))
+            aba_interesses.append_row([aviso_email.strip(), ", ".join(aviso_areas), " | ".join(preferencias), datetime.now().strftime("%d/%m/%Y")])
+            st.success("Interesse registrado. Quando houver Seletivo compatível, você poderá ser avisado.")
 
 # ── PÁGINA: INÍCIO / ÁREA DO CANDIDATO ────────────────────────────────────────
 elif pagina == "inicio":
