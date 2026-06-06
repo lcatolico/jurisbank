@@ -856,6 +856,49 @@ def formatar_concurso(nome, tempo):
         return f"Estuda há: {tempo}"
     return "Não estou estudando para concurso"
 
+
+def salvar_candidato_batch(aba, linha, dados: dict):
+    """Grava campos do candidato em uma única chamada batch — substitui 12 update_cell."""
+    MAPA = {
+        "formacao": 3, "instituicao": 4, "area": 5, "disponibilidade": 6,
+        "oab": 7, "experiencia_orgaos": 8, "sistemas": 9, "resumo": 11,
+        "selo_verificado": 13, "selo_recomendado": 14, "selo_destaque": 15,
+        "selo_experiente": 16, "concurso": 18, "foto": CAND_COL_FOTO,
+    }
+    updates = []
+    for campo, col in MAPA.items():
+        if campo in dados:
+            cell = gspread.utils.rowcol_to_a1(linha, col)
+            updates.append({"range": cell, "values": [[dados[campo]]]})
+    if updates:
+        aba.batch_update(updates, value_input_option="RAW")
+
+
+def salvar_recrutador_batch(aba, linha, dados: dict):
+    """Grava campos do recrutador em uma única chamada batch."""
+    MAPA = {
+        "nome": 1, "estado": 4, "municipio": 5, "orgao": 6,
+        "nome_orgao": 7, "cargo": 8, "areas": 9,
+    }
+    updates = []
+    for campo, col in MAPA.items():
+        if campo in dados:
+            cell = gspread.utils.rowcol_to_a1(linha, col)
+            updates.append({"range": cell, "values": [[dados[campo]]]})
+    if updates:
+        aba.batch_update(updates, value_input_option="RAW")
+
+
+def email_ja_cadastrado(aba, email):
+    """Verifica duplicidade de e-mail antes de cadastrar."""
+    try:
+        todos = aba.get_all_records()
+        email_norm = str(email or "").strip().lower()
+        return any(str(c.get("email","")).strip().lower() == email_norm for c in todos)
+    except Exception:
+        return False
+
+
 def html_selos(c):
     h=""
     if c.get("selo_verificado")=="Sim": h+='<span class="selo selo-verificado">✓ Verificado</span>'
@@ -1081,8 +1124,11 @@ elif pagina == "avisos":
                 preferencias.append("Instituições: " + ", ".join(aviso_inst))
             if aviso_estados:
                 preferencias.append("Estados: " + ", ".join(aviso_estados))
-            aba_interesses.append_row([aviso_email.strip(), ", ".join(aviso_areas), " | ".join(preferencias), datetime.now().strftime("%d/%m/%Y")])
-            st.success("Interesse registrado. Quando houver Seletivo compatível, você poderá ser avisado.")
+            try:
+                aba_interesses.append_row([aviso_email.strip(), ", ".join(aviso_areas), " | ".join(preferencias), datetime.now().strftime("%d/%m/%Y")])
+                st.success("Interesse registrado. Quando houver Seletivo compatível, você poderá ser avisado.")
+            except Exception as e:
+                st.error(f"Erro ao registrar interesse. Tente novamente. ({e})")
 
 # ── PÁGINA: INÍCIO / ÁREA DO CANDIDATO ────────────────────────────────────────
 elif pagina == "inicio":
@@ -1236,10 +1282,9 @@ elif pagina == "perfil":
         cand = st.session_state.cand_logado
         formacoes_base = formacoes_candidato(cand) or [{"grau":"Bacharel em Direito","instituicao":"","periodo":""}]
         experiencias_base = experiencias_candidato(cand) or [{"instituicao":"","orgao":"","cargo":"","supervisor":"","supervisor_email":"","inicio":"","fim":"","area":"","atribuicoes":"","sistemas":"","ferramenta_ia":""}]
-        if "edit_qtd_form" not in st.session_state:
-            st.session_state.edit_qtd_form = max(1, len(formacoes_base))
-        if "edit_qtd_exp" not in st.session_state:
-            st.session_state.edit_qtd_exp = max(1, len(experiencias_base))
+        # Sempre sincroniza com a planilha ao entrar na página (evita estado stale)
+        st.session_state.edit_qtd_form = max(1, len(formacoes_base))
+        st.session_state.edit_qtd_exp = max(1, len(experiencias_base))
 
         st.markdown("""<div class="edit-hero">
             <h1 class="edit-title">Editar <em>Perfil.</em></h1>
@@ -1376,7 +1421,7 @@ elif pagina == "perfil":
                 anos = anos_experiencias(experiencias_validas)
                 selo_verificado = "Sim" if oab == "Sim" else "Não"
                 selo_experiente = "Sim" if anos >= 2 else "Não"
-                atual.update({
+                payload = {
                     "formacao": formacao_final,
                     "instituicao": instituicao_final,
                     "area": area_final,
@@ -1389,23 +1434,16 @@ elif pagina == "perfil":
                     "selo_verificado": selo_verificado,
                     "selo_experiente": selo_experiente,
                     "concurso": concurso,
-                })
-                aba_candidatos.update_cell(linha, 3, formacao_final)
-                aba_candidatos.update_cell(linha, 4, instituicao_final)
-                aba_candidatos.update_cell(linha, 5, area_final)
-                aba_candidatos.update_cell(linha, 6, disponibilidade)
-                aba_candidatos.update_cell(linha, 7, oab)
-                aba_candidatos.update_cell(linha, 8, experiencia_final)
-                aba_candidatos.update_cell(linha, 9, sistemas)
-                aba_candidatos.update_cell(linha, 11, resumo)
-                aba_candidatos.update_cell(linha, 13, selo_verificado)
-                aba_candidatos.update_cell(linha, 16, selo_experiente)
-                aba_candidatos.update_cell(linha, 18, concurso)
-                aba_candidatos.update_cell(linha, CAND_COL_FOTO, foto_data)
-                st.session_state.cand_logado = atual
-                st.session_state.cand_email_logado = atual.get("email", "")
-                st.success("Perfil atualizado com sucesso.")
-                ir("inicio")
+                }
+                try:
+                    salvar_candidato_batch(aba_candidatos, linha, payload)
+                    atual.update(payload)
+                    st.session_state.cand_logado = atual
+                    st.session_state.cand_email_logado = atual.get("email", "")
+                    st.success("Perfil atualizado com sucesso.")
+                    ir("inicio")
+                except Exception as e:
+                    st.error(f"Erro ao salvar perfil. Tente novamente. ({e})")
 
 # ── PÁGINA: CANDIDATOS ────────────────────────────────────────────────────────
 elif pagina == "candidatos":
@@ -1752,6 +1790,8 @@ elif pagina == "cadastro":
             elif senha_cad != senha_conf: st.error("As senhas não coincidem.")
             elif not inst_interesse: st.error("Selecione ao menos uma instituição de interesse.")
             elif not cons: st.error("Aceite os Termos para continuar.")
+            elif email_ja_cadastrado(aba_candidatos, email):
+                st.error("Este e-mail já está cadastrado. Use a aba 'Já tenho cadastro'.")
             else:
                 anos=anos_experiencias(experiencias_validas)
                 st.session_state.dc.update({"nome":nome,"email":email,"senha":hash_senha(senha_cad),"foto":foto_data,"formacao":salvar_lista_json(formacoes_validas),"instituicao":resumo_formacoes(formacoes_validas),"area":", ".join(inst_interesse),"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":salvar_lista_json(experiencias_validas),"sistemas":sistemas_experiencias(experiencias_validas),"pos":"","resumo":res,"concurso":conc})
@@ -1804,11 +1844,15 @@ elif pagina == "cadastro":
                     d=st.session_state.dc
                     selos=calc_selos(d["oab"],d["anos_experiencia"],d.get("carta",False),d.get("avaliacao",False))
                     pd_,_,desc=calc_disc(rd)
-                    aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Não estou estudando para concurso"),d.get("senha",""),d.get("foto","")])
-                    st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}
-                    st.success("Bem-vindo ao JurisBank!")
-                    st.markdown(f'<div class="info-box">Perfil: <strong>{pd_} — {desc}</strong></div>',unsafe_allow_html=True)
-                    st.balloons()
+                    try:
+                        aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Não estou estudando para concurso"),d.get("senha",""),d.get("foto","")])
+                        st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}
+                        st.session_state.pop("cad_qtd_form", None); st.session_state.pop("cad_qtd_exp", None)
+                        st.success("Bem-vindo ao JurisBank!")
+                        st.markdown(f'<div class="info-box">Perfil: <strong>{pd_} — {desc}</strong></div>',unsafe_allow_html=True)
+                        st.balloons()
+                    except Exception as e:
+                        st.error(f"Erro ao salvar cadastro. Tente novamente. ({e})")
 
 # ── PÁGINA: RECRUTADOR ────────────────────────────────────────────────────────
 elif pagina == "recrutador":
@@ -1862,18 +1906,20 @@ elif pagina == "recrutador":
                     if idx_r is None:
                         st.error("Não encontrei seu cadastro de recrutador.")
                     else:
-                        linha=idx_r+2
-                        aba_recrutadores.update_cell(linha,1,rec_nome)
-                        aba_recrutadores.update_cell(linha,4,rec_estado)
-                        aba_recrutadores.update_cell(linha,5,rec_municipio)
-                        aba_recrutadores.update_cell(linha,6,rec_orgao)
-                        aba_recrutadores.update_cell(linha,7,rec_nome_orgao)
-                        aba_recrutadores.update_cell(linha,8,rec_cargo)
-                        aba_recrutadores.update_cell(linha,9,", ".join(rec_areas))
-                        st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
-                        st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
-                        st.success("Perfil do recrutador atualizado.")
-                        st.rerun()
+                        payload_rec = {
+                            "nome": rec_nome, "estado": rec_estado,
+                            "municipio": rec_municipio, "orgao": rec_orgao,
+                            "nome_orgao": rec_nome_orgao, "cargo": rec_cargo,
+                            "areas": ", ".join(rec_areas),
+                        }
+                        try:
+                            salvar_recrutador_batch(aba_recrutadores, idx_r+2, payload_rec)
+                            st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
+                            st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
+                            st.success("Perfil do recrutador atualizado.")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Erro ao salvar perfil. Tente novamente. ({e})")
             if st.button("Lançar Novo Seletivo", key="btn_lancar_seletivo_perfil_rec"):
                 st.session_state.rec_dashboard = "novo_seletivo"
                 st.session_state["criar_ch"] = True
@@ -2061,8 +2107,11 @@ elif pagina == "recrutador":
                                     "Organização das etapas: " + (organizacao_etapas.strip() or "Não informado"),
                                     "Mensagem aos candidatos: " + (comunicacao.strip() or "Não informado"),
                                 ]
-                                aba_chamadas.append_row([gerar_id(),tch,och,toch,", ".join(ach),ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prazo_principal.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
-                                del st.session_state["criar_ch"]; st.session_state.rec_dashboard="seletivos"; st.success("Seletivo publicado!"); st.rerun()
+                                try:
+                                    aba_chamadas.append_row([gerar_id(),tch,och,toch,", ".join(ach),ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prazo_principal.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
+                                    del st.session_state["criar_ch"]; st.session_state.rec_dashboard="seletivos"; st.success("Seletivo publicado!"); st.rerun()
+                                except Exception as e:
+                                    st.error(f"Erro ao publicar Seletivo. Tente novamente. ({e})")
 
             if st.session_state.rec_dashboard == "novo_seletivo":
                 pass
@@ -2099,8 +2148,11 @@ elif pagina == "recrutador":
                             if st.button("Encerrar",key=f"enc{i}"):
                                 tc=aba_chamadas.get_all_records()
                                 idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
-                                if idx is not None: aba_chamadas.update_cell(idx+2,14,"encerrado")
-                                st.success("Encerrada."); st.rerun()
+                                try:
+                                    if idx is not None: aba_chamadas.update_cell(idx+2,14,"encerrado")
+                                    st.success("Encerrada."); st.rerun()
+                                except Exception as e:
+                                    st.error(f"Erro ao encerrar Seletivo. ({e})")
                     if st.session_state.get(painel_editar_key):
                         with st.expander("Editar Seletivo",expanded=True):
                             with st.form(f"form_editar_chamada_{i}"):
@@ -2256,9 +2308,12 @@ elif pagina == "recrutador":
                     elif not cr: st.error("Aceite os Termos para continuar.")
                     else:
                         dr=st.session_state.cad_rec
-                        aba_recrutadores.append_row([nr,er,hash_senha(sr),dr["estado"],dr["municipio"],dr["orgao"],dr["nome_orgao"],dr["cargo"],dr["areas"],"pendente",datetime.now().strftime("%d/%m/%Y %H:%M")])
-                        del st.session_state.cad_rec
-                        st.success("Cadastro realizado! Aguarde a ativação."); st.balloons()
+                        try:
+                            aba_recrutadores.append_row([nr,er,hash_senha(sr),dr["estado"],dr["municipio"],dr["orgao"],dr["nome_orgao"],dr["cargo"],dr["areas"],"pendente",datetime.now().strftime("%d/%m/%Y %H:%M")])
+                            del st.session_state.cad_rec
+                            st.success("Cadastro realizado! Aguarde a ativação."); st.balloons()
+                        except Exception as e:
+                            st.error(f"Erro ao finalizar cadastro. Tente novamente. ({e})")
 
 
 # ── PÁGINA: AVALIAÇÃO DO RECOMENDADOR ────────────────────────────────────────
@@ -2350,21 +2405,22 @@ elif pagina == "recomendar":
                     elif not confirmacao:
                         st.error("Confirme sua responsabilidade sobre as informações prestadas.")
                     else:
-                        resposta = f"Tempo: {tempo} | Contexto: {contexto} | Adequação: {adequacao} | Nota: {nota}/5 | Pontos fortes: {pontos_fortes}"
-                        # Atualizar planilha de recomendações
-                        idx_recom = next((i for i, r in enumerate(recs_recom) if r.get("token") == token_url), None)
-                        if idx_recom is not None:
-                            aba_recomendacoes.update_cell(idx_recom + 2, 4, "concluido")
-                            aba_recomendacoes.update_cell(idx_recom + 2, 6, resposta)
-                            aba_recomendacoes.update_cell(idx_recom + 2, 7, comentarios)
-                        # Ativar selo recomendado no candidato
-                        if cand_recom:
-                            todos_cands2 = aba_candidatos.get_all_records()
-                            idx_cand = next((i for i, c in enumerate(todos_cands2) if c.get("email") == rec_recom.get("email_candidato")), None)
-                            if idx_cand is not None:
-                                aba_candidatos.update_cell(idx_cand + 2, 14, "Sim")  # coluna N = selo_recomendado
-                        st.success("Avaliação enviada com sucesso! O selo ★ Recomendado foi ativado no perfil do candidato.")
-                        st.balloons()
+                        try:
+                            resposta = f"Tempo: {tempo} | Contexto: {contexto} | Adequação: {adequacao} | Nota: {nota}/5 | Pontos fortes: {pontos_fortes}"
+                            idx_recom = next((i for i, r in enumerate(recs_recom) if r.get("token") == token_url), None)
+                            if idx_recom is not None:
+                                aba_recomendacoes.update_cell(idx_recom + 2, 4, "concluido")
+                                aba_recomendacoes.update_cell(idx_recom + 2, 6, resposta)
+                                aba_recomendacoes.update_cell(idx_recom + 2, 7, comentarios)
+                            if cand_recom:
+                                todos_cands2 = aba_candidatos.get_all_records()
+                                idx_cand = next((i for i, c in enumerate(todos_cands2) if c.get("email") == rec_recom.get("email_candidato")), None)
+                                if idx_cand is not None:
+                                    aba_candidatos.update_cell(idx_cand + 2, 14, "Sim")
+                            st.success("Avaliação enviada! O selo ★ Recomendado foi ativado no perfil do candidato.")
+                            st.balloons()
+                        except Exception as e:
+                            st.error(f"Erro ao registrar avaliação. Tente novamente. ({e})")
 
 # ── PÁGINAS LEGAIS ────────────────────────────────────────────────────────────
 elif pagina in ["privacidade","termos"]:
@@ -2397,4 +2453,3 @@ elif pagina in ["privacidade","termos"]:
                 for it in tx: st.markdown(f'<p class="doc-item">• {it}</p>',unsafe_allow_html=True)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
     st.markdown(f'<p style="font-size:12px;color:#4a6080;font-weight:500;text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
-
