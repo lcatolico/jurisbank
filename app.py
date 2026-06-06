@@ -1024,6 +1024,10 @@ def salvar_candidato_batch(aba, linha, dados: dict):
     if updates:
         aba.batch_update(updates, value_input_option="RAW")
         try:
+            registros_recrutadores_cache.clear()
+        except Exception:
+            pass
+        try:
             registros_candidatos_cache.clear()
         except Exception:
             pass
@@ -1042,6 +1046,10 @@ def salvar_recrutador_batch(aba, linha, dados: dict):
             updates.append({"range": cell, "values": [[dados[campo]]]})
     if updates:
         aba.batch_update(updates, value_input_option="RAW")
+        try:
+            registros_chamadas_cache.clear()
+        except Exception:
+            pass
 
 
 def salvar_resultado_seletivo(aba, linha, dados: dict):
@@ -2485,7 +2493,12 @@ elif pagina == "recrutador":
                     }
                     try:
                         salvar_recrutador_batch(aba_recrutadores, idx_r+2, payload_rec)
-                        st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
+                        recs_atualizados = leitura_planilha_segura(
+                            registros_recrutadores_cache,
+                            "sheet_error_recrutadores",
+                            "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes."
+                        )
+                        st.session_state.rec_logado=recs_atualizados[idx_r] if idx_r < len(recs_atualizados) else {**rec, **payload_rec}
                         st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
                         st.session_state.rec_auth_token=token_recrutador(st.session_state.rec_logado)
                         st.success("Perfil do recrutador atualizado.")
@@ -2577,7 +2590,16 @@ elif pagina == "recrutador":
                             if ifav: favs.remove(ec)
                             else: favs.append(ec)
                             aba_recrutadores.update_cell(idx_r+2,12,", ".join(favs))
-                            st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
+                            try:
+                                registros_recrutadores_cache.clear()
+                            except Exception:
+                                pass
+                            recs_atualizados = leitura_planilha_segura(
+                                registros_recrutadores_cache,
+                                "sheet_error_recrutadores",
+                                "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes."
+                            )
+                            st.session_state.rec_logado=recs_atualizados[idx_r] if idx_r < len(recs_atualizados) else rec
                             st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
                             st.session_state.rec_auth_token=token_recrutador(st.session_state.rec_logado)
                             st.rerun()
