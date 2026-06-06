@@ -75,35 +75,28 @@ header[data-testid="stHeader"] { display: none !important; }
     background: #071D49;
 }
 .topbar-logo, .topbar-logo *, .topbar a, .topbar a * { text-decoration: none !important; }
-.topbar-logo { display: flex; align-items: center; gap: 12px; min-width: 190px; }
+.topbar-logo { display: flex; align-items: center; gap: 14px; min-width: 190px; }
 .topbar-logo-icon {
-    width: 38px; height: 38px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg,#C49A2C,#C49A2C);
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     color: #071D49 !important;
     font-family: 'Cormorant Garamond',serif;
-    font-size: 15px;
+    font-size: 19px;
     font-weight: 900;
     letter-spacing: 0;
     box-shadow: 0 8px 20px rgba(200,150,12,0.28);
 }
 .topbar .topbar-logo-name {
     font-family: 'Cormorant Garamond',serif;
-    font-size: 19px;
+    font-size: 27px;
     font-weight: 900;
     color: #ffffff !important;
     letter-spacing: 0;
     line-height: 1;
-}
-.topbar .topbar-logo-sub {
-    font-size: 10px;
-    color: #C49A2C !important;
-    font-style: italic;
-    letter-spacing:.05em;
     display: block;
-    margin-top: 3px;
 }
 .topbar-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .topbar-nav a {
@@ -161,6 +154,7 @@ header[data-testid="stHeader"] { display: none !important; }
 @media (max-width: 760px) { .profile-panel { max-width: none; padding: 22px; } .profile-detail-grid, .rec-action-row { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .topbar { padding: 0.9rem 1rem; } .topbar-logo { min-width: 160px; } .topbar-nav { width: 100%; justify-content: flex-start; } }
 .page-title { font-family: 'Cormorant Garamond',serif; font-size: clamp(32px,4vw,50px); font-weight: 700; color: #071D49; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.05; }
+.page-title.single-line-title { white-space: nowrap; font-size: clamp(34px,4vw,48px); margin-bottom: 0; }
 .page-title em { font-style: normal; background: linear-gradient(135deg,#C49A2C,#C49A2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .page-sub { font-size: 15px; color: #5E6675; margin: 0; font-weight: 600; }
 .stats-row { display: flex; gap: 12px; margin-top: 1.5rem; flex-wrap: wrap; }
@@ -309,7 +303,7 @@ html, body, [class*="css"] { color: #071D49 !important; }
     color: #071D49 !important;
 }
 .topbar .topbar-logo-name { color: #ffffff !important; }
-.topbar .topbar-logo-sub, .topbar-nav a.active { color: #E7D28A !important; }
+.topbar-nav a.active { color: #E7D28A !important; }
 .topbar-nav a.active { border-color: rgba(232,212,138,.45) !important; background: rgba(232,212,138,.1) !important; }
 .hero-card, .profile-shell, .profile-panel, .edit-hero, .cand-card, .chamada-card, .metric-box,
 .info-card, .lock-box, .profile-detail, [data-testid="stFileUploader"] section {
@@ -1352,7 +1346,7 @@ else:
         ("recrutador","Sou Recrutador"),
     ]
 
-nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">IJ</div><div><span class="topbar-logo-name">IndicaJur</span><span class="topbar-logo-sub">indicações jurídicas com critério</span></div></a><div class="topbar-nav">'
+nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/"><div class="topbar-logo-icon">IJ</div><div><span class="topbar-logo-name">IndicaJur</span></div></a><div class="topbar-nav">'
 for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     if not rec_logado() and not cand_logado():
@@ -2721,20 +2715,24 @@ elif pagina == "recrutador":
                         sb='<span class="badge-encerrada">Encerrada</span>'
                     resultado_resumo = str(ch.get("resultado_tipo","") or "").strip()
                     resultado_html = f'<span style="font-size:11px;color:#5E6675;font-weight:700">Resultado: {html_texto(resultado_resumo)}</span>' if resultado_resumo else ''
-                    st.markdown(f"""<div class="chamada-card">
-                        <div style="display:flex;justify-content:space-between;align-items:center">
-                            <div>
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#5E6675;font-weight:600">📅 {ch.get('prazo','—')}</span></div>
-                                <p style="font-size:15px;font-weight:700;color:#071D49;margin:0 0 2px">{ch.get('titulo','—')}</p>
-                                <p style="font-size:12px;color:#5E6675;font-weight:500;margin:0">{ch.get('municipio','—')}/{ch.get('estado','—')} · {ch.get('area','—')}</p>
-                                {resultado_html}
-                            </div>
-                            <div style="text-align:right">
-                                <p style="font-size:26px;font-weight:800;color:#C49A2C;margin:0">{n}</p>
-                                <p style="font-size:11px;color:#5E6675;font-weight:600;margin:0">inscrito(s)</p>
-                            </div>
-                        </div>
-                    </div>""",unsafe_allow_html=True)
+                    card_seletivo_html = (
+                        '<div class="chamada-card">'
+                        '<div style="display:flex;justify-content:space-between;align-items:center;gap:16px">'
+                        '<div style="min-width:0;flex:1">'
+                        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}'
+                        f'<span style="font-size:11px;color:#5E6675;font-weight:600">Prazo: {html_texto(ch.get("prazo","—"))}</span></div>'
+                        f'<p style="font-size:15px;font-weight:700;color:#071D49;margin:0 0 2px">{html_texto(ch.get("titulo","—"))}</p>'
+                        f'<p style="font-size:12px;color:#5E6675;font-weight:500;margin:0">{html_texto(ch.get("municipio","—"))}/{html_texto(ch.get("estado","—"))} · {html_texto(ch.get("area","—"))}</p>'
+                        f'{resultado_html}'
+                        '</div>'
+                        '<div style="text-align:right;min-width:78px">'
+                        f'<p style="font-size:26px;font-weight:800;color:#C49A2C;margin:0">{n}</p>'
+                        '<p style="font-size:11px;color:#5E6675;font-weight:600;margin:0">inscrito(s)</p>'
+                        '</div>'
+                        '</div>'
+                        '</div>'
+                    )
+                    st.markdown(card_seletivo_html, unsafe_allow_html=True)
                     cv,crs=st.columns([6,3])
                     with cv:
                         if st.button("Ver inscritos",key=f"btn_vi_{ch_key}"):
@@ -2925,8 +2923,7 @@ elif pagina == "recrutador":
 
     elif "cad_rec" not in st.session_state:
         st.markdown("""<div class="hero-card">
-            <h1 class="page-title">Área do<br><em>Recrutador.</em></h1>
-            <p class="page-sub">Acesse o banco de talentos jurídicos certificados</p>
+            <h1 class="page-title single-line-title">Área do Recrutador</h1>
         </div>""",unsafe_allow_html=True)
         tabs=st.tabs(["Entrar","Criar conta"])
         with tabs[0]:
