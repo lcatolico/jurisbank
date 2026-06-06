@@ -1435,14 +1435,17 @@ elif pagina == "inicio":
     if cand_logado():
         cand = st.session_state.cand_logado
         email_cand = str(cand.get("email","") or "").strip().lower()
-        todas_chamadas = aba_chamadas.get_all_records()
+        todas_chamadas = leitura_planilha_segura(
+            registros_chamadas_cache,
+            "sheet_error_chamadas",
+            "Não foi possível consultar os Seletivos agora. Tente novamente em alguns instantes.",
+        )
         inscritas = [ch for ch in todas_chamadas if email_cand in [e.strip().lower() for e in inscritos(ch)]]
         em_andamento = [ch for ch in inscritas if ch_aberta(ch)]
         finalizadas = [ch for ch in inscritas if not ch_aberta(ch)]
 
         st.markdown("""<div class="hero-card compact-hero">
-            <h1 class="page-title">Minhas<br><em>Candidaturas.</em></h1>
-            <p class="page-sub">Acompanhe os Seletivos em que você está inscrito e encontre novas oportunidades compatíveis com seu perfil.</p>
+            <h1 class="page-title single-line-title">Minhas Candidaturas</h1>
         </div>""", unsafe_allow_html=True)
         busca_cand = st.text_input("Buscar por Seletivo, órgão ou cidade", placeholder="Digite o nome do Seletivo ou órgão", key="busca_minhas_candidaturas")
 
@@ -1497,7 +1500,14 @@ elif pagina == "inicio":
                 st.markdown('<div class="info-card">Nenhuma candidatura finalizada até o momento.</div>', unsafe_allow_html=True)
         st.stop()
 
-        abertos = [ch for ch in aba_chamadas.get_all_records() if ch_aberta(ch)]
+        abertos = [
+            ch for ch in leitura_planilha_segura(
+                registros_chamadas_cache,
+                "sheet_error_chamadas",
+                "Não foi possível consultar os Seletivos agora. Tente novamente em alguns instantes.",
+            )
+            if ch_aberta(ch)
+        ]
 
         formacoes_view = formacoes_candidato(cand)
         experiencias_view = experiencias_candidato(cand)
@@ -1588,8 +1598,7 @@ elif pagina == "inicio":
 
     else:
         st.markdown("""<div class="hero-card">
-            <h1 class="page-title">Área do<br><em>Candidato.</em></h1>
-            <p class="page-sub">Entre para acompanhar seu perfil ou comece seu cadastro no IndicaJur.</p>
+            <h1 class="page-title single-line-title">Área do Candidato</h1>
         </div>""", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         tabs = st.tabs(["Já tenho cadastro","Cadastrar-me"])
@@ -1625,16 +1634,14 @@ elif pagina == "inicio":
 elif pagina == "conta":
     if not cand_logado():
         st.markdown("""<div class="hero-card">
-            <h1 class="page-title">Minha<br><em>Conta.</em></h1>
-            <p class="page-sub">Entre para consultar seus dados pessoais.</p>
+            <h1 class="page-title single-line-title">Minha Conta</h1>
         </div>""", unsafe_allow_html=True)
         if st.button("Ir para login do candidato", key="btn_conta_login"):
             ir("inicio")
     else:
         cand = st.session_state.cand_logado
         st.markdown("""<div class="hero-card compact-hero">
-            <h1 class="page-title">Minha<br><em>Conta.</em></h1>
-            <p class="page-sub">Dados pessoais e meios de contato usados para identificação e comunicação.</p>
+            <h1 class="page-title single-line-title">Minha Conta</h1>
         </div>""", unsafe_allow_html=True)
         st.markdown(f"""<div class="profile-section-card">
             <p class="profile-section-title">Identificação</p>
@@ -1864,7 +1871,11 @@ elif pagina == "perfil":
 
 # ── PÁGINA: CANDIDATOS ────────────────────────────────────────────────────────
 elif pagina == "candidatos":
-    dados = aba_candidatos.get_all_records()
+    dados = leitura_planilha_segura(
+        registros_candidatos_cache,
+        "sheet_error_candidatos",
+        "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes.",
+    )
     if "cand_sel" not in st.session_state: st.session_state.cand_sel = None
 
     if st.session_state.cand_sel:
@@ -1970,7 +1981,11 @@ elif pagina == "candidatos":
 
 # ── PÁGINA: CHAMADAS ──────────────────────────────────────────────────────────
 elif pagina == "chamadas":
-    todas = aba_chamadas.get_all_records()
+    todas = leitura_planilha_segura(
+        registros_chamadas_cache,
+        "sheet_error_chamadas",
+        "Não foi possível consultar os Seletivos agora. Tente novamente em alguns instantes.",
+    )
     restaurar_candidato_da_sessao()
     email_param = params.get("email", "")
     if isinstance(email_param, list):
@@ -2068,7 +2083,11 @@ elif pagina == "chamadas":
                         ec=st.session_state.cand_logado.get("email",""); ia=inscritos(ch)
                         if ec not in ia:
                             ia.append(ec)
-                            tc=aba_chamadas.get_all_records()
+                            tc = leitura_planilha_segura(
+                                registros_chamadas_cache,
+                                "sheet_error_chamadas",
+                                "Não foi possível consultar os Seletivos agora. Tente novamente em alguns instantes.",
+                            )
                             idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
                             if idx is not None: aba_chamadas.update_cell(idx+2,16,", ".join(ia))
                         del st.session_state[f"ci{i}"]
@@ -2751,7 +2770,11 @@ elif pagina == "recrutador":
                             with c3: eforma=st.selectbox("Forma de seleção",FORMAS_SELECAO,index=FORMAS_SELECAO.index(ch.get("forma_selecao","Análise curricular")) if ch.get("forma_selecao","") in FORMAS_SELECAO else 0,key=f"edit_ch_forma_{i}")
                             salvar_ed=st.form_submit_button("Salvar alterações")
                         if salvar_ed:
-                            tc=aba_chamadas.get_all_records()
+                            tc = leitura_planilha_segura(
+                                registros_chamadas_cache,
+                                "sheet_error_chamadas",
+                                "Não foi possível consultar os Seletivos agora. Tente novamente em alguns instantes.",
+                            )
                             idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
                             if idx is None:
                                 st.error("Não encontrei este Seletivo na planilha.")
@@ -2767,7 +2790,11 @@ elif pagina == "recrutador":
                                 st.rerun()
                     if st.session_state.get(painel_resultado_key):
                         with st.expander("Resultado e encerramento do Seletivo", expanded=True):
-                            todos_cands_resultado = aba_candidatos.get_all_records()
+                            todos_cands_resultado = leitura_planilha_segura(
+                                registros_candidatos_cache,
+                                "sheet_error_candidatos",
+                                "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes.",
+                            )
                             inscritos_cands = [c for c in todos_cands_resultado if c.get("email","") in ins_]
                             opcoes_candidatos = [
                                 f"{c.get('nome','Sem nome')} <{c.get('email','')}>"
@@ -2847,7 +2874,11 @@ elif pagina == "recrutador":
                                         "encerrado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
                                         "comunicacao_resultado": "enviada" if enviar_comunicacao else "não enviada",
                                     }
-                                    tc=aba_chamadas.get_all_records()
+                                    tc = leitura_planilha_segura(
+                                        registros_chamadas_cache,
+                                        "sheet_error_chamadas",
+                                        "Não foi possível consultar os Seletivos agora. Tente novamente em alguns instantes.",
+                                    )
                                     idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
                                     if idx is None:
                                         st.error("Não encontrei este Seletivo na planilha.")
@@ -2891,7 +2922,11 @@ elif pagina == "recrutador":
                         with st.expander("Painel de inscritos",expanded=True):
                             if not ins_: st.info("Nenhum inscrito.")
                             else:
-                                tc=aba_candidatos.get_all_records()
+                                tc = leitura_planilha_segura(
+                                    registros_candidatos_cache,
+                                    "sheet_error_candidatos",
+                                    "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes.",
+                                )
                                 id_=[c for c in tc if c.get("email","") in ins_]
                                 c1,c2,c3=st.columns(3)
                                 with c1: st.markdown(f'<div class="metric-box"><p class="metric-label">Total</p><p class="metric-value">{len(id_)}</p></div>',unsafe_allow_html=True)
@@ -2934,7 +2969,12 @@ elif pagina == "recrutador":
                 entrar_rec = st.form_submit_button("Entrar →")
             if entrar_rec:
                 if el and sl:
-                    recs_=aba_recrutadores.get_all_records(); sh=hash_senha(sl)
+                    recs_ = leitura_planilha_segura(
+                        registros_recrutadores_cache,
+                        "sheet_error_recrutadores",
+                        "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes.",
+                    )
+                    sh=hash_senha(sl)
                     enc=next((r for r in recs_ if r["email"]==el and r["senha"]==sh and r["status"]=="ativo"),None)
                     if enc:
                         st.session_state.rec_logado=enc
@@ -3054,7 +3094,11 @@ elif pagina == "recomendar":
             </div>''', unsafe_allow_html=True)
         else:
             # Buscar dados do candidato
-            todos_cands = aba_candidatos.get_all_records()
+            todos_cands = leitura_planilha_segura(
+                registros_candidatos_cache,
+                "sheet_error_candidatos",
+                "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes.",
+            )
             cand_recom = next((c for c in todos_cands if c.get("email") == rec_recom.get("email_candidato")), None)
             nome_cand = cand_recom["nome"] if cand_recom else rec_recom.get("email_candidato", "candidato")
 
@@ -3124,7 +3168,11 @@ elif pagina == "recomendar":
                                 aba_recomendacoes.update_cell(idx_recom + 2, 6, resposta)
                                 aba_recomendacoes.update_cell(idx_recom + 2, 7, comentarios)
                             if cand_recom:
-                                todos_cands2 = aba_candidatos.get_all_records()
+                                todos_cands2 = leitura_planilha_segura(
+                                    registros_candidatos_cache,
+                                    "sheet_error_candidatos",
+                                    "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes.",
+                                )
                                 idx_cand = next((i for i, c in enumerate(todos_cands2) if c.get("email") == rec_recom.get("email_candidato")), None)
                                 if idx_cand is not None:
                                     aba_candidatos.update_cell(idx_cand + 2, 14, "Sim")
@@ -3162,7 +3210,11 @@ elif pagina == "esqueci":
                 _, cand_rec = linha_candidato(email_rec_senha)
                 encontrado = cand_rec is not None
             else:
-                recs_todos = aba_recrutadores.get_all_records()
+                recs_todos = leitura_planilha_segura(
+                    registros_recrutadores_cache,
+                    "sheet_error_recrutadores",
+                    "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes.",
+                )
                 encontrado = any(r.get("email","").lower() == email_rec_senha.lower() for r in recs_todos)
 
             # Sempre mostrar a mesma mensagem (não revelar se e-mail existe)
@@ -3240,7 +3292,11 @@ elif pagina == "redefinir":
                                 st.error("Candidato não encontrado.")
                                 st.stop()
                         else:
-                            recs_todos = aba_recrutadores.get_all_records()
+                            recs_todos = leitura_planilha_segura(
+                                registros_recrutadores_cache,
+                                "sheet_error_recrutadores",
+                                "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes.",
+                            )
                             idx_r = next((i for i, r in enumerate(recs_todos)
                                           if r.get("email","").lower() == email_real.lower()), None)
                             if idx_r is not None:
