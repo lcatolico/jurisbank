@@ -1,0 +1,8 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Ícone IndicaJur</title>
+  <desc id="desc">Monograma IJ em fundo azul profundo com detalhe dourado.</desc>
+  <rect width="320" height="320" rx="72" fill="#071D49"/>
+  <text x="82" y="198" fill="#FBFAF7" font-family="Georgia, 'Times New Roman', serif" font-size="142" font-weight="700">I</text>
+  <text x="150" y="212" fill="#C49A2C" font-family="Georgia, 'Times New Roman', serif" font-size="160" font-weight="700">J</text>
+  <path d="M122 238 C164 198, 202 152, 238 88" stroke="#C49A2C" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,15 @@
+<svg width="980" height="220" viewBox="0 0 980 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">IndicaJur</title>
+  <desc id="desc">Logo horizontal da marca IndicaJur em azul profundo e dourado institucional.</desc>
+  <rect width="980" height="220" rx="28" fill="#FBFAF7"/>
+  <g transform="translate(68 42)">
+    <rect x="0" y="0" width="136" height="136" rx="28" fill="#071D49"/>
+    <text x="34" y="88" fill="#FBFAF7" font-family="Georgia, 'Times New Roman', serif" font-size="64" font-weight="700">I</text>
+    <text x="66" y="94" fill="#C49A2C" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700">J</text>
+    <path d="M54 105 C74 88, 88 74, 105 48" stroke="#C49A2C" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <line x1="252" y1="52" x2="252" y2="168" stroke="#C49A2C" stroke-width="3" opacity=".65"/>
+  <text x="304" y="126" fill="#071D49" font-family="Georgia, 'Times New Roman', serif" font-size="82" font-weight="700" letter-spacing="-1">Indica</text>
+  <text x="590" y="126" fill="#C49A2C" font-family="Georgia, 'Times New Roman', serif" font-size="82" font-weight="700" letter-spacing="-1">Jur</text>
+  <text x="309" y="160" fill="#5E6675" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="600" letter-spacing=".5">INDICAÇÕES JURÍDICAS COM CRITÉRIO</text>
+</svg>

@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JurisBank - Talentos jurídicos para livre nomeação</title>
+<title>IndicaJur - Indicações jurídicas com critério</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --off:#f9f8f6;
-  --creme:#f2efe9;
-  --grafite:#1e1e1e;
-  --grafite-medio:#3a3a3a;
-  --grafite-suave:#6a6a6a;
-  --dourado:#b8973a;
-  --dourado-claro:#e8d48a;
-  --dourado-bg:#faf6ec;
-  --borda:#ddd8ce;
+  --off:#FBFAF7;
+  --creme:#F4F0E6;
+  --grafite:#071D49;
+  --grafite-medio:#26344F;
+  --grafite-suave:#5E6675;
+  --dourado:#C49A2C;
+  --dourado-claro:#E7D28A;
+  --dourado-bg:#FFF8E6;
+  --borda:#D9D2C3;
   --branco:#ffffff;
   --verde:#2a6040;
 }
@@ -34,15 +34,16 @@ nav{
   backdrop-filter:blur(16px);
   border-bottom:1px solid var(--borda);
 }
-.logo{display:flex;align-items:baseline;gap:2px;color:var(--grafite);min-width:0}
-.logo span{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;letter-spacing:-.9px;line-height:1}
+.logo{display:flex;align-items:center;gap:10px;color:var(--grafite);min-width:0}
+.logo span:not(.logo-mark){font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;letter-spacing:-.9px;line-height:1}
+.logo-mark{width:40px;height:40px;border-radius:12px;background:var(--grafite);color:var(--dourado-claro);display:inline-flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:800;box-shadow:0 10px 24px rgba(7,29,73,.14)}
 .logo em{font-style:normal;color:var(--dourado)}
 .nav-links{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;white-space:nowrap}
 .nav-links a{padding:8px 10px;border-radius:6px;font-size:13px;font-weight:600;color:var(--grafite-suave);transition:all .15s}
 .nav-links a:hover{color:var(--grafite);background:var(--creme)}
 .nav-actions{display:flex;align-items:center;gap:8px;white-space:nowrap}
 .nav-actions a{padding:9px 14px;border-radius:7px;font-size:13px;font-weight:700;transition:all .15s}
-.btn-rec{background:var(--grafite)!important;color:var(--branco)!important;border-radius:7px!important}
+.btn-rec{background:var(--grafite)!important;color:var(--branco)!important;border-radius:7px!important;border:1px solid var(--grafite)!important}
 .btn-cand{border:1.5px solid var(--borda)!important;color:var(--grafite)!important;border-radius:7px!important;background:var(--branco)}
 .btn-cand:hover{border-color:var(--dourado)!important;color:var(--dourado)!important;background:var(--dourado-bg)!important}
 
@@ -92,12 +93,12 @@ nav{
   box-shadow:0 24px 70px rgba(30,30,30,.08);
 }
 .card-top{display:flex;align-items:center;gap:14px;padding-bottom:18px;border-bottom:1px solid var(--borda);margin-bottom:18px}
-.avatar{width:48px;height:48px;border-radius:12px;background:var(--grafite);color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.avatar{width:48px;height:48px;border-radius:12px;background:var(--grafite);color:var(--dourado-claro);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
 .card-name{font-size:16px;font-weight:700;color:var(--grafite)}
 .card-sub{font-size:12px;color:var(--grafite-suave);margin-top:2px;line-height:1.4}
 .selos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
 .selo{font-size:10px;font-weight:800;padding:4px 10px;border-radius:99px}
-.sv{background:#eef3ff;color:#2a4080;border:1px solid #c0cef0}
+.sv{background:#F4F0E6;color:#071D49;border:1px solid #D9D2C3}
 .sr{background:#f0f8f0;color:#2a6040;border:1px solid #a0d0b0}
 .sd{background:var(--dourado-bg);color:var(--dourado);border:1px solid var(--dourado-claro)}
 .disc-box{background:var(--creme);border:1px solid var(--borda);border-radius:10px;padding:13px 14px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
@@ -179,7 +180,7 @@ nav{
 .btn-cw:hover{background:transparent;color:white}
 .btn-co{background:transparent;color:white;border-color:rgba(255,255,255,.35)}
 .btn-co:hover{border-color:white;background:rgba(255,255,255,.08)}
-footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:13px}
+footer{background:#061733;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:13px}
 .foot-row{max-width:1120px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
 .foot-logo{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:700;color:rgba(255,255,255,.74);letter-spacing:-.5px}
 .foot-logo em{font-style:normal;color:var(--dourado-claro)}
@@ -214,7 +215,7 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
 </head>
 <body>
 <nav>
-  <a href="#" class="logo" aria-label="JurisBank"><span>Juris<em>Bank</em></span></a>
+  <a href="#" class="logo" aria-label="IndicaJur"><span class="logo-mark">IJ</span><span>Indica<em>Jur</em></span></a>
   <div class="nav-links">
     <a href="#como">Como funciona</a>
     <a href="#avisos">Avisos</a>
@@ -274,7 +275,7 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
   <div class="sec-inner">
     <div class="eyebrow">Ponto de partida</div>
     <h2 class="sec-title">Entre no radar<br><em>dos Seletivos.</em></h2>
-    <p class="sec-sub">O JurisBank existe para reduzir ruído: candidatos organizam um perfil profissional sério; recrutadores encontram pessoas compatíveis com critérios objetivos.</p>
+    <p class="sec-sub">O IndicaJur existe para reduzir ruído: candidatos organizam um perfil profissional sério; recrutadores encontram pessoas compatíveis com critérios objetivos.</p>
     <div class="capture-panel">
       <div class="capture-main">
         <div class="capture-kicker">Para candidatos</div>
@@ -350,7 +351,7 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
       <div class="tool-card"><div class="tool-title">Comunicação dirigida</div><div class="tool-desc">Base para alertas a candidatos ativos conforme área, interesse institucional e compatibilidade com a chamada.</div><div class="tags"><span class="tag">Avisos</span><span class="tag">Interesse</span></div></div>
       <div class="tool-card"><div class="tool-title">Favoritos e notas</div><div class="tool-desc">Organização privada de candidatos, observações e acompanhamento do recrutador durante a análise.</div><div class="tags"><span class="tag">Privado</span></div></div>
       <div class="tool-card"><div class="tool-title">LGPD e transparência</div><div class="tool-desc">Compartilhamento de perfil condicionado a consentimento e uso claro das informações profissionais.</div><div class="tags"><span class="tag">Consentimento</span></div></div>
-      <div class="tool-card"><div class="tool-title">Decisão humana</div><div class="tool-desc">O JurisBank organiza informações e reduz ruído. A escolha permanece contextual, motivada e sob responsabilidade do recrutador.</div><div class="tags"><span class="tag">Apoio</span></div></div>
+      <div class="tool-card"><div class="tool-title">Decisão humana</div><div class="tool-desc">O IndicaJur organiza informações e reduz ruído. A escolha permanece contextual, motivada e sob responsabilidade do recrutador.</div><div class="tags"><span class="tag">Apoio</span></div></div>
     </div>
   </div>
 </section>
@@ -369,7 +370,7 @@ footer{background:#111;padding:46px 4rem;color:rgba(255,255,255,.38);font-size:1
 
 <footer>
   <div class="foot-row">
-    <div class="foot-logo">Juris<em>Bank</em></div>
+    <div class="foot-logo">Indica<em>Jur</em></div>
     <div class="foot-links">
       <a href="https://jurisbank.streamlit.app/?p=privacidade" target="_blank">Privacidade</a>
       <a href="https://jurisbank.streamlit.app/?p=termos" target="_blank">Termos</a>

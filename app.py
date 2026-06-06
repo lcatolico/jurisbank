@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 import fitz
@@ -13,8 +13,8 @@ import base64
 from datetime import datetime, date
 
 st.set_page_config(
-    page_title="JurisBank",
-    page_icon="⚖",
+    page_title="IndicaJur",
+    page_icon="IJ",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -22,8 +22,9 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600;700;800&display=swap');
+:root { --ij-navy:#071D49; --ij-gold:#C49A2C; --ij-gold-soft:#E7D28A; --ij-off:#FBFAF7; --ij-cream:#F4F0E6; --ij-border:#D9D2C3; --ij-text:#071D49; --ij-muted:#5E6675; --ij-white:#FFFFFF; }
 
-html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #0d1f4e; }
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #071D49; }
 
 [data-testid="stToolbar"] { display: none !important; }
 [data-testid="stSidebarCollapsedControl"] { display: none !important; }
@@ -32,7 +33,7 @@ header[data-testid="stHeader"] { display: none !important; }
 [data-testid="stSidebar"] { display: none !important; }
 
 [data-testid="stAppViewContainer"] {
-    background: #eef3fe;
+    background: #FBFAF7;
     min-height: 100vh;
 }
 .main .block-container,
@@ -50,15 +51,15 @@ header[data-testid="stHeader"] { display: none !important; }
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li,
 [data-testid="stMarkdownContainer"] span {
-    color: #0d1f4e;
+    color: #071D49;
 }
 [data-testid="stMarkdownContainer"] strong {
-    color: #0d1f4e;
+    color: #071D49;
     font-weight: 700;
 }
 [data-testid="stCaptionContainer"],
 .stCaptionContainer {
-    color: #4a6080 !important;
+    color: #5E6675 !important;
     font-weight: 500;
 }
 
@@ -71,17 +72,17 @@ header[data-testid="stHeader"] { display: none !important; }
     border-bottom: 2px solid rgba(200,150,12,0.3);
     margin: 0 calc(50% - 50vw) 2rem;
     flex-wrap: wrap; gap: 12px;
-    background: #0d1f4e;
+    background: #071D49;
 }
 .topbar-logo, .topbar-logo *, .topbar a, .topbar a * { text-decoration: none !important; }
 .topbar-logo { display: flex; align-items: center; gap: 12px; min-width: 190px; }
 .topbar-logo-icon {
     width: 38px; height: 38px;
-    background: linear-gradient(135deg,#d9a514,#f0c040);
+    background: linear-gradient(135deg,#C49A2C,#C49A2C);
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    color: #0d1f4e !important;
+    color: #071D49 !important;
     font-family: 'Cormorant Garamond',serif;
     font-size: 15px;
     font-weight: 900;
@@ -98,7 +99,7 @@ header[data-testid="stHeader"] { display: none !important; }
 }
 .topbar .topbar-logo-sub {
     font-size: 10px;
-    color: #f0c040 !important;
+    color: #C49A2C !important;
     font-style: italic;
     letter-spacing:.05em;
     display: block;
@@ -114,96 +115,96 @@ header[data-testid="stHeader"] { display: none !important; }
     transition: all 0.2s;
 }
 .topbar-nav a:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
-.topbar-nav a.active { color: #f0c040; border-color: rgba(200,150,12,0.4); background: rgba(200,150,12,0.12); }
+.topbar-nav a.active { color: #C49A2C; border-color: rgba(200,150,12,0.4); background: rgba(200,150,12,0.12); }
 .topbar-nav a.btn-rec {
-    background: linear-gradient(135deg,#c8960c,#f0c040);
-    color: #0d1f4e; border: none; font-weight: 700;
+    background: linear-gradient(135deg,#C49A2C,#C49A2C);
+    color: #071D49; border: none; font-weight: 700;
 }
 .topbar-nav a.btn-rec:hover { opacity: 0.9; }
 
 /* ── Cards ── */
-.hero-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 20px; padding: 2rem 2.5rem; margin-bottom: 1.5rem; box-shadow: 0 8px 28px rgba(13,31,78,0.06); }
-.profile-shell { background: #ffffff; border: 1.5px solid #c5d5f5; border-radius: 16px; padding: 18px 22px; margin: 0 0 1rem; box-shadow: 0 10px 26px rgba(13,31,78,0.06); }
-.profile-shell-title { font-size: 13px; font-weight: 900; color: #0d1f4e; text-transform: uppercase; letter-spacing: .12em; margin: 0 0 14px; }
-.profile-panel { background: #ffffff; border: 1.5px solid #c5d5f5; border-radius: 22px; padding: 34px 38px; margin: 0 0 1.5rem; box-shadow: 0 12px 30px rgba(13,31,78,0.08); width: 100%; }
+.hero-card { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 20px; padding: 2rem 2.5rem; margin-bottom: 1.5rem; box-shadow: 0 8px 28px rgba(13,31,78,0.06); }
+.profile-shell { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 16px; padding: 18px 22px; margin: 0 0 1rem; box-shadow: 0 10px 26px rgba(13,31,78,0.06); }
+.profile-shell-title { font-size: 13px; font-weight: 900; color: #071D49; text-transform: uppercase; letter-spacing: .12em; margin: 0 0 14px; }
+.profile-panel { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 22px; padding: 34px 38px; margin: 0 0 1.5rem; box-shadow: 0 12px 30px rgba(13,31,78,0.08); width: 100%; }
 .profile-head { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
 .profile-avatar { width: 68px; height: 68px; border-radius: 14px; background: #247b56; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; flex-shrink: 0; }
-.profile-photo { width: 68px; height: 68px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 1px solid #d0dcfa; }
-.profile-name-main { font-size: 24px; font-weight: 900; color: #0d1f4e; margin: 0 0 2px; }
-.profile-sub-main { font-size: 15px; font-weight: 700; color: #587bd6; margin: 0; line-height: 1.35; }
+.profile-photo { width: 68px; height: 68px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 1px solid #D9D2C3; }
+.profile-name-main { font-size: 24px; font-weight: 900; color: #071D49; margin: 0 0 2px; }
+.profile-sub-main { font-size: 15px; font-weight: 700; color: #5E6675; margin: 0; line-height: 1.35; }
 .profile-chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; }
-.profile-chip { display: inline-flex; align-items: center; min-height: 23px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: 1px solid #c5d5f5; background: #e8effe; color: #1a3a8f; }
+.profile-chip { display: inline-flex; align-items: center; min-height: 23px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: 1px solid #D9D2C3; background: #F4F0E6; color: #071D49; }
 .profile-chip-green { background: #e6f4ea; color: #15803d; border-color: #b0dfc0; }
-.profile-chip-gold { background: #fff8e6; color: #b45309; border-color: #f0c040; }
+.profile-chip-gold { background: #fff8e6; color: #b45309; border-color: #C49A2C; }
 .profile-disc-card { background: #f7fbf9; border: 1px solid #d8efe4; border-radius: 13px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
 .profile-disc-letter { color: #15803d; font-size: 24px; font-weight: 900; min-width: 26px; }
-.profile-disc-text { color: #587bd6; font-size: 13px; font-weight: 600; line-height: 1.45; margin: 0; }
-.profile-concurso { background: #fff8e6; border: 1.5px solid #f0c040; color: #b45309; border-radius: 12px; padding: 12px 14px; font-size: 13px; font-weight: 800; margin: 0 0 14px; }
+.profile-disc-text { color: #5E6675; font-size: 13px; font-weight: 600; line-height: 1.45; margin: 0; }
+.profile-concurso { background: #fff8e6; border: 1.5px solid #C49A2C; color: #b45309; border-radius: 12px; padding: 12px 14px; font-size: 13px; font-weight: 800; margin: 0 0 14px; }
 .profile-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 14px; }
-.profile-detail { background: #f3f7ff; border: 1px solid #d0dcfa; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #0d1f4e; line-height: 1.6; }
+.profile-detail { background: #f3f7ff; border: 1px solid #D9D2C3; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #071D49; line-height: 1.6; }
 .profile-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
 .profile-status { display: inline-flex; align-items: center; min-height: 27px; padding: 0 12px; border-radius: 999px; border: 1px solid #b0dfc0; background: #e6f4ea; color: #15803d; font-size: 12px; font-weight: 900; }
 .profile-status-off { border-color: #f0c8a0; background: #fff3e8; color: #c05a1a; }
 .profile-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.profile-action { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 16px; border-radius: 10px; background: #fff8e6; border: 1.5px solid #f0c040; color: #c8960c !important; text-decoration: none !important; font-size: 12px; font-weight: 900; }
-.profile-action:hover { background: #f0c040; color: #0d1f4e !important; }
-.edit-hero { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 16px; padding: 1.35rem 1.6rem; margin-bottom: 1.2rem; box-shadow: 0 8px 24px rgba(13,31,78,0.05); }
-.edit-title { font-family: 'Cormorant Garamond',serif; font-size: 32px; font-weight: 700; color: #0d1f4e; margin: 0 0 4px; line-height: 1.05; }
-.edit-title em { font-style: normal; color: #d9a514; }
-.edit-sub { font-size: 13px; color: #2a4a8a; margin: 0; font-weight: 600; }
+.profile-action { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 16px; border-radius: 10px; background: #fff8e6; border: 1.5px solid #C49A2C; color: #C49A2C !important; text-decoration: none !important; font-size: 12px; font-weight: 900; }
+.profile-action:hover { background: #C49A2C; color: #071D49 !important; }
+.edit-hero { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 16px; padding: 1.35rem 1.6rem; margin-bottom: 1.2rem; box-shadow: 0 8px 24px rgba(13,31,78,0.05); }
+.edit-title { font-family: 'Cormorant Garamond',serif; font-size: 32px; font-weight: 700; color: #071D49; margin: 0 0 4px; line-height: 1.05; }
+.edit-title em { font-style: normal; color: #C49A2C; }
+.edit-sub { font-size: 13px; color: #5E6675; margin: 0; font-weight: 600; }
 @media (max-width: 760px) { .profile-panel { max-width: none; padding: 22px; } .profile-detail-grid { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .topbar { padding: 0.9rem 1rem; } .topbar-logo { min-width: 160px; } .topbar-nav { width: 100%; justify-content: flex-start; } }
-.page-title { font-family: 'Cormorant Garamond',serif; font-size: clamp(32px,4vw,50px); font-weight: 700; color: #0d1f4e; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.05; }
-.page-title em { font-style: normal; background: linear-gradient(135deg,#c8960c,#f0c040); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.page-sub { font-size: 15px; color: #2a4a8a; margin: 0; font-weight: 600; }
+.page-title { font-family: 'Cormorant Garamond',serif; font-size: clamp(32px,4vw,50px); font-weight: 700; color: #071D49; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.05; }
+.page-title em { font-style: normal; background: linear-gradient(135deg,#C49A2C,#C49A2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.page-sub { font-size: 15px; color: #5E6675; margin: 0; font-weight: 600; }
 .stats-row { display: flex; gap: 12px; margin-top: 1.5rem; flex-wrap: wrap; }
-.stat-pill { background: #dce8ff; border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 700; color: #0d1f4e; border: 1px solid #a0bcf0; }
-.cand-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 8px; transition: all 0.2s; }
-.cand-card:hover { border-color: #4070f4; box-shadow: 0 6px 24px rgba(64,112,244,0.1); transform: translateY(-1px); }
-.chamada-card { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 10px; transition: all 0.2s; }
-.chamada-card:hover { border-color: #4070f4; box-shadow: 0 6px 24px rgba(64,112,244,0.1); }
+.stat-pill { background: #F4F0E6; border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 700; color: #071D49; border: 1px solid #D9D2C3; }
+.cand-card { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 8px; transition: all 0.2s; }
+.cand-card:hover { border-color: #C49A2C; box-shadow: 0 6px 24px rgba(64,112,244,0.1); transform: translateY(-1px); }
+.chamada-card { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 10px; transition: all 0.2s; }
+.chamada-card:hover { border-color: #C49A2C; box-shadow: 0 6px 24px rgba(64,112,244,0.1); }
 .avatar { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; color: white; }
-.cand-photo { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 1px solid #d0dcfa; }
-.cand-photo-lg { width: 60px; height: 60px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 1px solid #d0dcfa; }
-.cand-name { font-size: 15px; font-weight: 700; color: #0d1f4e; margin: 0 0 3px; }
-.cand-sub { font-size: 12px; color: #4a6080; margin: 0; font-weight: 500; }
+.cand-photo { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 1px solid #D9D2C3; }
+.cand-photo-lg { width: 60px; height: 60px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 1px solid #D9D2C3; }
+.cand-name { font-size: 15px; font-weight: 700; color: #071D49; margin: 0 0 3px; }
+.cand-sub { font-size: 12px; color: #5E6675; margin: 0; font-weight: 500; }
 .cand-card + div[data-testid="stHorizontalBlock"] { margin-top: -8px !important; margin-bottom: 18px !important; }
 .cand-card + div[data-testid="stHorizontalBlock"] .stButton button { min-height: 36px !important; padding: 0.45rem 1rem !important; }
 .badge-sim { background: #e6f4ea; color: #1a7a4a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
 .badge-nao { background: #fff3e8; color: #c05a1a; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #f0c8a0; }
 .badge-aberta { background: #e6f4ea; color: #1a7a4a; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0dfc0; }
-.badge-encerrada { background: #f4f7fe; color: #4a6080; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #d0dcfa; }
-.badge-inscrito { background: #e8effe; color: #1a3a8f; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #b0c5f5; }
+.badge-encerrada { background: #F7F4ED; color: #5E6675; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #D9D2C3; }
+.badge-inscrito { background: #F4F0E6; color: #071D49; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid #D9D2C3; }
 .selo { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 99px; margin-right: 4px; margin-top: 4px; }
-.selo-verificado { background: #e8effe; color: #1a3a8f; border: 1px solid #b0c5f5; }
+.selo-verificado { background: #F4F0E6; color: #071D49; border: 1px solid #D9D2C3; }
 .selo-recomendado { background: #e6f4ea; color: #15803d; border: 1px solid #b0dfc0; }
 .selo-destaque { background: #fff8e6; color: #b45309; border: 1px solid #fde68a; }
 .selo-experiente { background: #f3effe; color: #6d28d9; border: 1px solid #ddd6fe; }
-.metric-box { background: #ffffff; border: 1.5px solid #d0dcfa; border-radius: 14px; padding: 16px 18px; text-align: center; }
-.metric-label { font-size: 11px; font-weight: 700; color: #4a6080; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px; }
-.metric-value { font-size: 20px; font-weight: 800; color: #0d1f4e; margin: 0; }
-.profile-name { font-family: 'Cormorant Garamond',serif; font-size: 28px; font-weight: 700; color: #0d1f4e; margin: 0 0 6px; }
-.section-label { font-size: 11px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .1em; margin: 1.5rem 0 0.5rem; }
-.info-card { background: #f0f5ff; border: 1.5px solid #c5d5f5; border-radius: 12px; padding: 14px 18px; font-size: 14px; color: #1a3a8f; line-height: 1.6; font-weight: 500; }
-.custom-divider { height: 1px; background: #d0dcfa; margin: 1.5rem 0; }
-.info-box { background: #e8effe; border: 1px solid #b0c5f5; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #1a3a8f; margin-top: 8px; font-weight: 600; }
-.lock-box { background: #f4f7fe; border: 1.5px solid #d0dcfa; border-radius: 12px; padding: 14px 18px; font-size: 13px; color: #4a6080; text-align: center; font-weight: 500; }
+.metric-box { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 14px; padding: 16px 18px; text-align: center; }
+.metric-label { font-size: 11px; font-weight: 700; color: #5E6675; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 6px; }
+.metric-value { font-size: 20px; font-weight: 800; color: #071D49; margin: 0; }
+.profile-name { font-family: 'Cormorant Garamond',serif; font-size: 28px; font-weight: 700; color: #071D49; margin: 0 0 6px; }
+.section-label { font-size: 11px; font-weight: 800; color: #071D49; text-transform: uppercase; letter-spacing: .1em; margin: 1.5rem 0 0.5rem; }
+.info-card { background: #F7F4ED; border: 1.5px solid #D9D2C3; border-radius: 12px; padding: 14px 18px; font-size: 14px; color: #071D49; line-height: 1.6; font-weight: 500; }
+.custom-divider { height: 1px; background: #D9D2C3; margin: 1.5rem 0; }
+.info-box { background: #F4F0E6; border: 1px solid #D9D2C3; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #071D49; margin-top: 8px; font-weight: 600; }
+.lock-box { background: #F7F4ED; border: 1.5px solid #D9D2C3; border-radius: 12px; padding: 14px 18px; font-size: 13px; color: #5E6675; text-align: center; font-weight: 500; }
 .disclaimer-box { background: #fff8e6; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #92400e; line-height: 1.6; margin-top: 1rem; font-weight: 500; }
 .step-bar { display: flex; gap: 8px; margin-bottom: 2rem; }
-.step { flex: 1; height: 4px; border-radius: 99px; background: #d0dcfa; }
-.step.active { background: linear-gradient(135deg,#c8960c,#f0c040); }
+.step { flex: 1; height: 4px; border-radius: 99px; background: #D9D2C3; }
+.step.active { background: linear-gradient(135deg,#C49A2C,#C49A2C); }
 .step.done { background: #1a7a4a; }
-.step-title { font-size: 13px; font-weight: 700; color: #2a4a8a; margin-bottom: 0.3rem; }
-.step-desc { font-family: 'Cormorant Garamond',serif; font-size: 24px; font-weight: 700; color: #0d1f4e; margin-bottom: 1.5rem; }
-.doc-sub { font-size: 12px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .08em; margin: 1.5rem 0 0.5rem; }
-.doc-body { font-size: 14px; color: #1a3a8f; line-height: 1.8; margin-bottom: 0.8rem; font-weight: 500; }
-.doc-item { font-size: 14px; color: #1a3a8f; line-height: 1.8; padding-left: 1rem; font-weight: 500; }
+.step-title { font-size: 13px; font-weight: 700; color: #5E6675; margin-bottom: 0.3rem; }
+.step-desc { font-family: 'Cormorant Garamond',serif; font-size: 24px; font-weight: 700; color: #071D49; margin-bottom: 1.5rem; }
+.doc-sub { font-size: 12px; font-weight: 800; color: #071D49; text-transform: uppercase; letter-spacing: .08em; margin: 1.5rem 0 0.5rem; }
+.doc-body { font-size: 14px; color: #071D49; line-height: 1.8; margin-bottom: 0.8rem; font-weight: 500; }
+.doc-item { font-size: 14px; color: #071D49; line-height: 1.8; padding-left: 1rem; font-weight: 500; }
 
 /* Botões globais */
 .stButton button {
     min-height: 42px !important;
-    background: linear-gradient(135deg,#d9a514,#f0c040) !important;
-    color: #0d1f4e !important;
+    background: linear-gradient(135deg,#C49A2C,#C49A2C) !important;
+    color: #071D49 !important;
     border: 1px solid rgba(13,31,78,0.08) !important;
     border-radius: 10px !important;
     font-family: 'Inter',sans-serif !important;
@@ -216,8 +217,8 @@ header[data-testid="stHeader"] { display: none !important; }
 .stButton button:hover { opacity: 0.96 !important; transform: translateY(-1px) !important; box-shadow: 0 10px 22px rgba(217,165,20,0.24) !important; }
 [data-testid="stFormSubmitButton"] button {
     min-height: 42px !important;
-    background: linear-gradient(135deg,#d9a514,#f0c040) !important;
-    color: #0d1f4e !important;
+    background: linear-gradient(135deg,#C49A2C,#C49A2C) !important;
+    color: #071D49 !important;
     border: 1px solid rgba(13,31,78,0.08) !important;
     border-radius: 10px !important;
     font-family: 'Inter',sans-serif !important;
@@ -227,48 +228,48 @@ header[data-testid="stHeader"] { display: none !important; }
     box-shadow: 0 8px 18px rgba(217,165,20,0.18) !important;
 }
 [data-testid="stFormSubmitButton"] button:hover {
-    background: linear-gradient(135deg,#d9a514,#f0c040) !important;
-    color: #0d1f4e !important;
+    background: linear-gradient(135deg,#C49A2C,#C49A2C) !important;
+    color: #071D49 !important;
     border-color: rgba(13,31,78,0.08) !important;
 }
 div[data-testid="column"]:last-child .stButton button,
-div[data-testid="column"]:nth-last-child(2) .stButton button { background: #ffffff !important; color: #0d1f4e !important; border: 1.5px solid #c5d5f5 !important; border-radius: 10px !important; padding: 0.58rem 1rem !important; font-size: 13px !important; font-weight: 800 !important; width: 100%; box-shadow: 0 6px 16px rgba(13,31,78,0.08) !important; }
+div[data-testid="column"]:nth-last-child(2) .stButton button { background: #ffffff !important; color: #071D49 !important; border: 1.5px solid #D9D2C3 !important; border-radius: 10px !important; padding: 0.58rem 1rem !important; font-size: 13px !important; font-weight: 800 !important; width: 100%; box-shadow: 0 6px 16px rgba(13,31,78,0.08) !important; }
 div[data-testid="column"]:last-child .stButton button:hover,
-div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background: #e8f0fe !important; border-color: #4070f4 !important; color: #0d1f4e !important; }
-.stTextInput input, .stTextArea textarea, .stDateInput input { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; font-family: 'Inter',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
-.stTextInput input:focus, .stTextArea textarea:focus, .stDateInput input:focus { border-color: #4070f4 !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
-.stTextInput input::placeholder, .stTextArea textarea::placeholder { color: #4a6080 !important; opacity: 1 !important; font-weight: 500 !important; }
-.stSelectbox > div > div { border-radius: 10px !important; border-color: #d0dcfa !important; background: #ffffff !important; color: #0d1f4e !important; }
-.stSelectbox [data-baseweb="select"] * { color: #0d1f4e !important; font-weight: 500 !important; }
-.stRadio label, .stCheckbox label { color: #0d1f4e !important; font-weight: 600 !important; }
-.stMultiSelect > div > div { background: #ffffff !important; border-color: #d0dcfa !important; border-radius: 10px !important; }
-.stMultiSelect [data-baseweb="select"] { color: #0d1f4e !important; }
-.stMultiSelect [data-baseweb="select"] svg { fill: #0d1f4e !important; color: #0d1f4e !important; }
-[data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"], [role="listbox"] { background: #ffffff !important; color: #0d1f4e !important; }
-[role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #0d1f4e !important; }
-[role="option"]:hover, [role="option"][aria-selected="true"] { background: #e8f0fe !important; color: #0d1f4e !important; }
-label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 700 !important; }
-.form-item-title { font-size: 12px; font-weight: 800; color: #1a3a8f; text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid #d0dcfa; }
-.add-hint { font-size: 12px; color: #4a6080; font-weight: 600; margin: -2px 0 10px; }
-.highlight-panel { background: #fff8e6; border: 1.5px solid #f0c040; border-radius: 12px; padding: 12px 16px; margin: 10px 0 14px; color: #0d1f4e; font-weight: 800; }
-.stTextInput input:disabled { background: #f4f7fe !important; color: #1a3a8f !important; -webkit-text-fill-color: #1a3a8f !important; border-color: #c5d5f5 !important; font-weight: 800 !important; opacity: 1 !important; }
-[data-baseweb="input"], [data-baseweb="select"] { background: #ffffff !important; color: #0d1f4e !important; }
-[data-baseweb="input"] button, [data-testid="stFileUploader"] button { background: #ffffff !important; color: #0d1f4e !important; border-color: #c5d5f5 !important; }
-[data-testid="stFileUploader"] section { background: #ffffff !important; border-color: #c5d5f5 !important; border-radius: 12px !important; }
-[data-testid="stFileUploader"] * { color: #0d1f4e !important; }
+div[data-testid="column"]:nth-last-child(2) .stButton button:hover { background: #F4F0E6 !important; border-color: #C49A2C !important; color: #071D49 !important; }
+.stTextInput input, .stTextArea textarea, .stDateInput input { border-radius: 10px !important; border-color: #D9D2C3 !important; background: #ffffff !important; color: #071D49 !important; font-family: 'Inter',sans-serif !important; font-size: 14px !important; font-weight: 500 !important; }
+.stTextInput input:focus, .stTextArea textarea:focus, .stDateInput input:focus { border-color: #C49A2C !important; box-shadow: 0 0 0 3px rgba(64,112,244,0.1) !important; }
+.stTextInput input::placeholder, .stTextArea textarea::placeholder { color: #5E6675 !important; opacity: 1 !important; font-weight: 500 !important; }
+.stSelectbox > div > div { border-radius: 10px !important; border-color: #D9D2C3 !important; background: #ffffff !important; color: #071D49 !important; }
+.stSelectbox [data-baseweb="select"] * { color: #071D49 !important; font-weight: 500 !important; }
+.stRadio label, .stCheckbox label { color: #071D49 !important; font-weight: 600 !important; }
+.stMultiSelect > div > div { background: #ffffff !important; border-color: #D9D2C3 !important; border-radius: 10px !important; }
+.stMultiSelect [data-baseweb="select"] { color: #071D49 !important; }
+.stMultiSelect [data-baseweb="select"] svg { fill: #071D49 !important; color: #071D49 !important; }
+[data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"], [role="listbox"] { background: #ffffff !important; color: #071D49 !important; }
+[role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #071D49 !important; }
+[role="option"]:hover, [role="option"][aria-selected="true"] { background: #F4F0E6 !important; color: #071D49 !important; }
+label[data-baseweb="label"] { color: #071D49 !important; font-weight: 700 !important; }
+.form-item-title { font-size: 12px; font-weight: 800; color: #071D49; text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid #D9D2C3; }
+.add-hint { font-size: 12px; color: #5E6675; font-weight: 600; margin: -2px 0 10px; }
+.highlight-panel { background: #fff8e6; border: 1.5px solid #C49A2C; border-radius: 12px; padding: 12px 16px; margin: 10px 0 14px; color: #071D49; font-weight: 800; }
+.stTextInput input:disabled { background: #F7F4ED !important; color: #071D49 !important; -webkit-text-fill-color: #071D49 !important; border-color: #D9D2C3 !important; font-weight: 800 !important; opacity: 1 !important; }
+[data-baseweb="input"], [data-baseweb="select"] { background: #ffffff !important; color: #071D49 !important; }
+[data-baseweb="input"] button, [data-testid="stFileUploader"] button { background: #ffffff !important; color: #071D49 !important; border-color: #D9D2C3 !important; }
+[data-testid="stFileUploader"] section { background: #ffffff !important; border-color: #D9D2C3 !important; border-radius: 12px !important; }
+[data-testid="stFileUploader"] * { color: #071D49 !important; }
 .stTabs [data-baseweb="tab-list"] {
-    background: #dfeaff !important;
+    background: #F4F0E6 !important;
     border-radius: 12px !important;
     padding: 5px !important;
     gap: 5px !important;
-    border: 1px solid #c5d5f5 !important;
+    border: 1px solid #D9D2C3 !important;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.65) !important;
 }
 .stTabs [data-baseweb="tab"] {
     min-height: 38px !important;
     padding: 0 14px !important;
     background: transparent !important;
-    color: #1a3a8f !important;
+    color: #071D49 !important;
     border-radius: 9px !important;
     font-weight: 700 !important;
 }
@@ -278,106 +279,106 @@ label[data-baseweb="label"] { color: #0d1f4e !important; font-weight: 700 !impor
 }
 .stTabs [aria-selected="true"] {
     background: #ffffff !important;
-    color: #0d1f4e !important;
+    color: #071D49 !important;
     font-weight: 800 !important;
     box-shadow: 0 6px 14px rgba(13,31,78,0.08) !important;
 }
 .stAlert [data-testid="stMarkdownContainer"],
 .stAlert [data-testid="stMarkdownContainer"] p {
-    color: #0d1f4e !important;
+    color: #071D49 !important;
     font-weight: 600;
 }
 
 /* ── Camada visual neutra inspirada na nova landing ── */
-[data-testid="stAppViewContainer"] { background: #f9f8f6 !important; }
-html, body, [class*="css"] { color: #1e1e1e !important; }
+[data-testid="stAppViewContainer"] { background: #FBFAF7 !important; }
+html, body, [class*="css"] { color: #071D49 !important; }
 .main .block-container { max-width: 1120px; }
 .topbar {
-    background: #1e1e1e !important;
-    border-bottom: 1px solid #ddd8ce !important;
+    background: #071D49 !important;
+    border-bottom: 1px solid #D9D2C3 !important;
     box-shadow: 0 8px 24px rgba(30,30,30,0.08);
 }
 .topbar-logo-icon, .topbar-nav a.btn-rec {
-    background: linear-gradient(135deg,#b8973a,#e8d48a) !important;
-    color: #1e1e1e !important;
+    background: linear-gradient(135deg,#C49A2C,#E7D28A) !important;
+    color: #071D49 !important;
 }
 .topbar .topbar-logo-name { color: #ffffff !important; }
-.topbar .topbar-logo-sub, .topbar-nav a.active { color: #e8d48a !important; }
+.topbar .topbar-logo-sub, .topbar-nav a.active { color: #E7D28A !important; }
 .topbar-nav a.active { border-color: rgba(232,212,138,.45) !important; background: rgba(232,212,138,.1) !important; }
 .hero-card, .profile-shell, .profile-panel, .edit-hero, .cand-card, .chamada-card, .metric-box,
 .info-card, .lock-box, .profile-detail, [data-testid="stFileUploader"] section {
     background: #ffffff !important;
-    border-color: #ddd8ce !important;
+    border-color: #D9D2C3 !important;
     box-shadow: 0 14px 36px rgba(30,30,30,0.06) !important;
 }
 .page-title, .edit-title, .profile-name-main, .profile-name, .cand-name,
 .metric-value, .section-label, .profile-shell-title, .form-item-title {
-    color: #1e1e1e !important;
+    color: #071D49 !important;
 }
 .page-title em, .edit-title em {
     background: none !important;
-    -webkit-text-fill-color: #b8973a !important;
-    color: #b8973a !important;
+    -webkit-text-fill-color: #C49A2C !important;
+    color: #C49A2C !important;
 }
 .page-sub, .edit-sub, .cand-sub, .doc-body, .add-hint,
 [data-testid="stCaptionContainer"], .stCaptionContainer {
-    color: #6a6a6a !important;
+    color: #5E6675 !important;
 }
 .stButton button, [data-testid="stFormSubmitButton"] button {
-    background: #b8973a !important;
-    color: #1e1e1e !important;
+    background: #C49A2C !important;
+    color: #071D49 !important;
     border-color: rgba(30,30,30,.1) !important;
     box-shadow: 0 10px 22px rgba(184,151,58,.18) !important;
 }
 .stButton button:hover, [data-testid="stFormSubmitButton"] button:hover {
-    background: #e8d48a !important;
-    color: #1e1e1e !important;
+    background: #E7D28A !important;
+    color: #071D49 !important;
 }
 div[data-testid="column"]:last-child .stButton button,
 div[data-testid="column"]:nth-last-child(2) .stButton button {
     background: #ffffff !important;
-    color: #1e1e1e !important;
-    border-color: #ddd8ce !important;
+    color: #071D49 !important;
+    border-color: #D9D2C3 !important;
 }
 div[data-testid="column"]:last-child .stButton button:hover,
 div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
-    background: #f2efe9 !important;
-    border-color: #b8973a !important;
+    background: #F4F0E6 !important;
+    border-color: #C49A2C !important;
 }
 .profile-action {
-    background: #faf6ec !important;
-    border-color: #e8d48a !important;
+    background: #FFF8E6 !important;
+    border-color: #E7D28A !important;
     color: #8a6a16 !important;
 }
-.profile-action:hover { background: #e8d48a !important; color: #1e1e1e !important; }
+.profile-action:hover { background: #E7D28A !important; color: #071D49 !important; }
 .highlight-panel, .profile-concurso {
-    background: #faf6ec !important;
-    border-color: #e8d48a !important;
-    color: #1e1e1e !important;
+    background: #FFF8E6 !important;
+    border-color: #E7D28A !important;
+    color: #071D49 !important;
 }
 .stat-pill, .profile-chip, .badge-inscrito {
-    background: #f2efe9 !important;
-    color: #1e1e1e !important;
-    border-color: #ddd8ce !important;
+    background: #F4F0E6 !important;
+    color: #071D49 !important;
+    border-color: #D9D2C3 !important;
 }
-.custom-divider, .form-item-title { border-color: #ddd8ce !important; background: #ddd8ce !important; }
+.custom-divider, .form-item-title { border-color: #D9D2C3 !important; background: #D9D2C3 !important; }
 .stTextInput input, .stTextArea textarea, .stDateInput input,
 .stSelectbox > div > div, .stMultiSelect > div > div,
 [data-baseweb="input"], [data-baseweb="select"] {
     background: #ffffff !important;
-    color: #1e1e1e !important;
-    border-color: #ddd8ce !important;
+    color: #071D49 !important;
+    border-color: #D9D2C3 !important;
 }
 [data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"], [role="listbox"] {
     background: #ffffff !important;
-    color: #1e1e1e !important;
+    color: #071D49 !important;
 }
-[role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #1e1e1e !important; }
-[role="option"]:hover, [role="option"][aria-selected="true"] { background: #f2efe9 !important; color: #1e1e1e !important; }
+[role="option"], [role="option"] *, [data-baseweb="calendar"] * { color: #071D49 !important; }
+[role="option"]:hover, [role="option"][aria-selected="true"] { background: #F4F0E6 !important; color: #071D49 !important; }
 .stSelectbox [data-baseweb="select"] div,
 .stSelectbox [data-baseweb="select"] span {
-    color: #1e1e1e !important;
-    -webkit-text-fill-color: #1e1e1e !important;
+    color: #071D49 !important;
+    -webkit-text-fill-color: #071D49 !important;
 }
 [data-baseweb="popover"] [role="option"],
 [data-baseweb="popover"] [role="option"] *,
@@ -386,30 +387,30 @@ div[data-testid="column"]:nth-last-child(2) .stButton button:hover {
 [data-baseweb="select-dropdown"] [role="option"],
 [data-baseweb="select-dropdown"] [role="option"] * {
     background-color: #ffffff !important;
-    color: #1e1e1e !important;
-    -webkit-text-fill-color: #1e1e1e !important;
+    color: #071D49 !important;
+    -webkit-text-fill-color: #071D49 !important;
 }
 [data-baseweb="popover"] [aria-selected="true"],
 [data-baseweb="menu"] [aria-selected="true"],
 [data-baseweb="select-dropdown"] [aria-selected="true"],
 [data-baseweb="popover"] [role="option"]:hover,
 [data-baseweb="menu"] [role="option"]:hover {
-    background-color: #f2efe9 !important;
-    color: #1e1e1e !important;
+    background-color: #F4F0E6 !important;
+    color: #071D49 !important;
 }
 .stMultiSelect [data-baseweb="tag"] { color: inherit !important; }
-.stTabs [data-baseweb="tab-list"] { background: #f2efe9 !important; border-color: #ddd8ce !important; }
-.stTabs [data-baseweb="tab"] { color: #6a6a6a !important; }
-.stTabs [aria-selected="true"] { color: #1e1e1e !important; box-shadow: 0 6px 14px rgba(30,30,30,0.08) !important; }
-.profile-sub-main { color: #6a6a6a !important; font-size: 13px !important; font-weight: 600 !important; }
+.stTabs [data-baseweb="tab-list"] { background: #F4F0E6 !important; border-color: #D9D2C3 !important; }
+.stTabs [data-baseweb="tab"] { color: #5E6675 !important; }
+.stTabs [aria-selected="true"] { color: #071D49 !important; box-shadow: 0 6px 14px rgba(30,30,30,0.08) !important; }
+.profile-sub-main { color: #5E6675 !important; font-size: 13px !important; font-weight: 600 !important; }
 .profile-section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
-.profile-section-card { background: #ffffff; border: 1px solid #ddd8ce; border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.profile-section-card { background: #ffffff; border: 1px solid #D9D2C3; border-radius: 12px; padding: 14px 16px; min-width: 0; }
 .profile-section-card.full { grid-column: 1 / -1; }
-.profile-section-title { color: #6a6a6a; font-size: 10px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px; }
+.profile-section-title { color: #5E6675; font-size: 10px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px; }
 .profile-list { display: flex; flex-direction: column; gap: 8px; }
-.profile-list-item { color: #1e1e1e; font-size: 13px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
-.profile-list-item span { color: #6a6a6a; font-weight: 600; }
-.profile-empty { color: #6a6a6a; font-size: 13px; font-weight: 600; }
+.profile-list-item { color: #071D49; font-size: 13px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
+.profile-list-item span { color: #5E6675; font-weight: 600; }
+.profile-empty { color: #5E6675; font-size: 13px; font-weight: 600; }
 @media (max-width: 760px) { .profile-section-grid { grid-template-columns: 1fr; } .profile-section-card.full { grid-column: auto; } }
 </style>
 """, unsafe_allow_html=True)
@@ -466,7 +467,7 @@ if "pagina" not in st.session_state or params.get("p"):
 pagina = st.session_state.pagina
 
 # ── Constantes ────────────────────────────────────────────────────────────────
-AVATAR_CORES = ["#1a3a8f","#2e7d5e","#7b3fa0","#c05a1a","#1a6b8a","#a04040","#3a6b2a"]
+AVATAR_CORES = ["#071D49","#2e7d5e","#7b3fa0","#c05a1a","#1a6b8a","#a04040","#3a6b2a"]
 DISC_LABEL = {"D":"Dominante","I":"Influente","S":"Estável","C":"Conformidade"}
 DISC_CORES_BADGE = {"D":"rgba(252,165,165,0.12)","I":"rgba(253,230,138,0.12)","S":"rgba(110,231,183,0.12)","C":"rgba(147,197,253,0.12)"}
 DISC_TEXTO_BADGE = {"D":"#fca5a5","I":"#fde68a","S":"#6ee7b7","C":"#93c5fd"}
@@ -525,7 +526,7 @@ PERGUNTAS_DISC = [
 ]
 DISC_AVISO = "O perfil DISC é um indicador comportamental de apoio. Ele não substitui análise curricular, entrevista estruturada, prova prática ou avaliação técnica do trabalho."
 LETRAS_DISC = ["D","I","S","C"]
-DISCLAIMER = "O JurisBank atua exclusivamente como plataforma de aproximação. A publicação deste Seletivo não configura processo seletivo vinculante, concurso público ou compromisso de contratação. O uso do ius indicandum é de responsabilidade exclusiva do recrutador, que deve observar as normas de impessoalidade e vedação ao nepotismo aplicáveis ao seu órgão."
+DISCLAIMER = "O IndicaJur atua exclusivamente como plataforma de aproximação. A publicação deste Seletivo não configura processo seletivo vinculante, concurso público ou compromisso de contratação. O uso do ius indicandum é de responsabilidade exclusiva do recrutador, que deve observar as normas de impessoalidade e vedação ao nepotismo aplicáveis ao seu órgão."
 
 # ── Funções ───────────────────────────────────────────────────────────────────
 def cor_avatar(n): return AVATAR_CORES[sum(ord(c) for c in n)%len(AVATAR_CORES)]
@@ -963,29 +964,29 @@ def invalidar_token(token):
 def email_redefinicao(destinatario, link, tipo):
     """Envia e-mail com link de redefinição de senha."""
     label = "candidato" if tipo == "candidato" else "recrutador"
-    assunto = "JurisBank — Redefinição de senha"
+    assunto = "IndicaJur — Redefinição de senha"
     corpo = f"""
     <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff">
-        <div style="background:#1e1e1e;padding:32px;text-align:center;border-radius:12px 12px 0 0">
-            <h1 style="color:#ffffff;font-size:22px;margin:0;letter-spacing:-.5px">Juris<span style="color:#b8973a">dica</span></h1>
+        <div style="background:#071D49;padding:32px;text-align:center;border-radius:12px 12px 0 0">
+            <h1 style="color:#ffffff;font-size:22px;margin:0;letter-spacing:-.5px">Juris<span style="color:#C49A2C">dica</span></h1>
             <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:4px 0 0;font-style:italic">ius indicandum</p>
         </div>
-        <div style="padding:32px;background:#f9f8f6;border-radius:0 0 12px 12px">
-            <h2 style="color:#1e1e1e;font-size:20px;margin:0 0 12px">Redefinição de senha</h2>
-            <p style="color:#6a6a6a;font-size:15px;line-height:1.7;margin:0 0 20px">
-                Recebemos uma solicitação de redefinição de senha para sua conta de <strong style="color:#1e1e1e">{label}</strong> no JurisBank.
+        <div style="padding:32px;background:#FBFAF7;border-radius:0 0 12px 12px">
+            <h2 style="color:#071D49;font-size:20px;margin:0 0 12px">Redefinição de senha</h2>
+            <p style="color:#5E6675;font-size:15px;line-height:1.7;margin:0 0 20px">
+                Recebemos uma solicitação de redefinição de senha para sua conta de <strong style="color:#071D49">{label}</strong> no IndicaJur.
             </p>
-            <p style="color:#6a6a6a;font-size:14px;line-height:1.7;margin:0 0 24px">
+            <p style="color:#5E6675;font-size:14px;line-height:1.7;margin:0 0 24px">
                 Clique no botão abaixo para criar uma nova senha. O link é válido por <strong>2 horas</strong>.
             </p>
             <div style="text-align:center;margin:28px 0">
-                <a href="{link}" style="display:inline-block;padding:14px 36px;background:#b8973a;color:#1e1e1e;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">
+                <a href="{link}" style="display:inline-block;padding:14px 36px;background:#C49A2C;color:#071D49;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">
                     Redefinir minha senha →
                 </a>
             </div>
-            <p style="color:#9a9a9a;font-size:12px;line-height:1.6;margin:0;border-top:1px solid #ddd8ce;padding-top:16px">
+            <p style="color:#9a9a9a;font-size:12px;line-height:1.6;margin:0;border-top:1px solid #D9D2C3;padding-top:16px">
                 Se você não solicitou a redefinição, ignore este e-mail — sua senha não será alterada.<br>
-                <strong>JurisBank</strong> — banco de talentos jurídicos certificados.
+                <strong>IndicaJur</strong> — banco de talentos jurídicos certificados.
             </p>
         </div>
     </div>
@@ -1008,7 +1009,7 @@ def html_disc(c):
 
 def html_conc(c):
     if c.get("concurso") and c.get("concurso")!="Não estou estudando para concurso":
-        return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(200,150,12,0.1);color:#f0c040;margin-left:4px;border:1px solid rgba(200,150,12,0.18)">📚 Concursando</span>'
+        return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(200,150,12,0.1);color:#C49A2C;margin-left:4px;border:1px solid rgba(200,150,12,0.18)">📚 Concursando</span>'
     return ""
 
 def barra(atual,total=3):
@@ -1029,15 +1030,15 @@ def calc_disc(rs):
 
 def render_disc(d):
     cb=DISC_CORES_BADGE.get(d,"rgba(255,255,255,0.06)"); tb=DISC_TEXTO_BADGE.get(d,"#fff"); det=DISC_DETALHES.get(d,{})
-    return f"""<div class="info-card" style="background:{cb};border-color:#c5d5f5">
+    return f"""<div class="info-card" style="background:{cb};border-color:#D9D2C3">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
             <span style="font-weight:800;color:{tb};font-size:22px">{d}</span>
             <span style="font-weight:700;color:{tb};font-size:15px">{det.get('nome','')}</span>
         </div>
         <p style="color:{tb};font-size:13px;font-weight:600;margin:0 0 8px">{det.get('resumo','')}</p>
-        <p style="color:#2a4a8a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">Pontos fortes:</strong> {det.get('pontos_fortes','')}</p>
-        <p style="color:#2a4a8a;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">No gabinete:</strong> {det.get('no_gabinete','')}</p>
-        <p style="color:#2a4a8a;font-size:12px;margin:0"><strong style="color:{tb}">Atenção:</strong> {det.get('atencao','')}</p>
+        <p style="color:#5E6675;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">Pontos fortes:</strong> {det.get('pontos_fortes','')}</p>
+        <p style="color:#5E6675;font-size:12px;margin:0 0 4px"><strong style="color:{tb}">No gabinete:</strong> {det.get('no_gabinete','')}</p>
+        <p style="color:#5E6675;font-size:12px;margin:0"><strong style="color:{tb}">Atenção:</strong> {det.get('atencao','')}</p>
     </div>"""
 
 
@@ -1067,30 +1068,30 @@ def enviar_email(destinatario, assunto, corpo_html):
         return False
 
 def email_recomendador(nome_candidato, email_recomendador, link):
-    assunto = f"JurisBank — {nome_candidato} solicitou sua avaliação"
+    assunto = f"IndicaJur — {nome_candidato} solicitou sua avaliação"
     corpo = f"""
     <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff">
-        <div style="background:linear-gradient(135deg,#0d1f4e,#1a3a8f);padding:32px;text-align:center;border-radius:12px 12px 0 0">
-            <div style="width:48px;height:48px;background:linear-gradient(135deg,#c8960c,#f0c040);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px">⚖</div>
-            <h1 style="color:#ffffff;font-size:22px;margin:0;letter-spacing:-0.5px">JurisBank</h1>
+        <div style="background:linear-gradient(135deg,#071D49,#071D49);padding:32px;text-align:center;border-radius:12px 12px 0 0">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#C49A2C,#C49A2C);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px">⚖</div>
+            <h1 style="color:#ffffff;font-size:22px;margin:0;letter-spacing:-0.5px">IndicaJur</h1>
             <p style="color:rgba(255,255,255,0.6);font-size:12px;margin:4px 0 0;font-style:italic">ius indicandum</p>
         </div>
         <div style="padding:32px;background:#f4f6fc;border-radius:0 0 12px 12px">
-            <h2 style="color:#0d1f4e;font-size:20px;margin:0 0 12px">Solicitação de avaliação</h2>
+            <h2 style="color:#071D49;font-size:20px;margin:0 0 12px">Solicitação de avaliação</h2>
             <p style="color:#4a5568;font-size:15px;line-height:1.7;margin:0 0 20px">
-                O profissional <strong style="color:#0d1f4e">{nome_candidato}</strong> indicou você como recomendador no JurisBank e solicita que você preencha uma avaliação do seu perfil profissional.
+                O profissional <strong style="color:#071D49">{nome_candidato}</strong> indicou você como recomendador no IndicaJur e solicita que você preencha uma avaliação do seu perfil profissional.
             </p>
             <p style="color:#4a5568;font-size:14px;line-height:1.7;margin:0 0 24px">
                 A avaliação é rápida (menos de 5 minutos) e ficará disponível para recrutadores de Tribunais, Ministérios Públicos, Defensorias e Procuradorias ao analisar o perfil do candidato.
             </p>
             <div style="text-align:center;margin:28px 0">
-                <a href="{link}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#c8960c,#f0c040);color:#0d1f4e;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">
+                <a href="{link}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#C49A2C,#C49A2C);color:#071D49;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">
                     Preencher avaliação →
                 </a>
             </div>
-            <p style="color:#8090b8;font-size:12px;line-height:1.6;margin:0;border-top:1px solid #d0dcfa;padding-top:16px">
+            <p style="color:#8090b8;font-size:12px;line-height:1.6;margin:0;border-top:1px solid #D9D2C3;padding-top:16px">
                 Este link é exclusivo e de uso único. Caso não reconheça esta solicitação, ignore este e-mail.<br>
-                <strong>JurisBank</strong> — plataforma de aproximação entre profissionais do Direito e órgãos do sistema de justiça.
+                <strong>IndicaJur</strong> — plataforma de aproximação entre profissionais do Direito e órgãos do sistema de justiça.
             </p>
         </div>
     </div>
@@ -1142,7 +1143,7 @@ else:
         ("recrutador","Sou Recrutador"),
     ]
 
-nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">JB</div><div><span class="topbar-logo-name">JurisBank</span></div></a><div class="topbar-nav">'
+nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.github.io/jurisbank/" target="_blank"><div class="topbar-logo-icon">IJ</div><div><span class="topbar-logo-name">IndicaJur</span><span class="topbar-logo-sub">indicações jurídicas com critério</span></div></a><div class="topbar-nav">'
 for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     if not rec_logado() and not cand_logado():
@@ -1167,7 +1168,7 @@ st.markdown(nav_html, unsafe_allow_html=True)
 # ── PÁGINA PÚBLICA ────────────────────────────────────────────────────────────
 if pagina == "publico":
     st.markdown("""<div class="hero-card">
-        <h1 class="page-title">JurisBank<br><em>Ambientes.</em></h1>
+        <h1 class="page-title">IndicaJur<br><em>Ambientes.</em></h1>
         <p class="page-sub">Acesse o espaço correto para consultar oportunidades, gerir seu perfil ou conduzir Seletivos.</p>
     </div>""", unsafe_allow_html=True)
 
@@ -1320,12 +1321,12 @@ elif pagina == "inicio":
     else:
         st.markdown("""<div class="hero-card">
             <h1 class="page-title">Área do<br><em>Candidato.</em></h1>
-            <p class="page-sub">Entre para acompanhar seu perfil ou comece seu cadastro no JurisBank.</p>
+            <p class="page-sub">Entre para acompanhar seu perfil ou comece seu cadastro no IndicaJur.</p>
         </div>""", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         tabs = st.tabs(["Já tenho cadastro","Cadastrar-me"])
         with tabs[0]:
-            st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Entrar no meu perfil</p>', unsafe_allow_html=True)
+            st.markdown('<p style="font-size:16px;font-weight:700;color:#071D49;margin:1rem 0">Entrar no meu perfil</p>', unsafe_allow_html=True)
             with st.form("form_login_candidato_inicio"):
                 email_login = st.text_input("E-mail cadastrado", key="login_candidato_inicio")
                 senha_login = st.text_input("Senha", type="password", key="senha_candidato_inicio", help="Perfis antigos sem senha ainda podem entrar apenas com o e-mail.")
@@ -1334,11 +1335,11 @@ elif pagina == "inicio":
                 if not email_login:
                     st.error("Informe seu e-mail.")
                 elif login_candidato(email_login, senha_login, permitir_sem_senha=True):
-                    st.success("Bem-vindo ao JurisBank.")
+                    st.success("Bem-vindo ao IndicaJur.")
                     st.rerun()
                 else:
                     st.error("E-mail ou senha inválidos.")
-            st.markdown('<p style="font-size:12px;color:#6a6a6a;margin-top:8px">Esqueceu a senha? <a href="?p=esqueci" style="color:#b8973a;font-weight:700">Recuperar acesso →</a></p>', unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#5E6675;margin-top:8px">Esqueceu a senha? <a href="?p=esqueci" style="color:#C49A2C;font-weight:700">Recuperar acesso →</a></p>', unsafe_allow_html=True)
         with tabs[1]:
             st.markdown("""<div class="info-card">
                 <strong>Cadastre seu currículo jurídico</strong><br>
@@ -1560,7 +1561,7 @@ elif pagina == "candidatos":
                 {avatar_detalhe}
                 <div>
                     <div class="profile-name">{html_texto(c.get('nome','—'))}</div>
-                    <div style="font-size:13px;color:#4a6080;margin-bottom:6px">{html_texto(resumo_formacoes(formacoes_view) or c.get('instituicao','—'))}</div>
+                    <div style="font-size:13px;color:#5E6675;margin-bottom:6px">{html_texto(resumo_formacoes(formacoes_view) or c.get('instituicao','—'))}</div>
                     <div>{html_selos(c)}</div>
                 </div>
             </div>
@@ -1585,7 +1586,7 @@ elif pagina == "candidatos":
                 st.markdown(f'<div class="info-card">{html_texto(c["resumo"])}</div>',unsafe_allow_html=True)
             else:
                 prev=c["resumo"][:150]+"..." if len(c["resumo"])>150 else c["resumo"]
-                st.markdown(f'<div class="info-card">{html_texto(prev)}<br><br><span style="color:#f0c040;font-size:12px">🔐 Resumo completo disponível para recrutadores.</span></div>',unsafe_allow_html=True)
+                st.markdown(f'<div class="info-card">{html_texto(prev)}<br><br><span style="color:#C49A2C;font-size:12px">🔐 Resumo completo disponível para recrutadores.</span></div>',unsafe_allow_html=True)
         st.markdown('<p class="section-label">Contato</p>',unsafe_allow_html=True)
         if rec_logado():
             st.markdown(f'<div class="info-card">✉ {html_texto(c.get("email","—"))}</div>',unsafe_allow_html=True)
@@ -1619,7 +1620,7 @@ elif pagina == "candidatos":
             cm={"Verificado":"selo_verificado","Recomendado":"selo_recomendado","Destaque":"selo_destaque","Experiente":"selo_experiente"}
             cf=[c for c in cf if c.get(cm[fsel])=="Sim"]
 
-        st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin-bottom:1rem">{len(cf)} candidato(s)</p>',unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:13px;color:#5E6675;font-weight:600;margin-bottom:1rem">{len(cf)} candidato(s)</p>',unsafe_allow_html=True)
         for i,cand in enumerate(cf):
             cor=cor_avatar(cand["nome"]); dsp=cand.get("disponibilidade","Não")
             formacao_res = resumo_formacoes(formacoes_candidato(cand)) or cand.get("instituicao","—")
@@ -1688,7 +1689,7 @@ elif pagina == "chamadas":
     if fs=="Abertas": chf=[ch for ch in chf if ch_aberta(ch)]
     elif fs=="Encerradas": chf=[ch for ch in chf if not ch_aberta(ch)]
 
-    st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin-bottom:1rem">{len(chf)} seletivo(s)</p>',unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:13px;color:#5E6675;font-weight:600;margin-bottom:1rem">{len(chf)} seletivo(s)</p>',unsafe_allow_html=True)
 
     for i,ch in enumerate(chf):
         ab=ch_aberta(ch); ins_=inscritos(ch); n=len(ins_)
@@ -1700,14 +1701,14 @@ elif pagina == "chamadas":
                 <div style="flex:1">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
                         {sb}
-                        <span style="font-size:11px;color:#4a6080;font-weight:600">📅 {ch.get('prazo','—')}</span>
-                        <span style="font-size:11px;color:#4a6080;font-weight:600">👥 {n} inscrito(s)</span>
+                        <span style="font-size:11px;color:#5E6675;font-weight:600">📅 {ch.get('prazo','—')}</span>
+                        <span style="font-size:11px;color:#5E6675;font-weight:600">👥 {n} inscrito(s)</span>
                     </div>
-                    <p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:0 0 4px">{ch.get('titulo','—')}</p>
-                    <p style="font-size:13px;color:#4a6080;font-weight:500;margin:0 0 8px">{ch.get('orgao','—')} · {ch.get('municipio','—')}/{ch.get('estado','—')}</p>
+                    <p style="font-size:16px;font-weight:700;color:#071D49;margin:0 0 4px">{ch.get('titulo','—')}</p>
+                    <p style="font-size:13px;color:#5E6675;font-weight:500;margin:0 0 8px">{ch.get('orgao','—')} · {ch.get('municipio','—')}/{ch.get('estado','—')}</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
-                        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#e8effe;color:#1a3a8f;border:1px solid #c5d5f5">{ch.get('area','—')}</span>
-                        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#f4f7fe;color:#0d1f4e;border:1px solid #d0dcfa">{ch.get('regime','—')}</span>
+                        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#F4F0E6;color:#071D49;border:1px solid #D9D2C3">{ch.get('area','—')}</span>
+                        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#F7F4ED;color:#071D49;border:1px solid #D9D2C3">{ch.get('regime','—')}</span>
                         <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#e6f4ea;color:#1a7a4a;border:1px solid #b0dfc0">{ch.get('vagas','—')} vaga(s)</span>
                     </div>
                 </div>
@@ -1728,7 +1729,7 @@ elif pagina == "chamadas":
                     ir("inicio")
 
         if st.session_state.get(f"ci{i}"):
-            st.markdown(f'<div class="info-card" style="margin-top:8px"><strong style="color:#0d1f4e">Inscrever em: {ch.get("titulo","")}</strong></div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="info-card" style="margin-top:8px"><strong style="color:#071D49">Inscrever em: {ch.get("titulo","")}</strong></div>',unsafe_allow_html=True)
             cons=st.checkbox("Autorizo o compartilhamento do meu perfil com o recrutador deste Seletivo, nos termos da LGPD.",key=f"cs{i}")
             ca,cx=st.columns(2)
             with ca:
@@ -1895,12 +1896,12 @@ elif pagina == "cadastro":
     elif et==2:
         c1,c2=st.columns(2)
         with c1:
-            st.markdown('<p style="font-weight:600;color:#f0c040;margin-bottom:4px">★ Carta de recomendação</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#4a6080;font-weight:500;margin-bottom:8px">De um Juiz, Promotor, Defensor ou Procurador ativo</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-weight:600;color:#C49A2C;margin-bottom:4px">★ Carta de recomendação</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#5E6675;font-weight:500;margin-bottom:8px">De um Juiz, Promotor, Defensor ou Procurador ativo</p>',unsafe_allow_html=True)
             carta=st.file_uploader("",type="pdf",key="carta",label_visibility="collapsed")
         with c2:
-            st.markdown('<p style="font-weight:600;color:#f0c040;margin-bottom:4px">◆ Avaliação de desempenho</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:12px;color:#4a6080;font-weight:500;margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-weight:600;color:#C49A2C;margin-bottom:4px">◆ Avaliação de desempenho</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#5E6675;font-weight:500;margin-bottom:8px">Avaliação formal emitida pelo órgão</p>',unsafe_allow_html=True)
             aval=st.file_uploader("",type="pdf",key="aval",label_visibility="collapsed")
 
         d=st.session_state.dc; sp=[]
@@ -1910,7 +1911,7 @@ elif pagina == "cadastro":
         if d.get("anos_experiencia",0)>=2: sp.append("● Experiente")
         if sp:
             st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:13px;font-weight:600;color:#f0c040">Selos:</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:13px;font-weight:600;color:#C49A2C">Selos:</p>',unsafe_allow_html=True)
             st.markdown(" ".join([f'<span class="selo selo-verificado">{s}</span>' for s in sp]),unsafe_allow_html=True)
         st.markdown("<br>",unsafe_allow_html=True)
         c1,c2=st.columns(2)
@@ -1923,7 +1924,7 @@ elif pagina == "cadastro":
 
     elif et==3:
         st.markdown(f'<div class="info-box">{DISC_AVISO}</div>',unsafe_allow_html=True)
-        st.markdown('<p style="font-size:14px;color:#4a6080;font-weight:500;margin-bottom:1.5rem">Não há respostas certas ou erradas. Responda pensando na forma como você costuma atuar no trabalho.</p>',unsafe_allow_html=True)
+        st.markdown('<p style="font-size:14px;color:#5E6675;font-weight:500;margin-bottom:1.5rem">Não há respostas certas ou erradas. Responda pensando na forma como você costuma atuar no trabalho.</p>',unsafe_allow_html=True)
         rd=[]
         for j,(perg,ops) in enumerate(PERGUNTAS_DISC):
             r=st.radio(f"**{j+1}.** {perg}",ops,key=f"dq{j}",index=None)
@@ -1933,7 +1934,7 @@ elif pagina == "cadastro":
         with c1:
             if st.button("← Voltar"): st.session_state.et=2; st.rerun()
         with c2:
-            if st.button("Cadastrar no JurisBank →"):
+            if st.button("Cadastrar no IndicaJur →"):
                 if None in rd: st.error(f"Responda todas as {len(PERGUNTAS_DISC)} perguntas.")
                 else:
                     d=st.session_state.dc
@@ -1943,7 +1944,7 @@ elif pagina == "cadastro":
                         aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Não estou estudando para concurso"),d.get("senha",""),d.get("foto","")])
                         st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}
                         st.session_state.pop("cad_qtd_form", None); st.session_state.pop("cad_qtd_exp", None)
-                        st.success("Bem-vindo ao JurisBank!")
+                        st.success("Bem-vindo ao IndicaJur!")
                         st.markdown(f'<div class="info-box">Perfil: <strong>{pd_} — {desc}</strong></div>',unsafe_allow_html=True)
                         st.balloons()
                     except Exception as e:
@@ -2037,7 +2038,7 @@ elif pagina == "recrutador":
             with c2: ssel=st.selectbox("Selo",["Todos","Verificado","Recomendado","Destaque","Experiente"])
             with c3:
                 dsc=st.selectbox("DISC",["Todos","D — Dominante","I — Influente","S — Estável","C — Conformidade"])
-                if dsc!="Todos": st.markdown(f'<div style="background:#f0f5ff;border:1px solid #c5d5f5;border-radius:8px;padding:8px;font-size:11px;color:#2a4a8a;font-weight:600;margin-top:4px">ℹ {DISC_EXPLICACOES_FILTRO.get(dsc,"")}</div>',unsafe_allow_html=True)
+                if dsc!="Todos": st.markdown(f'<div style="background:#F7F4ED;border:1px solid #D9D2C3;border-radius:8px;padding:8px;font-size:11px;color:#5E6675;font-weight:600;margin-top:4px">ℹ {DISC_EXPLICACOES_FILTRO.get(dsc,"")}</div>',unsafe_allow_html=True)
             with c4: csel=st.selectbox("Concurso",["Todos","Concursando","Não concursando"])
             with c5: sisel=st.text_input("Sistema",placeholder="Ex: Eproc")
             with c6: emin=st.number_input("Exp. mín.",min_value=0,max_value=20,value=0)
@@ -2073,7 +2074,7 @@ elif pagina == "recrutador":
 
             if not filtros_aplicados:
                 st.markdown('<div class="info-card">Selecione ao menos um filtro para visualizar candidatos compatíveis.</div>',unsafe_allow_html=True)
-            st.markdown(f'<p style="font-size:13px;color:#4a6080;font-weight:600;margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
+            st.markdown(f'<p style="font-size:13px;color:#5E6675;font-weight:600;margin:1rem 0 0.5rem">{len(fi)} candidato(s)</p>',unsafe_allow_html=True)
             for i,cand in enumerate(fi):
                 cor=cor_avatar(cand["nome"]); dc=cand.get("disponibilidade","Não")
                 bdg='<span class="badge-sim">● Disponível</span>' if dc=="Sim" else '<span class="badge-nao">● Indisponível</span>'
@@ -2221,13 +2222,13 @@ elif pagina == "recrutador":
                     st.markdown(f"""<div class="chamada-card">
                         <div style="display:flex;justify-content:space-between;align-items:center">
                             <div>
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#4a6080;font-weight:600">📅 {ch.get('prazo','—')}</span></div>
-                                <p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:0 0 2px">{ch.get('titulo','—')}</p>
-                                <p style="font-size:12px;color:#4a6080;font-weight:500;margin:0">{ch.get('municipio','—')}/{ch.get('estado','—')} · {ch.get('area','—')}</p>
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#5E6675;font-weight:600">📅 {ch.get('prazo','—')}</span></div>
+                                <p style="font-size:15px;font-weight:700;color:#071D49;margin:0 0 2px">{ch.get('titulo','—')}</p>
+                                <p style="font-size:12px;color:#5E6675;font-weight:500;margin:0">{ch.get('municipio','—')}/{ch.get('estado','—')} · {ch.get('area','—')}</p>
                             </div>
                             <div style="text-align:right">
-                                <p style="font-size:26px;font-weight:800;color:#f0c040;margin:0">{n}</p>
-                                <p style="font-size:11px;color:#4a6080;font-weight:600;margin:0">inscrito(s)</p>
+                                <p style="font-size:26px;font-weight:800;color:#C49A2C;margin:0">{n}</p>
+                                <p style="font-size:11px;color:#5E6675;font-weight:600;margin:0">inscrito(s)</p>
                             </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
@@ -2304,7 +2305,7 @@ elif pagina == "recrutador":
                                                 <p class="cand-sub">{cand.get('formacao','—')} · {cand.get('area','—')}</p>
                                                 <div style="margin-top:4px">{html_selos(cand)}{html_disc(cand)}</div>
                                             </div>
-                                            <div style="font-size:12px;color:#4a6080;font-weight:500">✉ {cand.get('email','—')}</div>
+                                            <div style="font-size:12px;color:#5E6675;font-weight:500">✉ {cand.get('email','—')}</div>
                                         </div>
                                     </div>""",unsafe_allow_html=True)
 
@@ -2315,7 +2316,7 @@ elif pagina == "recrutador":
         </div>""",unsafe_allow_html=True)
         tabs=st.tabs(["Entrar","Criar conta"])
         with tabs[0]:
-            st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Acesse sua conta</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:16px;font-weight:700;color:#071D49;margin:1rem 0">Acesse sua conta</p>',unsafe_allow_html=True)
             with st.form("form_login_recrutador"):
                 el=st.text_input("E-mail institucional",key="le")
                 sl=st.text_input("Senha",type="password",key="ls")
@@ -2330,10 +2331,10 @@ elif pagina == "recrutador":
                         st.rerun()
                     else: st.error("E-mail ou senha incorretos, ou conta ainda não aprovada.")
                 else: st.error("Preencha e-mail e senha.")
-            st.markdown('<p style="font-size:12px;color:#6a6a6a;margin-top:8px">Esqueceu a senha? <a href="?p=esqueci&tipo=recrutador" style="color:#b8973a;font-weight:700">Recuperar acesso →</a></p>', unsafe_allow_html=True)
+            st.markdown('<p style="font-size:12px;color:#5E6675;margin-top:8px">Esqueceu a senha? <a href="?p=esqueci&tipo=recrutador" style="color:#C49A2C;font-weight:700">Recuperar acesso →</a></p>', unsafe_allow_html=True)
         with tabs[1]:
-            st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:1rem 0 0.5rem">Criar conta</p>',unsafe_allow_html=True)
-            st.markdown('<p style="font-size:13px;color:#4a6080;font-weight:500;margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:15px;font-weight:700;color:#071D49;margin:1rem 0 0.5rem">Criar conta</p>',unsafe_allow_html=True)
+            st.markdown('<p style="font-size:13px;color:#5E6675;font-weight:500;margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
             if st.button("Começar →",key="bc"):
                 st.session_state.cad_rec={"etapa":1}; st.rerun()
     else:
@@ -2445,7 +2446,7 @@ elif pagina == "recomendar":
 
             st.markdown(f'''<div class="hero-card">
                 <h1 class="page-title">Avaliação de<br><em>Recomendação.</em></h1>
-                <p class="page-sub">Você foi indicado como recomendador de <strong style="color:#f0c040">{nome_cand}</strong> no JurisBank. Preencha a avaliação abaixo.</p>
+                <p class="page-sub">Você foi indicado como recomendador de <strong style="color:#C49A2C">{nome_cand}</strong> no IndicaJur. Preencha a avaliação abaixo.</p>
             </div>''', unsafe_allow_html=True)
 
             st.markdown(f'''<div class="disclaimer-box">
@@ -2454,7 +2455,7 @@ elif pagina == "recomendar":
             st.markdown("<br>", unsafe_allow_html=True)
 
             with st.form("form_recomendacao"):
-                st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:1rem">Sobre o candidato</p>', unsafe_allow_html=True)
+                st.markdown('<p style="font-size:15px;font-weight:700;color:#071D49;margin-bottom:1rem">Sobre o candidato</p>', unsafe_allow_html=True)
 
                 tempo = st.selectbox("Há quanto tempo conhece o candidato? *", [
                     "Selecione...", "Menos de 1 ano", "1 a 2 anos", "2 a 5 anos", "Mais de 5 anos"
@@ -2466,7 +2467,7 @@ elif pagina == "recomendar":
                 ])
 
                 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin-bottom:1rem">Avaliação profissional</p>', unsafe_allow_html=True)
+                st.markdown('<p style="font-size:15px;font-weight:700;color:#071D49;margin-bottom:1rem">Avaliação profissional</p>', unsafe_allow_html=True)
 
                 pontos_fortes = st.text_area(
                     "Quais os principais pontos fortes do candidato? *",
@@ -2659,10 +2660,10 @@ elif pagina in ["privacidade","termos"]:
         ]
     else:
         secs=[
-            ("1. Aceitação",[("p","Ao usar o JurisBank você concorda com estes Termos e com a Política de Privacidade.")]),
+            ("1. Aceitação",[("p","Ao usar o IndicaJur você concorda com estes Termos e com a Política de Privacidade.")]),
             ("2. Seletivos",[("p","A publicação de um Seletivo não configura processo seletivo vinculante ou concurso público. O uso do ius indicandum é de responsabilidade exclusiva do recrutador.")]),
             ("3. Impessoalidade",[("l",["Princípio da impessoalidade (art. 37, CF/88)","Vedação ao nepotismo (SV nº 13 do STF)","Resolução CNJ nº 07/2005"])]),
-            ("4. Responsabilidades",[("p","O JurisBank não garante contratações e não se responsabiliza por decisões dos recrutadores.")]),
+            ("4. Responsabilidades",[("p","O IndicaJur não garante contratações e não se responsabiliza por decisões dos recrutadores.")]),
             ("5. Foro",[("p","Comarca de [MUNICÍPIO A PREENCHER], Estado de [ESTADO A PREENCHER].")]),
         ]
     for ts,cont in secs:
@@ -2672,4 +2673,4 @@ elif pagina in ["privacidade","termos"]:
             elif tp=="l":
                 for it in tx: st.markdown(f'<p class="doc-item">• {it}</p>',unsafe_allow_html=True)
         st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
-    st.markdown(f'<p style="font-size:12px;color:#4a6080;font-weight:500;text-align:center">JurisBank — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:12px;color:#5E6675;font-weight:500;text-align:center">IndicaJur — Versão 1.0 — {datetime.now().strftime("%d/%m/%Y")}</p>',unsafe_allow_html=True)
