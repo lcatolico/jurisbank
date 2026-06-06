@@ -794,6 +794,13 @@ def parse_data_periodo(valor):
             pass
     return None
 
+def parse_data_br(valor):
+    valor = str(valor or "").strip()
+    try:
+        return datetime.strptime(valor, "%d/%m/%Y").date()
+    except ValueError:
+        return None
+
 def dividir_periodo(valor):
     valor = str(valor or "").replace(" até ", " a ").replace("-", " a ").strip()
     partes = [p.strip() for p in valor.split(" a ") if p.strip()]
@@ -989,7 +996,7 @@ elif cand_logado():
     nav_pages = [
         ("inicio","Meu Perfil"),
         ("perfil","Editar Perfil"),
-        ("chamadas","Seletivos"),
+        ("chamadas","Ver Seletivos"),
     ]
 else:
     nav_pages = [
@@ -1083,7 +1090,6 @@ elif pagina == "inicio":
         if concurso_val != "Não estou estudando para concurso":
             concurso_html = f'<div class="profile-concurso">📚 Estudando para: {html_lib.escape(concurso_val)}</div>'
         interesses = cand.get("area","").strip()
-        subtitulo = interesses or "Perfil profissional em construção"
         status_class = "" if disponivel else "profile-status-off"
         email_link = urllib.parse.quote(cand.get("email",""))
         foto_url = str(cand.get("foto","") or "").strip()
@@ -1104,7 +1110,6 @@ elif pagina == "inicio":
             f'{avatar_html}'
             f'<div>'
             f'<p class="profile-name-main">{html_lib.escape(cand.get("nome",""))}</p>'
-            f'<p class="profile-sub-main">{html_lib.escape(subtitulo)}</p>'
             f'<p class="cand-sub">{html_lib.escape(cand.get("email",""))}</p>'
             f'</div>'
             f'</div>'
@@ -1140,13 +1145,6 @@ elif pagina == "inicio":
             f'</div>'
         )
         st.markdown(perfil_html, unsafe_allow_html=True)
-        cver, cedit, cesp = st.columns([2, 2, 5])
-        with cver:
-            if st.button("Ver seletivos →", key="btn_cand_ver_seletivos"):
-                ir("chamadas")
-        with cedit:
-            if st.button("Editar perfil →", key="btn_cand_editar_perfil"):
-                ir("perfil")
         st.session_state.editar_perfil_candidato = False
 
     else:
@@ -1158,9 +1156,11 @@ elif pagina == "inicio":
         tabs = st.tabs(["Já tenho cadastro","Cadastrar-me"])
         with tabs[0]:
             st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Entrar no meu perfil</p>', unsafe_allow_html=True)
-            email_login = st.text_input("E-mail cadastrado", key="login_candidato_inicio")
-            senha_login = st.text_input("Senha", type="password", key="senha_candidato_inicio", help="Perfis antigos sem senha ainda podem entrar apenas com o e-mail.")
-            if st.button("Entrar", key="btn_login_candidato_inicio"):
+            with st.form("form_login_candidato_inicio"):
+                email_login = st.text_input("E-mail cadastrado", key="login_candidato_inicio")
+                senha_login = st.text_input("Senha", type="password", key="senha_candidato_inicio", help="Perfis antigos sem senha ainda podem entrar apenas com o e-mail.")
+                entrar_login = st.form_submit_button("Entrar")
+            if entrar_login:
                 if not email_login:
                     st.error("Informe seu e-mail.")
                 elif login_candidato(email_login, senha_login, permitir_sem_senha=True):
@@ -1189,20 +1189,19 @@ elif pagina == "perfil":
             <h1 class="edit-title">Editar <em>Perfil.</em></h1>
             <p class="page-sub">Entre com e-mail e senha para alterar suas informações profissionais.</p>
         </div>""", unsafe_allow_html=True)
-        email_editar = st.text_input("E-mail cadastrado", value=email_param, key="login_editar_email")
-        senha_editar = st.text_input("Senha", type="password", key="login_editar_senha")
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("Entrar e editar perfil", key="btn_login_editar_perfil"):
-                if not email_editar:
-                    st.error("Informe seu e-mail.")
-                elif login_candidato(email_editar, senha_editar, permitir_sem_senha=True):
-                    st.rerun()
-                else:
-                    st.error("E-mail ou senha inválidos.")
-        with c2:
-            if st.button("Voltar à Área do Candidato", key="btn_voltar_login_cand"):
-                ir("inicio")
+        with st.form("form_login_editar_perfil"):
+            email_editar = st.text_input("E-mail cadastrado", value=email_param, key="login_editar_email")
+            senha_editar = st.text_input("Senha", type="password", key="login_editar_senha")
+            entrar_editar = st.form_submit_button("Entrar e editar perfil")
+        if entrar_editar:
+            if not email_editar:
+                st.error("Informe seu e-mail.")
+            elif login_candidato(email_editar, senha_editar, permitir_sem_senha=True):
+                st.rerun()
+            else:
+                st.error("E-mail ou senha inválidos.")
+        if st.button("Voltar à Área do Candidato", key="btn_voltar_login_cand"):
+            ir("inicio")
     else:
         cand = st.session_state.cand_logado
         formacoes_base = formacoes_candidato(cand) or [{"grau":"Bacharel em Direito","instituicao":"","periodo":""}]
@@ -1495,9 +1494,11 @@ elif pagina == "chamadas":
 
     if not cand_logado() and not rec_logado():
         with st.expander("Sou candidato cadastrado — quero me inscrever"):
-            em=st.text_input("Seu e-mail cadastrado",key="cl")
-            sn=st.text_input("Senha",type="password",key="cl_senha")
-            if st.button("Acessar",key="bcl"):
+            with st.form("form_login_candidato_chamadas"):
+                em=st.text_input("Seu e-mail cadastrado",key="cl")
+                sn=st.text_input("Senha",type="password",key="cl_senha")
+                acessar_chamadas = st.form_submit_button("Acessar")
+            if acessar_chamadas:
                 cf=login_candidato(em, sn, permitir_sem_senha=True)
                 if cf: st.success(f"Bem-vindo, {cf['nome'].split()[0]}!"); st.rerun()
                 else: st.error("E-mail ou senha inválidos.")
@@ -1844,8 +1845,11 @@ elif pagina == "recrutador":
                         st.success("Perfil do recrutador atualizado.")
                         st.rerun()
             if st.button("Lançar Novo Seletivo", key="btn_lancar_seletivo_perfil_rec"):
-                st.session_state.rec_dashboard = "seletivos"
+                st.session_state.rec_dashboard = "novo_seletivo"
                 st.session_state["criar_ch"] = True
+                st.rerun()
+            if st.button("Meus Seletivos", key="btn_meus_seletivos_perfil_rec"):
+                st.session_state.rec_dashboard = "seletivos"
                 st.rerun()
 
         if st.session_state.rec_dashboard == "banco":
@@ -1958,14 +1962,14 @@ elif pagina == "recrutador":
                             if st.button("Fechar",key=f"fc{i}"):
                                 del st.session_state["cr"]; st.rerun()
 
-        if st.session_state.rec_dashboard == "seletivos":
-            st.markdown('<p class="section-label">Dashboard de Seletivos</p>',unsafe_allow_html=True)
-            st.markdown('<div class="info-box">Crie, acompanhe e encerre Seletivos com critérios objetivos, etapas e histórico interno.</div>',unsafe_allow_html=True)
-            ch_col,btn_col=st.columns([8,3])
-            with ch_col: st.markdown('<p style="font-size:15px;font-weight:700;color:#1e1e1e">Meus Seletivos</p>',unsafe_allow_html=True)
-            with btn_col:
-                if st.button("+ Novo Seletivo",key="nch"):
-                    st.session_state["criar_ch"]=True; st.rerun()
+        if st.session_state.rec_dashboard in ["novo_seletivo","seletivos"]:
+            if st.session_state.rec_dashboard == "novo_seletivo":
+                st.markdown('<p class="section-label">Lançar Novo Seletivo</p>',unsafe_allow_html=True)
+                st.markdown('<div class="info-box">Preencha os dados do Seletivo, etapas previstas e prazos de cada etapa.</div>',unsafe_allow_html=True)
+                st.session_state["criar_ch"]=True
+            else:
+                st.markdown('<p class="section-label">Meus Seletivos</p>',unsafe_allow_html=True)
+                st.markdown('<div class="info-box">Consulte, edite, acompanhe inscritos e encerre Seletivos publicados.</div>',unsafe_allow_html=True)
 
             if st.session_state.get("criar_ch"):
                 with st.expander("Novo Seletivo",expanded=True):
@@ -1986,7 +1990,7 @@ elif pagina == "recrutador":
                     with c3: vch=st.number_input("Vagas *",min_value=1,max_value=20,value=1)
                     c1,c2=st.columns(2)
                     with c1: fsch=st.selectbox("Forma de seleção *",["Selecione..."]+FORMAS_SELECAO)
-                    with c2: prch=st.date_input("Prazo *",min_value=date.today())
+                    with c2: prch_txt=st.text_input("Prazo final para inscrições *",placeholder="dd/mm/aaaa")
                     st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
                     st.markdown('<p class="section-label">Etapas do Seletivo</p>',unsafe_allow_html=True)
                     etapas=st.multiselect(
@@ -1994,30 +1998,50 @@ elif pagina == "recrutador":
                         ["Triagem por currículo","Entrevista estruturada","Teste de escrita","Prova prática/minuta","Checagem de referências"],
                         default=["Triagem por currículo"]
                     )
+                    prazos_etapas = {}
+                    if etapas:
+                        st.markdown('<div class="info-box">Informe o prazo final previsto para cada etapa selecionada. Use o formato dd/mm/aaaa.</div>', unsafe_allow_html=True)
+                        for etapa in etapas:
+                            etapa_key = re.sub(r"[^a-zA-Z0-9]+", "_", etapa).strip("_").lower()
+                            prazos_etapas[etapa] = st.text_input(f"Prazo final - {etapa}", placeholder="dd/mm/aaaa", key=f"novo_sel_prazo_etapa_{etapa_key}")
                     organizacao_etapas=st.text_area("Como pretende organizar as etapas?",height=100,placeholder="Ex: primeiro análise curricular; depois entrevista com lista curta; se necessário, teste de escrita com prazo de 2 horas.")
                     comunicacao=st.text_area("Mensagem aos candidatos compatíveis",height=70,placeholder="Texto breve para orientar candidatos sobre o Seletivo e as próximas etapas.")
                     st.markdown("<br>",unsafe_allow_html=True)
                     c1,c2=st.columns(2)
                     with c1:
-                        if st.button("Cancelar",key="cch"): del st.session_state["criar_ch"]; st.rerun()
+                        if st.button("Cancelar",key="cch"):
+                            del st.session_state["criar_ch"]
+                            st.session_state.rec_dashboard="seletivos"
+                            st.rerun()
                     with c2:
                         if st.button("Publicar →",key="pch"):
-                            ok=all([tch,och,toch!="Selecione...",ach,ech!="Selecione...",mch_,rch,remch,regch!="Selecione...",fsch!="Selecione..."])
+                            prazo_principal = parse_data_br(prch_txt)
+                            prazos_invalidos = [et for et, dtxt in prazos_etapas.items() if not parse_data_br(dtxt)]
+                            ok=all([tch,och,toch!="Selecione...",ach,ech!="Selecione...",mch_,rch,remch,regch!="Selecione...",fsch!="Selecione...",prazo_principal])
                             if not ok: st.error("Preencha todos os campos.")
+                            elif prazos_invalidos: st.error("Informe os prazos das etapas no formato dd/mm/aaaa.")
                             else:
+                                etapas_descritas = []
+                                for etapa in etapas:
+                                    etapas_descritas.append(f"{etapa} até {prazos_etapas.get(etapa,'Não informado')}")
                                 plano_seletivo = [
                                     rch.strip(),
                                     "",
-                                    "Etapas: " + (", ".join(etapas) if etapas else "Não informado"),
+                                    "Etapas e prazos: " + ("; ".join(etapas_descritas) if etapas_descritas else "Não informado"),
                                     "Organização das etapas: " + (organizacao_etapas.strip() or "Não informado"),
                                     "Mensagem aos candidatos: " + (comunicacao.strip() or "Não informado"),
                                 ]
-                                aba_chamadas.append_row([gerar_id(),tch,och,toch,", ".join(ach),ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prch.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
-                                del st.session_state["criar_ch"]; st.success("Seletivo publicado!"); st.rerun()
+                                aba_chamadas.append_row([gerar_id(),tch,och,toch,", ".join(ach),ech,mch_,"\n".join(plano_seletivo),remch,regch,fsch,str(vch),prazo_principal.strftime("%d/%m/%Y"),"aberto",rec["email"],"",datetime.now().strftime("%d/%m/%Y")])
+                                del st.session_state["criar_ch"]; st.session_state.rec_dashboard="seletivos"; st.success("Seletivo publicado!"); st.rerun()
 
-            if not mch: st.info("Nenhum Seletivo publicado ainda.")
+            if st.session_state.rec_dashboard == "novo_seletivo":
+                pass
+            elif not mch: st.info("Nenhum Seletivo publicado ainda.")
             else:
                 for i,ch in enumerate(mch):
+                    ch_key = re.sub(r"[^a-zA-Z0-9_]+", "_", str(ch.get("id") or i))
+                    painel_inscritos_key = f"painel_inscritos_{ch_key}"
+                    painel_editar_key = f"painel_editar_{ch_key}"
                     ab=ch_aberta(ch); ins_=inscritos(ch); n=len(ins_)
                     sb='<span class="badge-aberta">● Aberta</span>' if ab else '<span class="badge-encerrada">● Encerrada</span>'
                     st.markdown(f"""<div class="chamada-card">
@@ -2035,11 +2059,11 @@ elif pagina == "recrutador":
                     </div>""",unsafe_allow_html=True)
                     cv,ced,ce=st.columns([6,2,2])
                     with cv:
-                        if st.button("Ver inscritos",key=f"vi{i}"):
-                            st.session_state[f"vi{i}"]=not st.session_state.get(f"vi{i}",False); st.rerun()
+                        if st.button("Ver inscritos",key=f"btn_vi_{ch_key}"):
+                            st.session_state[painel_inscritos_key]=not st.session_state.get(painel_inscritos_key,False); st.rerun()
                     with ced:
-                        if st.button("Editar",key=f"edch{i}"):
-                            st.session_state[f"edch{i}"]=not st.session_state.get(f"edch{i}",False); st.rerun()
+                        if st.button("Editar",key=f"btn_edch_{ch_key}"):
+                            st.session_state[painel_editar_key]=not st.session_state.get(painel_editar_key,False); st.rerun()
                     with ce:
                         if ab:
                             if st.button("Encerrar",key=f"enc{i}"):
@@ -2047,7 +2071,7 @@ elif pagina == "recrutador":
                                 idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
                                 if idx is not None: aba_chamadas.update_cell(idx+2,14,"encerrado")
                                 st.success("Encerrada."); st.rerun()
-                    if st.session_state.get(f"edch{i}"):
+                    if st.session_state.get(painel_editar_key):
                         with st.expander("Editar Seletivo",expanded=True):
                             with st.form(f"form_editar_chamada_{i}"):
                                 etitulo=st.text_input("Título",value=ch.get("titulo",""),key=f"edit_ch_tit_{i}")
@@ -2073,7 +2097,7 @@ elif pagina == "recrutador":
                                     aba_chamadas.update_cell(linha,11,eforma)
                                     st.success("Seletivo atualizado.")
                                     st.rerun()
-                    if st.session_state.get(f"vi{i}"):
+                    if st.session_state.get(painel_inscritos_key):
                         with st.expander("Painel de inscritos",expanded=True):
                             if not ins_: st.info("Nenhum inscrito.")
                             else:
@@ -2115,9 +2139,11 @@ elif pagina == "recrutador":
         tabs=st.tabs(["Entrar","Criar conta"])
         with tabs[0]:
             st.markdown('<p style="font-size:16px;font-weight:700;color:#0d1f4e;margin:1rem 0">Acesse sua conta</p>',unsafe_allow_html=True)
-            el=st.text_input("E-mail institucional",key="le")
-            sl=st.text_input("Senha",type="password",key="ls")
-            if st.button("Entrar →",key="bl"):
+            with st.form("form_login_recrutador"):
+                el=st.text_input("E-mail institucional",key="le")
+                sl=st.text_input("Senha",type="password",key="ls")
+                entrar_rec = st.form_submit_button("Entrar →")
+            if entrar_rec:
                 if el and sl:
                     recs_=aba_recrutadores.get_all_records(); sh=hash_senha(sl)
                     enc=next((r for r in recs_ if r["email"]==el and r["senha"]==sh and r["status"]=="ativo"),None)
