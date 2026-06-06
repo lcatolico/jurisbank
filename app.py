@@ -584,7 +584,11 @@ def validar_token_recrutador(token):
         email, assinatura = base64.urlsafe_b64decode((token + padding).encode("utf-8")).decode("utf-8").split("|", 1)
     except Exception:
         return None
-    for rec in aba_recrutadores.get_all_records():
+    for rec in leitura_planilha_segura(
+        registros_recrutadores_cache,
+        "sheet_error_recrutadores",
+        "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes."
+    ):
         if str(rec.get("email","")).strip().lower() == email and str(rec.get("status","")).lower() == "ativo":
             esperado = token_recrutador(rec)
             if esperado == token:
@@ -679,8 +683,40 @@ def extrair_campos(txt):
 def calc_selos(oab,anos,carta,aval):
     return {"verificado":"Sim" if oab=="Sim" else "Não","recomendado":"Sim" if carta else "Não","destaque":"Sim" if aval else "Não","experiente":"Sim" if anos>=2 else "Não"}
 
+@st.cache_data(ttl=60, show_spinner=False)
+def registros_candidatos_cache():
+    return aba_candidatos.get_all_records()
+
+@st.cache_data(ttl=60, show_spinner=False)
+def registros_recrutadores_cache():
+    return aba_recrutadores.get_all_records()
+
+@st.cache_data(ttl=60, show_spinner=False)
+def registros_chamadas_cache():
+    return aba_chamadas.get_all_records()
+
+def leitura_planilha_segura(funcao_cache, chave_erro, mensagem):
+    try:
+        dados = funcao_cache()
+        st.session_state.pop(chave_erro, None)
+        return dados
+    except gspread.exceptions.APIError:
+        st.session_state[chave_erro] = mensagem
+        return []
+    except Exception:
+        st.session_state[chave_erro] = mensagem
+        return []
+
 def linha_candidato(email):
-    todos = aba_candidatos.get_all_records()
+    try:
+        todos = registros_candidatos_cache()
+        st.session_state.pop("sheet_error_candidatos", None)
+    except gspread.exceptions.APIError:
+        st.session_state.sheet_error_candidatos = "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes."
+        return None, None
+    except Exception:
+        st.session_state.sheet_error_candidatos = "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes."
+        return None, None
     email = str(email or "").strip().lower()
     for i, cand in enumerate(todos):
         if str(cand.get("email","")).strip().lower() == email:
@@ -741,7 +777,11 @@ def restaurar_recrutador_da_sessao():
     email = str(st.session_state.get("rec_email_logado", "") or "").strip().lower()
     if rec_logado() or not email:
         return
-    for rec in aba_recrutadores.get_all_records():
+    for rec in leitura_planilha_segura(
+        registros_recrutadores_cache,
+        "sheet_error_recrutadores",
+        "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes."
+    ):
         if str(rec.get("email", "")).strip().lower() == email:
             st.session_state.rec_logado = rec
             st.session_state.rec_auth_token = token_recrutador(rec)
@@ -983,6 +1023,10 @@ def salvar_candidato_batch(aba, linha, dados: dict):
             updates.append({"range": cell, "values": [[dados[campo]]]})
     if updates:
         aba.batch_update(updates, value_input_option="RAW")
+        try:
+            registros_candidatos_cache.clear()
+        except Exception:
+            pass
 
 
 def salvar_recrutador_batch(aba, linha, dados: dict):
@@ -1561,6 +1605,8 @@ elif pagina == "inicio":
                     st.query_params["cauth"]=st.session_state.cand_auth_token
                     st.success("Bem-vindo ao IndicaJur.")
                     st.rerun()
+                elif st.session_state.get("sheet_error_candidatos"):
+                    st.error(st.session_state.sheet_error_candidatos)
                 else:
                     st.error("E-mail ou senha inválidos.")
             st.markdown('<p style="font-size:12px;color:#5E6675;margin-top:8px">Esqueceu a senha? <a href="?p=esqueci" style="color:#C49A2C;font-weight:700">Recuperar acesso →</a></p>', unsafe_allow_html=True)
@@ -1640,6 +1686,8 @@ elif pagina == "perfil":
                 st.query_params["p"]="perfil"
                 st.query_params["cauth"]=st.session_state.cand_auth_token
                 st.rerun()
+            elif st.session_state.get("sheet_error_candidatos"):
+                st.error(st.session_state.sheet_error_candidatos)
             else:
                 st.error("E-mail ou senha inválidos.")
         if st.button("Voltar à Área do Candidato", key="btn_voltar_login_cand"):
@@ -1942,6 +1990,8 @@ elif pagina == "chamadas":
                     st.query_params["p"]="chamadas"
                     st.query_params["cauth"]=st.session_state.cand_auth_token
                     st.success(f"Bem-vindo, {cf['nome'].split()[0]}!"); st.rerun()
+                elif st.session_state.get("sheet_error_candidatos"):
+                    st.error(st.session_state.sheet_error_candidatos)
                 else: st.error("E-mail ou senha inválidos.")
 
     if cand_logado():
@@ -2307,6 +2357,10 @@ elif pagina == "cadastro":
                     pd_,_,desc=calc_disc(rd)
                     try:
                         aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Nao estou estudando para concurso"),d.get("senha",""),d.get("foto",""),d.get("pais","Brasil"),d.get("cpf",""),d.get("celular",""),d.get("nascimento","")])
+                        try:
+                            registros_candidatos_cache.clear()
+                        except Exception:
+                            pass
                         st.session_state.cadastro_sucesso_email = d["email"]
                         st.session_state.cadastro_sucesso_nome = d["nome"]
                         st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}; st.session_state.cadastro_base={}
@@ -2342,7 +2396,18 @@ elif pagina == "cadastro_sucesso":
 elif pagina == "recrutador":
     if rec_logado():
         rec=st.session_state.rec_logado
-        dados=aba_candidatos.get_all_records(); recs=aba_recrutadores.get_all_records()
+        dados=leitura_planilha_segura(
+            registros_candidatos_cache,
+            "sheet_error_candidatos",
+            "Não foi possível consultar a base de candidatos agora. Tente novamente em alguns instantes."
+        )
+        recs=leitura_planilha_segura(
+            registros_recrutadores_cache,
+            "sheet_error_recrutadores",
+            "Não foi possível consultar a base de recrutadores agora. Tente novamente em alguns instantes."
+        )
+        if st.session_state.get("sheet_error_candidatos") or st.session_state.get("sheet_error_recrutadores"):
+            st.warning(st.session_state.get("sheet_error_candidatos") or st.session_state.get("sheet_error_recrutadores"))
         idx_r=next((i for i,r in enumerate(recs) if r["email"]==rec["email"]),None)
         ra=recs[idx_r] if idx_r is not None else rec
         favs=[f.strip() for f in str(ra.get("favoritos","")).split(",") if f.strip()]
@@ -2350,7 +2415,14 @@ elif pagina == "recrutador":
         for it in str(ra.get("anotacoes","")).split("|"):
             if "::" in it:
                 ec,nt=it.split("::",1); anots[ec.strip()]=nt.strip()
-        mch=[ch for ch in aba_chamadas.get_all_records() if ch.get("email_recrutador")==rec["email"]]
+        chamadas_rec=leitura_planilha_segura(
+            registros_chamadas_cache,
+            "sheet_error_chamadas",
+            "Não foi possível consultar os Seletivos agora. Tente novamente em alguns instantes."
+        )
+        if st.session_state.get("sheet_error_chamadas"):
+            st.warning(st.session_state.sheet_error_chamadas)
+        mch=[ch for ch in chamadas_rec if ch.get("email_recrutador")==rec["email"]]
 
         st.markdown(f"""<div class="hero-card">
             <h1 class="page-title">Olá, <em>{rec['nome'].split()[0]}!</em></h1>
