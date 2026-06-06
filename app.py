@@ -148,11 +148,17 @@ header[data-testid="stHeader"] { display: none !important; }
 .profile-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .profile-action { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 16px; border-radius: 10px; background: #fff8e6; border: 1.5px solid #C49A2C; color: #C49A2C !important; text-decoration: none !important; font-size: 12px; font-weight: 900; }
 .profile-action:hover { background: #C49A2C; color: #071D49 !important; }
+.rec-action-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 18px 0 4px; max-width: 720px; }
+.rec-action-card { display: flex; flex-direction: column; gap: 4px; min-height: 78px; justify-content: center; padding: 16px 18px; border-radius: 14px; background: #ffffff; border: 1.5px solid #D9D2C3; color: #071D49 !important; text-decoration: none !important; box-shadow: 0 12px 28px rgba(7,29,73,0.06); transition: all .18s ease; }
+.rec-action-card.primary { background: #071D49; border-color: #071D49; color: #ffffff !important; }
+.rec-action-card:hover { transform: translateY(-1px); border-color: #C49A2C; box-shadow: 0 16px 34px rgba(7,29,73,0.1); }
+.rec-action-title { font-size: 14px; font-weight: 900; color: inherit !important; }
+.rec-action-text { font-size: 12px; font-weight: 600; color: inherit !important; opacity: .72; line-height: 1.35; }
 .edit-hero { background: #ffffff; border: 1.5px solid #D9D2C3; border-radius: 16px; padding: 1.35rem 1.6rem; margin-bottom: 1.2rem; box-shadow: 0 8px 24px rgba(13,31,78,0.05); }
 .edit-title { font-family: 'Cormorant Garamond',serif; font-size: 32px; font-weight: 700; color: #071D49; margin: 0 0 4px; line-height: 1.05; }
 .edit-title em { font-style: normal; color: #C49A2C; }
 .edit-sub { font-size: 13px; color: #5E6675; margin: 0; font-weight: 600; }
-@media (max-width: 760px) { .profile-panel { max-width: none; padding: 22px; } .profile-detail-grid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .profile-panel { max-width: none; padding: 22px; } .profile-detail-grid, .rec-action-row { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .topbar { padding: 0.9rem 1rem; } .topbar-logo { min-width: 160px; } .topbar-nav { width: 100%; justify-content: flex-start; } }
 .page-title { font-family: 'Cormorant Garamond',serif; font-size: clamp(32px,4vw,50px); font-weight: 700; color: #071D49; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.05; }
 .page-title em { font-style: normal; background: linear-gradient(135deg,#C49A2C,#C49A2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -1109,7 +1115,7 @@ if rec_logado() and pagina == "recrutador":
     dash_param = params.get("dash", "")
     if isinstance(dash_param, list):
         dash_param = dash_param[0]
-    if dash_param in ["perfil","seletivos","banco"]:
+    if dash_param in ["perfil","editar_rec","novo_seletivo","seletivos","banco"]:
         st.session_state.rec_dashboard = dash_param
     sair_param = params.get("sair", "")
     if isinstance(sair_param, list):
@@ -1155,7 +1161,7 @@ for pg, lb in nav_pages:
 
 if rec_logado():
     dash_atual = st.session_state.get("rec_dashboard","perfil")
-    for dash, lb in [("perfil","Perfil"),("seletivos","Seletivos"),("banco","Banco de Candidatos")]:
+    for dash, lb in [("perfil","Perfil"),("editar_rec","Editar Perfil"),("seletivos","Seletivos"),("banco","Banco de Candidatos")]:
         active = "active" if pagina == "recrutador" and dash_atual == dash else ""
         nav_html += f'<a href="?p=recrutador&dash={dash}" class="{active}">{lb}</a>'
     nav_html += '<a href="?p=recrutador&sair=1" class="btn-rec">Sair</a>'
@@ -1650,9 +1656,12 @@ elif pagina == "candidatos":
 # ── PÁGINA: CHAMADAS ──────────────────────────────────────────────────────────
 elif pagina == "chamadas":
     todas = aba_chamadas.get_all_records()
+    restaurar_candidato_da_sessao()
     email_param = params.get("email", "")
     if isinstance(email_param, list):
         email_param = email_param[0]
+    if not cand_logado() and st.session_state.get("cand_email_logado"):
+        login_candidato(st.session_state.get("cand_email_logado"), permitir_sem_senha=True)
     if email_param and not cand_logado():
         login_candidato(email_param, permitir_sem_senha=True)
 
@@ -1725,7 +1734,7 @@ elif pagina == "chamadas":
                     st.session_state[f"ci{i}"]=True; st.rerun()
             elif ja: st.markdown('<span class="badge-inscrito">✓ Inscrito</span>',unsafe_allow_html=True)
             elif not cand_logado() and ab:
-                if st.button("Entrar para se inscrever", key=f"login_insc_{i}"):
+                if st.button("Entrar como candidato", key=f"login_insc_{i}"):
                     ir("inicio")
 
         if st.session_state.get(f"ci{i}"):
@@ -1985,44 +1994,51 @@ elif pagina == "recrutador":
                 <div class="profile-section-card"><p class="profile-section-title">Responsável</p><div class="profile-list-item">{html_lib.escape(rec.get('nome','—'))}</div></div>
                 <div class="profile-section-card"><p class="profile-section-title">E-mail</p><div class="profile-list-item">{html_lib.escape(rec.get('email','—'))}</div></div>
             </div>""",unsafe_allow_html=True)
-            with st.expander("Editar Perfil do Recrutador", expanded=False):
-                with st.form("form_editar_recrutador"):
-                    c1,c2=st.columns(2)
-                    with c1:
-                        rec_nome=st.text_input("Nome do responsável",value=ra.get("nome",rec.get("nome","")))
-                        rec_estado=st.selectbox("Estado",ESTADOS,index=ESTADOS.index(ra.get("estado",rec.get("estado","SC"))) if ra.get("estado",rec.get("estado","")) in ESTADOS else 0)
-                        rec_orgao=st.selectbox("Tipo de órgão",ORGAOS,index=ORGAOS.index(ra.get("orgao","")) if ra.get("orgao","") in ORGAOS else 0)
-                    with c2:
-                        rec_municipio=st.text_input("Município",value=ra.get("municipio",""))
-                        rec_nome_orgao=st.text_input("Nome do órgão",value=ra.get("nome_orgao",rec.get("orgao","")))
-                        rec_cargo=st.selectbox("Cargo",CARGOS,index=CARGOS.index(ra.get("cargo","")) if ra.get("cargo","") in CARGOS else 0)
-                    rec_areas=st.multiselect("Áreas de interesse do órgão",AREAS,default=lista_selecionada(ra.get("areas",""),AREAS))
-                    salvar_rec=st.form_submit_button("Salvar perfil")
-                if salvar_rec:
-                    if idx_r is None:
-                        st.error("Não encontrei seu cadastro de recrutador.")
-                    else:
-                        payload_rec = {
-                            "nome": rec_nome, "estado": rec_estado,
-                            "municipio": rec_municipio, "orgao": rec_orgao,
-                            "nome_orgao": rec_nome_orgao, "cargo": rec_cargo,
-                            "areas": ", ".join(rec_areas),
-                        }
-                        try:
-                            salvar_recrutador_batch(aba_recrutadores, idx_r+2, payload_rec)
-                            st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
-                            st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
-                            st.success("Perfil do recrutador atualizado.")
-                            st.rerun()
-                        except Exception as e:
-                            st.error(f"Erro ao salvar perfil. Tente novamente. ({e})")
-            if st.button("Lançar Novo Seletivo", key="btn_lancar_seletivo_perfil_rec"):
-                st.session_state.rec_dashboard = "novo_seletivo"
-                st.session_state["criar_ch"] = True
-                st.rerun()
-            if st.button("Meus Seletivos", key="btn_meus_seletivos_perfil_rec"):
-                st.session_state.rec_dashboard = "seletivos"
-                st.rerun()
+            st.markdown("""<div class="rec-action-row">
+                <a class="rec-action-card primary" href="?p=recrutador&dash=novo_seletivo">
+                    <span class="rec-action-title">Novo Seletivo</span>
+                    <span class="rec-action-text">Publicar oportunidade, etapas e prazos.</span>
+                </a>
+                <a class="rec-action-card" href="?p=recrutador&dash=seletivos">
+                    <span class="rec-action-title">Meus Seletivos</span>
+                    <span class="rec-action-text">Acompanhar inscritos, editar e encerrar.</span>
+                </a>
+            </div>""", unsafe_allow_html=True)
+
+
+        if st.session_state.rec_dashboard == "editar_rec":
+            st.markdown('<p class="section-label">Editar Perfil do Recrutador</p>', unsafe_allow_html=True)
+            st.markdown('<div class="info-box">Atualize os dados institucionais usados no perfil, nos Seletivos e na comunicação com candidatos.</div>', unsafe_allow_html=True)
+            with st.form("form_editar_recrutador"):
+                c1,c2=st.columns(2)
+                with c1:
+                    rec_nome=st.text_input("Nome do responsável",value=ra.get("nome",rec.get("nome","")))
+                    rec_estado=st.selectbox("Estado",ESTADOS,index=ESTADOS.index(ra.get("estado",rec.get("estado","SC"))) if ra.get("estado",rec.get("estado","")) in ESTADOS else 0)
+                    rec_orgao=st.selectbox("Tipo de órgão",ORGAOS,index=ORGAOS.index(ra.get("orgao","")) if ra.get("orgao","") in ORGAOS else 0)
+                with c2:
+                    rec_municipio=st.text_input("Município",value=ra.get("municipio",""))
+                    rec_nome_orgao=st.text_input("Nome do órgão",value=ra.get("nome_orgao",rec.get("orgao","")))
+                    rec_cargo=st.selectbox("Cargo",CARGOS,index=CARGOS.index(ra.get("cargo","")) if ra.get("cargo","") in CARGOS else 0)
+                rec_areas=st.multiselect("Áreas de interesse do órgão",AREAS,default=lista_selecionada(ra.get("areas",""),AREAS))
+                salvar_rec=st.form_submit_button("Salvar perfil")
+            if salvar_rec:
+                if idx_r is None:
+                    st.error("Não encontrei seu cadastro de recrutador.")
+                else:
+                    payload_rec = {
+                        "nome": rec_nome, "estado": rec_estado,
+                        "municipio": rec_municipio, "orgao": rec_orgao,
+                        "nome_orgao": rec_nome_orgao, "cargo": rec_cargo,
+                        "areas": ", ".join(rec_areas),
+                    }
+                    try:
+                        salvar_recrutador_batch(aba_recrutadores, idx_r+2, payload_rec)
+                        st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
+                        st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
+                        st.success("Perfil do recrutador atualizado.")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro ao salvar perfil. Tente novamente. ({e})")
 
         if st.session_state.rec_dashboard == "banco":
             st.markdown('<p class="section-label">Dashboard do Banco de Candidatos</p>',unsafe_allow_html=True)
