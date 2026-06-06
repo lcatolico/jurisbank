@@ -585,6 +585,28 @@ def validar_token_recrutador(token):
 def auth_rec_query():
     token = st.session_state.get("rec_auth_token", "")
     return f"&auth={urllib.parse.quote(token)}" if token else ""
+def token_candidato(cand):
+    email = str(cand.get("email","") or "").strip().lower()
+    senha = senha_candidato(cand)
+    assinatura = hashlib.sha256(f"{email}|{senha}|{auth_salt()}".encode()).hexdigest()
+    bruto = f"{email}|{assinatura}".encode("utf-8")
+    return base64.urlsafe_b64encode(bruto).decode("utf-8").rstrip("=")
+def validar_token_candidato(token):
+    token = str(token or "").strip()
+    if not token:
+        return None
+    try:
+        padding = "=" * (-len(token) % 4)
+        email, assinatura = base64.urlsafe_b64decode((token + padding).encode("utf-8")).decode("utf-8").split("|", 1)
+    except Exception:
+        return None
+    _, cand = linha_candidato(email)
+    if cand and token_candidato(cand) == token:
+        return cand
+    return None
+def auth_cand_query():
+    token = st.session_state.get("cand_auth_token", "")
+    return f"&cauth={urllib.parse.quote(token)}" if token else ""
 def gerar_id(): return f"ch_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 def anos_num(v):
     m = re.search(r"\d+", str(v or ""))
@@ -601,6 +623,10 @@ def ir(p):
     st.session_state.pagina=p
     st.query_params.clear()
     st.query_params["p"]=p
+    if p == "recrutador" and st.session_state.get("rec_auth_token"):
+        st.query_params["auth"] = st.session_state.rec_auth_token
+    if p in ["inicio","perfil","cadastro","chamadas"] and st.session_state.get("cand_auth_token"):
+        st.query_params["cauth"] = st.session_state.cand_auth_token
     st.rerun()
 
 def extrair_pdf(f):
@@ -670,16 +696,28 @@ def login_candidato(email, senha=None, permitir_sem_senha=True):
             return None
         st.session_state.cand_logado = cand
         st.session_state.cand_email_logado = cand.get("email", "")
+        st.session_state.cand_auth_token = token_candidato(cand)
         return cand
     return None
 
 def restaurar_candidato_da_sessao():
+    cauth_param = st.query_params.get("cauth", "")
+    if isinstance(cauth_param, list):
+        cauth_param = cauth_param[0]
+    if not cand_logado() and cauth_param:
+        cand_token = validar_token_candidato(cauth_param)
+        if cand_token:
+            st.session_state.cand_logado = cand_token
+            st.session_state.cand_email_logado = cand_token.get("email", "")
+            st.session_state.cand_auth_token = cauth_param
+            return
     email = str(st.session_state.get("cand_email_logado", "") or "").strip().lower()
     if cand_logado() or not email:
         return
     _, cand = linha_candidato(email)
     if cand:
         st.session_state.cand_logado = cand
+        st.session_state.cand_auth_token = token_candidato(cand)
 
 def restaurar_recrutador_da_sessao():
     auth_param = st.query_params.get("auth", "")
@@ -1234,6 +1272,7 @@ if cand_logado() and pagina in PAGINAS_CANDIDATO:
     if sair_cand_param == "1":
         del st.session_state.cand_logado
         st.session_state.pop("cand_email_logado", None)
+        st.session_state.pop("cand_auth_token", None)
         ir("publico")
 
 if rec_logado():
@@ -1259,7 +1298,8 @@ for pg, lb in nav_pages:
             active = "active"
         elif lb == "Sou Recrutador" and pagina == "recrutador":
             active = "active"
-    nav_html += f'<a href="?p={pg}" class="{active}">{lb}</a>'
+    auth_pg = auth_cand_query() if cand_logado() and pg in PAGINAS_CANDIDATO else ""
+    nav_html += f'<a href="?p={pg}{auth_pg}" class="{active}">{lb}</a>'
 
 if rec_logado():
     dash_atual = st.session_state.get("rec_dashboard","perfil")
@@ -1269,7 +1309,7 @@ if rec_logado():
         nav_html += f'<a href="?p=recrutador&dash={dash}{auth_qs}" class="{active}">{lb}</a>'
     nav_html += f'<a href="?p=recrutador&sair=1{auth_qs}" class="btn-rec">Sair</a>'
 elif cand_logado() and pagina in PAGINAS_CANDIDATO:
-    nav_html += '<a href="?p=inicio&sair_cand=1" class="btn-rec">Sair</a>'
+    nav_html += f'<a href="?p=inicio&sair_cand=1{auth_cand_query()}" class="btn-rec">Sair</a>'
 
 nav_html += '</div></div>'
 st.markdown(nav_html, unsafe_allow_html=True)
@@ -1444,6 +1484,8 @@ elif pagina == "inicio":
                 if not email_login:
                     st.error("Informe seu e-mail.")
                 elif login_candidato(email_login, senha_login, permitir_sem_senha=True):
+                    st.query_params["p"]="inicio"
+                    st.query_params["cauth"]=st.session_state.cand_auth_token
                     st.success("Bem-vindo ao IndicaJur.")
                     st.rerun()
                 else:
@@ -1478,6 +1520,8 @@ elif pagina == "perfil":
             if not email_editar:
                 st.error("Informe seu e-mail.")
             elif login_candidato(email_editar, senha_editar, permitir_sem_senha=True):
+                st.query_params["p"]="perfil"
+                st.query_params["cauth"]=st.session_state.cand_auth_token
                 st.rerun()
             else:
                 st.error("E-mail ou senha inválidos.")
@@ -1645,6 +1689,7 @@ elif pagina == "perfil":
                     atual.update(payload)
                     st.session_state.cand_logado = atual
                     st.session_state.cand_email_logado = atual.get("email", "")
+                    st.session_state.cand_auth_token = token_candidato(atual)
                     st.success("Perfil atualizado com sucesso.")
                     ir("inicio")
                 except Exception as e:
@@ -1776,7 +1821,10 @@ elif pagina == "chamadas":
                 acessar_chamadas = st.form_submit_button("Acessar")
             if acessar_chamadas:
                 cf=login_candidato(em, sn, permitir_sem_senha=True)
-                if cf: st.success(f"Bem-vindo, {cf['nome'].split()[0]}!"); st.rerun()
+                if cf:
+                    st.query_params["p"]="chamadas"
+                    st.query_params["cauth"]=st.session_state.cand_auth_token
+                    st.success(f"Bem-vindo, {cf['nome'].split()[0]}!"); st.rerun()
                 else: st.error("E-mail ou senha inválidos.")
 
     if cand_logado():
