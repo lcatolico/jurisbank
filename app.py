@@ -430,6 +430,7 @@ def conectar_sheets():
         "chamadas": pl.worksheet("chamadas"),
         "interesses": pl.worksheet("interesses"),
         "recomendacoes": pl.worksheet("recomendacoes"),
+        "tokens": pl.worksheet("tokens"),
     }
 
 abas = conectar_sheets()
@@ -438,6 +439,7 @@ aba_recrutadores = abas["recrutadores"]
 aba_chamadas = abas["chamadas"]
 aba_interesses = abas["interesses"]
 aba_recomendacoes = abas["recomendacoes"]
+aba_tokens = abas["tokens"]
 
 CAND_COL_SENHA = 19
 CAND_COL_FOTO = 20
@@ -457,7 +459,7 @@ garantir_coluna(aba_candidatos, "foto", CAND_COL_FOTO)
 params = st.query_params
 p = params.get("p", st.session_state.get("pagina", "publico"))
 if isinstance(p,list): p = p[0]
-if p not in ["publico","avisos","inicio","perfil","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar"]:
+if p not in ["publico","avisos","inicio","perfil","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar","esqueci","redefinir"]:
     p = "publico"
 if "pagina" not in st.session_state or params.get("p"):
     st.session_state.pagina = p
@@ -899,6 +901,98 @@ def email_ja_cadastrado(aba, email):
         return False
 
 
+
+def gerar_token_senha():
+    """Gera token seguro de 32 bytes para redefinição de senha."""
+    return secrets.token_urlsafe(32)
+
+
+def salvar_token(email, tipo, token):
+    """
+    Salva token na aba 'tokens'.
+    Colunas: token | email | tipo (candidato/recrutador) | criado_em | usado
+    """
+    try:
+        # Invalidar tokens anteriores do mesmo email+tipo
+        todos = aba_tokens.get_all_records()
+        for i, row in enumerate(todos):
+            if row.get("email","").lower() == email.lower() and row.get("tipo") == tipo and row.get("usado") != "sim":
+                aba_tokens.update_cell(i + 2, 5, "sim")
+        # Inserir novo token
+        aba_tokens.append_row([
+            token, email, tipo,
+            datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "nao"
+        ])
+        return True
+    except Exception as e:
+        return False
+
+
+def buscar_token(token):
+    """Retorna o registro do token se válido e não expirado (2h)."""
+    try:
+        todos = aba_tokens.get_all_records()
+        for row in todos:
+            if row.get("token") == token and row.get("usado") != "sim":
+                criado_str = row.get("criado_em", "")
+                try:
+                    criado = datetime.strptime(criado_str, "%d/%m/%Y %H:%M")
+                    if (datetime.now() - criado).total_seconds() < 7200:  # 2h
+                        return row
+                except Exception:
+                    return row  # sem data = aceita
+        return None
+    except Exception:
+        return None
+
+
+def invalidar_token(token):
+    """Marca token como usado."""
+    try:
+        todos = aba_tokens.get_all_records()
+        for i, row in enumerate(todos):
+            if row.get("token") == token:
+                aba_tokens.update_cell(i + 2, 5, "sim")
+                return True
+    except Exception:
+        pass
+    return False
+
+
+def email_redefinicao(destinatario, link, tipo):
+    """Envia e-mail com link de redefinição de senha."""
+    label = "candidato" if tipo == "candidato" else "recrutador"
+    assunto = "JurisBank — Redefinição de senha"
+    corpo = f"""
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff">
+        <div style="background:#1e1e1e;padding:32px;text-align:center;border-radius:12px 12px 0 0">
+            <h1 style="color:#ffffff;font-size:22px;margin:0;letter-spacing:-.5px">Juris<span style="color:#b8973a">dica</span></h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:4px 0 0;font-style:italic">ius indicandum</p>
+        </div>
+        <div style="padding:32px;background:#f9f8f6;border-radius:0 0 12px 12px">
+            <h2 style="color:#1e1e1e;font-size:20px;margin:0 0 12px">Redefinição de senha</h2>
+            <p style="color:#6a6a6a;font-size:15px;line-height:1.7;margin:0 0 20px">
+                Recebemos uma solicitação de redefinição de senha para sua conta de <strong style="color:#1e1e1e">{label}</strong> no JurisBank.
+            </p>
+            <p style="color:#6a6a6a;font-size:14px;line-height:1.7;margin:0 0 24px">
+                Clique no botão abaixo para criar uma nova senha. O link é válido por <strong>2 horas</strong>.
+            </p>
+            <div style="text-align:center;margin:28px 0">
+                <a href="{link}" style="display:inline-block;padding:14px 36px;background:#b8973a;color:#1e1e1e;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none">
+                    Redefinir minha senha →
+                </a>
+            </div>
+            <p style="color:#9a9a9a;font-size:12px;line-height:1.6;margin:0;border-top:1px solid #ddd8ce;padding-top:16px">
+                Se você não solicitou a redefinição, ignore este e-mail — sua senha não será alterada.<br>
+                <strong>JurisBank</strong> — banco de talentos jurídicos certificados.
+            </p>
+        </div>
+    </div>
+    """
+    return enviar_email(destinatario, assunto, corpo)
+
+
 def html_selos(c):
     h=""
     if c.get("selo_verificado")=="Sim": h+='<span class="selo selo-verificado">✓ Verificado</span>'
@@ -1244,6 +1338,7 @@ elif pagina == "inicio":
                     st.rerun()
                 else:
                     st.error("E-mail ou senha inválidos.")
+            st.markdown('<p style="font-size:12px;color:#6a6a6a;margin-top:8px">Esqueceu a senha? <a href="?p=esqueci" style="color:#b8973a;font-weight:700">Recuperar acesso →</a></p>', unsafe_allow_html=True)
         with tabs[1]:
             st.markdown("""<div class="info-card">
                 <strong>Cadastre seu currículo jurídico</strong><br>
@@ -2235,6 +2330,7 @@ elif pagina == "recrutador":
                         st.rerun()
                     else: st.error("E-mail ou senha incorretos, ou conta ainda não aprovada.")
                 else: st.error("Preencha e-mail e senha.")
+            st.markdown('<p style="font-size:12px;color:#6a6a6a;margin-top:8px">Esqueceu a senha? <a href="?p=esqueci&tipo=recrutador" style="color:#b8973a;font-weight:700">Recuperar acesso →</a></p>', unsafe_allow_html=True)
         with tabs[1]:
             st.markdown('<p style="font-size:15px;font-weight:700;color:#0d1f4e;margin:1rem 0 0.5rem">Criar conta</p>',unsafe_allow_html=True)
             st.markdown('<p style="font-size:13px;color:#4a6080;font-weight:500;margin-bottom:1rem">4 etapas. Ativação após validação institucional.</p>',unsafe_allow_html=True)
@@ -2421,6 +2517,130 @@ elif pagina == "recomendar":
                             st.balloons()
                         except Exception as e:
                             st.error(f"Erro ao registrar avaliação. Tente novamente. ({e})")
+
+# ── PÁGINA: ESQUECI A SENHA ──────────────────────────────────────────────────
+elif pagina == "esqueci":
+    tipo_param = params.get("tipo", "candidato")
+    if isinstance(tipo_param, list): tipo_param = tipo_param[0]
+    tipo = "recrutador" if tipo_param == "recrutador" else "candidato"
+    label_tipo = "Recrutador" if tipo == "recrutador" else "Candidato"
+
+    st.markdown(f"""<div class="hero-card">
+        <h1 class="page-title">Recuperar<br><em>Acesso.</em></h1>
+        <p class="page-sub">Informe seu e-mail cadastrado. Enviaremos um link para redefinir sua senha.</p>
+    </div>""", unsafe_allow_html=True)
+
+    with st.form("form_esqueci_senha"):
+        tipo_sel = st.radio("Tipo de conta", ["Candidato", "Recrutador"],
+                            index=1 if tipo == "recrutador" else 0, horizontal=True)
+        email_rec_senha = st.text_input("Seu e-mail cadastrado", placeholder="seu@email.com")
+        enviar_link = st.form_submit_button("Enviar link de redefinição →")
+
+    if enviar_link:
+        tipo_real = "recrutador" if tipo_sel == "Recrutador" else "candidato"
+        if not email_rec_senha:
+            st.error("Informe seu e-mail.")
+        else:
+            # Verificar se e-mail existe
+            encontrado = False
+            if tipo_real == "candidato":
+                _, cand_rec = linha_candidato(email_rec_senha)
+                encontrado = cand_rec is not None
+            else:
+                recs_todos = aba_recrutadores.get_all_records()
+                encontrado = any(r.get("email","").lower() == email_rec_senha.lower() for r in recs_todos)
+
+            # Sempre mostrar a mesma mensagem (não revelar se e-mail existe)
+            if encontrado:
+                token = gerar_token_senha()
+                app_url = "https://jurisbank.streamlit.app"
+                link = f"{app_url}/?p=redefinir&token={token}&tipo={tipo_real}"
+                ok_token = salvar_token(email_rec_senha.lower(), tipo_real, token)
+                ok_email = email_redefinicao(email_rec_senha, link, tipo_real)
+            st.success("Se este e-mail estiver cadastrado, você receberá o link em instantes. Verifique também a pasta de spam.")
+            if st.button("Voltar ao login", key="btn_voltar_login_esqueci"):
+                ir("inicio" if tipo_real == "candidato" else "recrutador")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("← Candidato", key="btn_login_cand_esqueci"):
+            ir("inicio")
+    with c2:
+        if st.button("← Recrutador", key="btn_login_rec_esqueci"):
+            ir("recrutador")
+
+
+# ── PÁGINA: REDEFINIR SENHA ───────────────────────────────────────────────────
+elif pagina == "redefinir":
+    token_url = params.get("token", "")
+    if isinstance(token_url, list): token_url = token_url[0]
+    tipo_url = params.get("tipo", "candidato")
+    if isinstance(tipo_url, list): tipo_url = tipo_url[0]
+
+    if not token_url:
+        st.markdown('''<div class="hero-card">
+            <h1 class="page-title">Link<br><em>inválido.</em></h1>
+            <p class="page-sub">Este link não é válido. Solicite um novo link de redefinição.</p>
+        </div>''', unsafe_allow_html=True)
+        if st.button("Solicitar novo link", key="btn_novo_link_invalido"):
+            ir("esqueci")
+    else:
+        registro = buscar_token(token_url)
+        if not registro:
+            st.markdown('''<div class="hero-card">
+                <h1 class="page-title">Link<br><em>expirado.</em></h1>
+                <p class="page-sub">Este link expirou ou já foi utilizado. Válido por 2 horas.</p>
+            </div>''', unsafe_allow_html=True)
+            if st.button("Solicitar novo link", key="btn_novo_link_exp"):
+                ir("esqueci")
+        else:
+            tipo_real = registro.get("tipo", tipo_url)
+            email_real = registro.get("email", "")
+
+            st.markdown(f"""<div class="hero-card">
+                <h1 class="page-title">Nova<br><em>Senha.</em></h1>
+                <p class="page-sub">Crie uma nova senha para <strong>{html_lib.escape(email_real)}</strong></p>
+            </div>""", unsafe_allow_html=True)
+
+            with st.form("form_redefinir_senha"):
+                nova_senha = st.text_input("Nova senha *", type="password",
+                                           help="Mínimo 6 caracteres")
+                conf_senha = st.text_input("Confirmar nova senha *", type="password")
+                salvar_nova = st.form_submit_button("Salvar nova senha →")
+
+            if salvar_nova:
+                if len(nova_senha) < 6:
+                    st.error("A senha deve ter pelo menos 6 caracteres.")
+                elif nova_senha != conf_senha:
+                    st.error("As senhas não coincidem.")
+                else:
+                    nova_hash = hash_senha(nova_senha)
+                    try:
+                        if tipo_real == "candidato":
+                            linha_n, _ = linha_candidato(email_real)
+                            if linha_n:
+                                aba_candidatos.update_cell(linha_n, CAND_COL_SENHA, nova_hash)
+                            else:
+                                st.error("Candidato não encontrado.")
+                                st.stop()
+                        else:
+                            recs_todos = aba_recrutadores.get_all_records()
+                            idx_r = next((i for i, r in enumerate(recs_todos)
+                                          if r.get("email","").lower() == email_real.lower()), None)
+                            if idx_r is not None:
+                                aba_recrutadores.update_cell(idx_r + 2, 3, nova_hash)
+                            else:
+                                st.error("Recrutador não encontrado.")
+                                st.stop()
+                        invalidar_token(token_url)
+                        st.success("Senha redefinida com sucesso! Faça login com sua nova senha.")
+                        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                        if st.button("Ir para o login →", key="btn_pos_redefinicao"):
+                            ir("inicio" if tipo_real == "candidato" else "recrutador")
+                    except Exception as e:
+                        st.error(f"Erro ao salvar nova senha. Tente novamente. ({e})")
+
 
 # ── PÁGINAS LEGAIS ────────────────────────────────────────────────────────────
 elif pagina in ["privacidade","termos"]:
