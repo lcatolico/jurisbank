@@ -450,6 +450,10 @@ aba_tokens = abas["tokens"]
 
 CAND_COL_SENHA = 19
 CAND_COL_FOTO = 20
+CAND_COL_PAIS = 21
+CAND_COL_CPF = 22
+CAND_COL_CELULAR = 23
+CAND_COL_NASCIMENTO = 24
 CH_COL_RESULTADO_TIPO = 18
 CH_COL_SELECIONADOS = 19
 CH_COL_MSG_APROVADOS = 20
@@ -468,6 +472,10 @@ def garantir_coluna(aba, nome, posicao):
 
 garantir_coluna(aba_candidatos, "senha", CAND_COL_SENHA)
 garantir_coluna(aba_candidatos, "foto", CAND_COL_FOTO)
+garantir_coluna(aba_candidatos, "pais", CAND_COL_PAIS)
+garantir_coluna(aba_candidatos, "cpf", CAND_COL_CPF)
+garantir_coluna(aba_candidatos, "celular", CAND_COL_CELULAR)
+garantir_coluna(aba_candidatos, "nascimento", CAND_COL_NASCIMENTO)
 garantir_coluna(aba_chamadas, "resultado_tipo", CH_COL_RESULTADO_TIPO)
 garantir_coluna(aba_chamadas, "selecionados", CH_COL_SELECIONADOS)
 garantir_coluna(aba_chamadas, "mensagem_aprovados", CH_COL_MSG_APROVADOS)
@@ -480,7 +488,7 @@ garantir_coluna(aba_chamadas, "comunicacao_resultado", CH_COL_COMUNICACAO_RESULT
 params = st.query_params
 p = params.get("p", st.session_state.get("pagina", "publico"))
 if isinstance(p,list): p = p[0]
-if p not in ["publico","avisos","inicio","perfil","candidatos","chamadas","cadastro","recrutador","privacidade","termos","recomendar","esqueci","redefinir"]:
+if p not in ["publico","avisos","inicio","conta","perfil","candidatos","chamadas","cadastro","cadastro_sucesso","recrutador","privacidade","termos","recomendar","esqueci","redefinir"]:
     p = "publico"
 if "pagina" not in st.session_state or params.get("p"):
     st.session_state.pagina = p
@@ -965,6 +973,8 @@ def salvar_candidato_batch(aba, linha, dados: dict):
         "oab": 7, "experiencia_orgaos": 8, "sistemas": 9, "resumo": 11,
         "selo_verificado": 13, "selo_recomendado": 14, "selo_destaque": 15,
         "selo_experiente": 16, "concurso": 18, "foto": CAND_COL_FOTO,
+        "pais": CAND_COL_PAIS, "cpf": CAND_COL_CPF,
+        "celular": CAND_COL_CELULAR, "nascimento": CAND_COL_NASCIMENTO,
     }
     updates = []
     for campo, col in MAPA.items():
@@ -1247,8 +1257,8 @@ def email_recomendador(nome_candidato, email_recomendador, link):
 restaurar_candidato_da_sessao()
 restaurar_recrutador_da_sessao()
 
-PAGINAS_CANDIDATO = ["inicio","perfil","cadastro","chamadas"]
-PAGINAS_PUBLICAS = ["publico","avisos","candidatos","privacidade","termos","recomendar"]
+PAGINAS_CANDIDATO = ["inicio","conta","perfil","cadastro","chamadas"]
+PAGINAS_PUBLICAS = ["publico","avisos","candidatos","cadastro_sucesso","privacidade","termos","recomendar"]
 
 if rec_logado() and pagina == "recrutador":
     dash_param = params.get("dash", "")
@@ -1279,9 +1289,9 @@ if rec_logado():
     nav_pages = []
 elif cand_logado():
     nav_pages = [
-        ("inicio","Meu Perfil"),
-        ("perfil","Editar Perfil"),
-        ("chamadas","Ver Seletivos"),
+        ("inicio","Minhas Candidaturas"),
+        ("conta","Minha Conta"),
+        ("perfil","Meu Currículo"),
     ]
 else:
     nav_pages = [
@@ -1294,7 +1304,7 @@ nav_html = '<div class="topbar"><a class="topbar-logo" href="https://lcatolico.g
 for pg, lb in nav_pages:
     active = "active" if pagina == pg else ""
     if not rec_logado() and not cand_logado():
-        if lb == "Sou Candidato" and pagina in ["inicio","cadastro","chamadas","avisos"]:
+        if lb == "Sou Candidato" and pagina in ["inicio","cadastro","cadastro_sucesso","chamadas","avisos"]:
             active = "active"
         elif lb == "Sou Recrutador" and pagina == "recrutador":
             active = "active"
@@ -1378,6 +1388,69 @@ elif pagina == "avisos":
 elif pagina == "inicio":
     if cand_logado():
         cand = st.session_state.cand_logado
+        email_cand = str(cand.get("email","") or "").strip().lower()
+        todas_chamadas = aba_chamadas.get_all_records()
+        inscritas = [ch for ch in todas_chamadas if email_cand in [e.strip().lower() for e in inscritos(ch)]]
+        em_andamento = [ch for ch in inscritas if ch_aberta(ch)]
+        finalizadas = [ch for ch in inscritas if not ch_aberta(ch)]
+
+        st.markdown("""<div class="hero-card compact-hero">
+            <h1 class="page-title">Minhas<br><em>Candidaturas.</em></h1>
+            <p class="page-sub">Acompanhe os Seletivos em que você está inscrito e encontre novas oportunidades compatíveis com seu perfil.</p>
+        </div>""", unsafe_allow_html=True)
+        busca_cand = st.text_input("Buscar por Seletivo, órgão ou cidade", placeholder="Digite o nome do Seletivo ou órgão", key="busca_minhas_candidaturas")
+
+        def filtrar_cands(lista):
+            termo = busca_cand.strip().lower()
+            if not termo:
+                return lista
+            return [ch for ch in lista if termo in " ".join([str(ch.get("titulo","")),str(ch.get("orgao","")),str(ch.get("municipio","")),str(ch.get("estado",""))]).lower()]
+
+        def card_candidatura(ch):
+            aberta = ch_aberta(ch)
+            status = "Em andamento" if aberta else "Finalizada"
+            badge = "badge-aberta" if aberta else "badge-encerrada"
+            st.markdown(f"""<div class="chamada-card">
+                <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+                    <div>
+                        <span class="{badge}">● {status}</span>
+                        <p style="font-size:17px;font-weight:800;color:#071D49;margin:10px 0 4px">{html_texto(ch.get("titulo","Seletivo"))}</p>
+                        <p style="font-size:13px;color:#5E6675;font-weight:600;margin:0 0 8px">{html_texto(ch.get("orgao",""))} · {html_texto(ch.get("municipio",""))}/{html_texto(ch.get("estado",""))}</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <span class="profile-chip">{html_texto(ch.get("area","Área não informada"))}</span>
+                            <span class="profile-chip">Prazo: {html_texto(ch.get("prazo","—"))}</span>
+                            <span class="profile-chip">{html_texto(ch.get("forma_selecao","Seleção não informada"))}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>""", unsafe_allow_html=True)
+
+        abas_cand = st.tabs(["Em andamento", "Banco de talentos", "Finalizadas"])
+        with abas_cand[0]:
+            lista = filtrar_cands(em_andamento)
+            if lista:
+                for ch in lista:
+                    card_candidatura(ch)
+            else:
+                st.markdown('<div class="info-card">Você ainda não possui candidaturas em andamento.</div>', unsafe_allow_html=True)
+                if st.button("Buscar oportunidades", key="buscar_oportunidades_inicio"):
+                    ir("chamadas")
+        with abas_cand[1]:
+            st.markdown("""<div class="info-card">
+                Seu perfil fica disponível no banco de talentos quando marcado como disponível para seleção. Mantenha o currículo atualizado para aumentar a precisão das indicações.
+            </div>""", unsafe_allow_html=True)
+            st.markdown(f'<div class="profile-section-card"><p class="profile-section-title">Status do curr?culo</p><div class="profile-list-item">{"Disponível para seleção" if cand.get("disponibilidade")=="Sim" else "Indisponível para seleção"}</div></div>', unsafe_allow_html=True)
+            if st.button("Atualizar meu currículo", key="atualizar_curriculo_inicio"):
+                ir("perfil")
+        with abas_cand[2]:
+            lista = filtrar_cands(finalizadas)
+            if lista:
+                for ch in lista:
+                    card_candidatura(ch)
+            else:
+                st.markdown('<div class="info-card">Nenhuma candidatura finalizada até o momento.</div>', unsafe_allow_html=True)
+        st.stop()
+
         abertos = [ch for ch in aba_chamadas.get_all_records() if ch_aberta(ch)]
 
         formacoes_view = formacoes_candidato(cand)
@@ -1475,7 +1548,7 @@ elif pagina == "inicio":
         st.markdown("<br>", unsafe_allow_html=True)
         tabs = st.tabs(["Já tenho cadastro","Cadastrar-me"])
         with tabs[0]:
-            st.markdown('<p style="font-size:16px;font-weight:700;color:#071D49;margin:1rem 0">Entrar no meu perfil</p>', unsafe_allow_html=True)
+            st.markdown('<p style="font-size:16px;font-weight:700;color:#071D49;margin:1rem 0">Entrar na minha conta</p>', unsafe_allow_html=True)
             with st.form("form_login_candidato_inicio"):
                 email_login = st.text_input("E-mail cadastrado", key="login_candidato_inicio")
                 senha_login = st.text_input("Senha", type="password", key="senha_candidato_inicio", help="Perfis antigos sem senha ainda podem entrar apenas com o e-mail.")
@@ -1500,7 +1573,51 @@ elif pagina == "inicio":
             if st.button("Começar cadastro →", key="btn_ir_cadastro_candidato"):
                 ir("cadastro")
 
-# ── PÁGINA: EDITAR PERFIL DO CANDIDATO ───────────────────────────────────────
+# ── PÁGINA: MINHA CONTA DO CANDIDATO ─────────────────────────────────────────
+elif pagina == "conta":
+    if not cand_logado():
+        st.markdown("""<div class="hero-card">
+            <h1 class="page-title">Minha<br><em>Conta.</em></h1>
+            <p class="page-sub">Entre para consultar seus dados pessoais.</p>
+        </div>""", unsafe_allow_html=True)
+        if st.button("Ir para login do candidato", key="btn_conta_login"):
+            ir("inicio")
+    else:
+        cand = st.session_state.cand_logado
+        st.markdown("""<div class="hero-card compact-hero">
+            <h1 class="page-title">Minha<br><em>Conta.</em></h1>
+            <p class="page-sub">Dados pessoais e meios de contato usados para identificação e comunicação.</p>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="profile-section-card">
+            <p class="profile-section-title">Identificação</p>
+            <div class="profile-list-item"><strong>{html_texto(cand.get("nome",""))}</strong></div>
+            <div class="profile-list-item">{html_texto(cand.get("email",""))}</div>
+        </div>""", unsafe_allow_html=True)
+        linha, atual = linha_candidato(cand.get("email",""))
+        with st.form("form_minha_conta_candidato"):
+            c1,c2=st.columns(2)
+            with c1:
+                pais_conta=st.selectbox("País de origem",["Brasil"],index=0,key="conta_pais")
+                cpf_conta=st.text_input("CPF",value=str(cand.get("cpf","") or ""),placeholder="000.000.000-00")
+            with c2:
+                celular_conta=st.text_input("Número de celular",value=str(cand.get("celular","") or ""),placeholder="(__) _____-____")
+                nascimento_conta=st.text_input("Data de nascimento",value=str(cand.get("nascimento","") or ""),placeholder="dd/mm/aaaa")
+            salvar_conta=st.form_submit_button("Salvar dados pessoais")
+        if salvar_conta:
+            if not linha:
+                st.error("Não foi possível localizar seu cadastro.")
+            else:
+                payload={"pais":pais_conta,"cpf":cpf_conta.strip(),"celular":celular_conta.strip(),"nascimento":nascimento_conta.strip()}
+                try:
+                    salvar_candidato_batch(aba_candidatos, linha, payload)
+                    cand.update(payload)
+                    st.session_state.cand_logado=cand
+                    st.session_state.cand_auth_token=token_candidato(cand)
+                    st.success("Dados pessoais atualizados.")
+                except Exception as e:
+                    st.error(f"Erro ao salvar dados pessoais. Tente novamente. ({e})")
+
+# ── PÁGINA: MEU CURRÍCULO DO CANDIDATO ───────────────────────────────────────
 elif pagina == "perfil":
     email_param = params.get("email", "")
     if isinstance(email_param, list):
@@ -1509,13 +1626,13 @@ elif pagina == "perfil":
         login_candidato(email_param, permitir_sem_senha=True)
     if not cand_logado():
         st.markdown("""<div class="edit-hero">
-            <h1 class="edit-title">Editar <em>Perfil.</em></h1>
+            <h1 class="edit-title">Meu <em>Currículo.</em></h1>
             <p class="page-sub">Entre com e-mail e senha para alterar suas informações profissionais.</p>
         </div>""", unsafe_allow_html=True)
         with st.form("form_login_editar_perfil"):
             email_editar = st.text_input("E-mail cadastrado", value=email_param, key="login_editar_email")
             senha_editar = st.text_input("Senha", type="password", key="login_editar_senha")
-            entrar_editar = st.form_submit_button("Entrar e editar perfil")
+            entrar_editar = st.form_submit_button("Entrar e editar currículo")
         if entrar_editar:
             if not email_editar:
                 st.error("Informe seu e-mail.")
@@ -1536,11 +1653,11 @@ elif pagina == "perfil":
         st.session_state.edit_qtd_exp = max(1, len(experiencias_base))
 
         st.markdown("""<div class="edit-hero">
-            <h1 class="edit-title">Editar <em>Perfil.</em></h1>
+            <h1 class="edit-title">Meu <em>Currículo.</em></h1>
             <p class="edit-sub">Atualize suas informações profissionais. Nome e e-mail permanecem vinculados ao cadastro.</p>
         </div>""", unsafe_allow_html=True)
 
-        if st.button("Voltar ao perfil", key="voltar_perfil_candidato"):
+        if st.button("Voltar às candidaturas", key="voltar_perfil_candidato"):
             ir("inicio")
 
         with st.form("form_editar_candidato_pagina"):
@@ -1690,7 +1807,7 @@ elif pagina == "perfil":
                     st.session_state.cand_logado = atual
                     st.session_state.cand_email_logado = atual.get("email", "")
                     st.session_state.cand_auth_token = token_candidato(atual)
-                    st.success("Perfil atualizado com sucesso.")
+                    st.success("Currículo atualizado com sucesso.")
                     ir("inicio")
                 except Exception as e:
                     st.error(f"Erro ao salvar perfil. Tente novamente. ({e})")
@@ -1924,14 +2041,104 @@ elif pagina == "cadastro":
     if "et" not in st.session_state: st.session_state.et=1
     if "campos" not in st.session_state: st.session_state.campos={}
     if "dc" not in st.session_state: st.session_state.dc={}
+    if "cadastro_base" not in st.session_state: st.session_state.cadastro_base={}
     et=st.session_state.et
-    ts=[("Seus dados\nprofissionais.","Upload do currículo ou preenchimento manual"),("Certificação e\nreferências.","Documentos que geram selos"),("Perfil\ncomportamental.",f"{len(PERGUNTAS_DISC)} perguntas — uso como apoio técnico")]
+    ts=[
+        ("Crie sua\nconta.","Identificacao inicial e e-mail de acesso"),
+        ("Complete seus\ndados.","Informacoes pessoais para contato"),
+        ("Crie sua\nsenha.","Seguranca da sua nova conta"),
+        ("Seus dados\nprofissionais.","Upload do curriculo ou preenchimento manual"),
+        ("Certificacao e\nreferencias.","Documentos que geram selos"),
+        ("Perfil\ncomportamental.",f"{len(PERGUNTAS_DISC)} perguntas - uso como apoio tecnico")
+    ]
     tt,ts_=ts[et-1]
     st.markdown(f'<div class="hero-card"><h1 class="page-title">{tt}</h1><p class="page-sub">{ts_}</p></div>',unsafe_allow_html=True)
-    st.markdown(barra(et,3),unsafe_allow_html=True)
-    st.markdown(f'<p class="step-title">Etapa {et} de 3</p>',unsafe_allow_html=True)
+    st.markdown(barra(et,6),unsafe_allow_html=True)
+    st.markdown(f'<p class="step-title">Etapa {et} de 6</p>',unsafe_allow_html=True)
 
     if et==1:
+        base=st.session_state.cadastro_base
+        pais=st.selectbox("Pais de origem",["Brasil"],index=0,key="cad_pais_origem")
+        cpf=st.text_input("CPF",value=base.get("cpf",""),placeholder="000.000.000-00",key="cad_cpf")
+        st.markdown('<div class="info-box">Utilizado para identificacao e autenticidade das informacoes fornecidas.</div>',unsafe_allow_html=True)
+        email=st.text_input("E-mail",value=base.get("email",""),key="cad_email_inicial")
+        st.markdown('<div class="info-box">Cadastre um e-mail que voce tenha acesso para validar a sua nova conta.</div>',unsafe_allow_html=True)
+        email_conf=st.text_input("Confirme o e-mail",value=base.get("email_conf",""),key="cad_email_confirma")
+        if st.button("Continuar",key="cad_conta_continuar"):
+            email_limpo=email.strip().lower()
+            if not cpf.strip():
+                st.error("Informe o CPF para continuar.")
+            elif not email_limpo or "@" not in email_limpo:
+                st.error("Informe um e-mail valido.")
+            elif email_limpo != email_conf.strip().lower():
+                st.error("Os e-mails informados nao coincidem.")
+            elif email_ja_cadastrado(aba_candidatos, email_limpo):
+                st.error("Este e-mail ja esta cadastrado. Use a opcao de entrar na Area do Candidato.")
+            else:
+                st.session_state.cadastro_base.update({"pais":pais,"cpf":cpf.strip(),"email":email_limpo,"email_conf":email_conf.strip().lower()})
+                st.session_state.et=2
+                st.rerun()
+        st.markdown('<div class="custom-divider"></div>',unsafe_allow_html=True)
+        if st.button("Ja tenho uma conta",key="cad_ir_login"):
+            ir("inicio")
+        st.caption("Powered by IndicaJur")
+
+    elif et==2:
+        base=st.session_state.cadastro_base
+        nome=st.text_input("Nome completo",value=base.get("nome",""),key="cad_nome_completo")
+        c1,c2=st.columns([1,2])
+        with c1:
+            ddi=st.selectbox("Pais",["BR +55"],index=0,key="cad_ddi")
+        with c2:
+            celular=st.text_input("Numero de celular",value=base.get("celular",""),placeholder="(__) _____-____",key="cad_celular")
+        st.markdown('<div class="info-box">Utilizado como um dos principais meios de contato. Por favor, indique o seu numero principal.</div>',unsafe_allow_html=True)
+        nascimento=st.text_input("Data de nascimento",value=base.get("nascimento",""),placeholder="Ex: 02/03/2004",key="cad_nascimento")
+        c1,c2=st.columns(2)
+        with c1:
+            if st.button("Voltar",key="cad_dados_voltar"):
+                st.session_state.et=1
+                st.rerun()
+        with c2:
+            if st.button("Continuar",key="cad_dados_continuar"):
+                if not nome.strip():
+                    st.error("Informe seu nome completo.")
+                elif not celular.strip():
+                    st.error("Informe seu numero de celular.")
+                elif not nascimento.strip():
+                    st.error("Informe sua data de nascimento.")
+                else:
+                    st.session_state.cadastro_base.update({"nome":nome.strip(),"ddi":ddi,"celular":celular.strip(),"nascimento":nascimento.strip()})
+                    st.session_state.et=3
+                    st.rerun()
+        st.caption("Powered by IndicaJur")
+
+    elif et==3:
+        senha_cad=st.text_input("Senha *",type="password",key="senha_candidato_cad")
+        st.markdown('<div class="info-box"><strong>Sua senha deve ter:</strong><br>- No minimo 8 caracteres;<br>- Letras;<br>- Numeros;<br>- Pelo menos 1 caractere especial (Ex: !@#$%^&*).</div>',unsafe_allow_html=True)
+        senha_conf=st.text_input("Confirmar senha *",type="password",key="senha_candidato_conf")
+        c1,c2=st.columns(2)
+        with c1:
+            if st.button("Voltar",key="cad_senha_voltar"):
+                st.session_state.et=2
+                st.rerun()
+        with c2:
+            if st.button("Concluir cadastro",key="cad_senha_continuar"):
+                tem_letra=any(ch.isalpha() for ch in senha_cad)
+                tem_numero=any(ch.isdigit() for ch in senha_cad)
+                tem_especial=any(not ch.isalnum() for ch in senha_cad)
+                if len(senha_cad) < 8:
+                    st.error("A senha deve ter no minimo 8 caracteres.")
+                elif not tem_letra or not tem_numero or not tem_especial:
+                    st.error("A senha deve conter letras, numeros e ao menos 1 caractere especial.")
+                elif senha_cad != senha_conf:
+                    st.error("As senhas nao coincidem.")
+                else:
+                    st.session_state.cadastro_base["senha"] = hash_senha(senha_cad)
+                    st.session_state.et=4
+                    st.rerun()
+        st.caption("Powered by IndicaJur")
+
+    elif et==4:
         pdf=st.file_uploader("Upload do currículo em PDF (opcional)",type="pdf")
         if pdf and not st.session_state.campos:
             with st.spinner("Extraindo..."): st.session_state.campos=extrair_campos(extrair_pdf(pdf))
@@ -1942,12 +2149,10 @@ elif pagina == "cadastro":
         st.markdown('<div class="highlight-panel">Disponível para seleção</div>', unsafe_allow_html=True)
         disp=st.radio("Disponível para seleção?",["Sim","Não"],horizontal=True)
 
-        c1,c2=st.columns(2)
-        with c1: nome=st.text_input("Nome completo *",value=campos.get("nome",""))
-        with c2: email=st.text_input("E-mail *",value=campos.get("email",""))
-        c1,c2=st.columns(2)
-        with c1: senha_cad=st.text_input("Senha de acesso *",type="password",key="senha_candidato_cad")
-        with c2: senha_conf=st.text_input("Confirmar senha *",type="password",key="senha_candidato_conf")
+        base=st.session_state.cadastro_base
+        nome=base.get("nome","")
+        email=base.get("email","")
+        st.markdown(f'<div class="info-box"><strong>{html_texto(nome)}</strong><br>{html_texto(email)}</div>',unsafe_allow_html=True)
 
         foto = st.file_uploader("Fotografia de perfil (opcional)", type=["jpg","jpeg","png"], key="foto_cadastro_cand")
         if foto:
@@ -2041,19 +2246,19 @@ elif pagina == "cadastro":
         if st.button("Próximo →"):
             formacoes_validas=[f for f in formacoes if f.get("grau") or f.get("instituicao") or f.get("periodo")]
             experiencias_validas=[e for e in experiencias if e.get("instituicao") or e.get("orgao") or e.get("cargo") or e.get("supervisor") or e.get("supervisor_email") or e.get("area") or e.get("atribuicoes") or e.get("sistemas") or e.get("ferramenta_ia")]
-            if not nome or not email or not formacoes_validas or not formacoes_validas[0].get("instituicao"): st.error("Preencha nome, e-mail e ao menos uma formação com instituição.")
-            elif len(senha_cad) < 6: st.error("Crie uma senha com pelo menos 6 caracteres.")
-            elif senha_cad != senha_conf: st.error("As senhas não coincidem.")
-            elif not inst_interesse: st.error("Selecione ao menos uma instituição de interesse.")
+            if not nome or not email or not formacoes_validas or not formacoes_validas[0].get("instituicao"): st.error("Preencha ao menos uma formacao com instituicao.")
+            elif not st.session_state.cadastro_base.get("senha"):
+                st.error("Crie a senha da conta antes de continuar.")
+            elif not inst_interesse: st.error("Selecione ao menos uma instituicao de interesse.")
             elif not cons: st.error("Aceite os Termos para continuar.")
             elif email_ja_cadastrado(aba_candidatos, email):
                 st.error("Este e-mail já está cadastrado. Use a aba 'Já tenho cadastro'.")
             else:
                 anos=anos_experiencias(experiencias_validas)
-                st.session_state.dc.update({"nome":nome,"email":email,"senha":hash_senha(senha_cad),"foto":foto_data,"formacao":salvar_lista_json(formacoes_validas),"instituicao":resumo_formacoes(formacoes_validas),"area":", ".join(inst_interesse),"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":salvar_lista_json(experiencias_validas),"sistemas":sistemas_experiencias(experiencias_validas),"pos":"","resumo":res,"concurso":conc})
+                st.session_state.dc.update({"nome":nome,"email":email,"senha":st.session_state.cadastro_base.get("senha",""),"pais":st.session_state.cadastro_base.get("pais","Brasil"),"cpf":st.session_state.cadastro_base.get("cpf",""),"celular":st.session_state.cadastro_base.get("celular",""),"nascimento":st.session_state.cadastro_base.get("nascimento",""),"foto":foto_data,"formacao":salvar_lista_json(formacoes_validas),"instituicao":resumo_formacoes(formacoes_validas),"area":", ".join(inst_interesse),"oab":oab,"anos_experiencia":anos,"disponibilidade":disp,"experiencia":salvar_lista_json(experiencias_validas),"sistemas":sistemas_experiencias(experiencias_validas),"pos":"","resumo":res,"concurso":conc})
                 st.session_state.et=2; st.rerun()
 
-    elif et==2:
+    elif et==5:
         c1,c2=st.columns(2)
         with c1:
             st.markdown('<p style="font-weight:600;color:#C49A2C;margin-bottom:4px">★ Carta de recomendação</p>',unsafe_allow_html=True)
@@ -2076,13 +2281,13 @@ elif pagina == "cadastro":
         st.markdown("<br>",unsafe_allow_html=True)
         c1,c2=st.columns(2)
         with c1:
-            if st.button("← Voltar"): st.session_state.et=1; st.rerun()
+            if st.button("← Voltar"): st.session_state.et=4; st.rerun()
         with c2:
             if st.button("Próximo →"):
                 st.session_state.dc.update({"carta":carta is not None,"avaliacao":aval is not None,"email_ref":""})
-                st.session_state.et=3; st.rerun()
+                st.session_state.et=6; st.rerun()
 
-    elif et==3:
+    elif et==6:
         st.markdown(f'<div class="info-box">{DISC_AVISO}</div>',unsafe_allow_html=True)
         st.markdown('<p style="font-size:14px;color:#5E6675;font-weight:500;margin-bottom:1.5rem">Não há respostas certas ou erradas. Responda pensando na forma como você costuma atuar no trabalho.</p>',unsafe_allow_html=True)
         rd=[]
@@ -2094,23 +2299,46 @@ elif pagina == "cadastro":
         with c1:
             if st.button("← Voltar"): st.session_state.et=2; st.rerun()
         with c2:
-            if st.button("Cadastrar no IndicaJur →"):
+            if st.button("Cadastrar no IndicaJur"):
                 if None in rd: st.error(f"Responda todas as {len(PERGUNTAS_DISC)} perguntas.")
                 else:
                     d=st.session_state.dc
                     selos=calc_selos(d["oab"],d["anos_experiencia"],d.get("carta",False),d.get("avaliacao",False))
                     pd_,_,desc=calc_disc(rd)
                     try:
-                        aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Não estou estudando para concurso"),d.get("senha",""),d.get("foto","")])
-                        st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}
+                        aba_candidatos.append_row([d["nome"],d["email"],d["formacao"],d["instituicao"],d["area"],d["disponibilidade"],d["oab"],d["experiencia"],d["sistemas"],d["pos"],d["resumo"],d.get("email_ref",""),selos["verificado"],selos["recomendado"],selos["destaque"],selos["experiente"],pd_,d.get("concurso","Nao estou estudando para concurso"),d.get("senha",""),d.get("foto",""),d.get("pais","Brasil"),d.get("cpf",""),d.get("celular",""),d.get("nascimento","")])
+                        st.session_state.cadastro_sucesso_email = d["email"]
+                        st.session_state.cadastro_sucesso_nome = d["nome"]
+                        st.session_state.et=1; st.session_state.campos={}; st.session_state.dc={}; st.session_state.cadastro_base={}
                         st.session_state.pop("cad_qtd_form", None); st.session_state.pop("cad_qtd_exp", None)
-                        st.success("Bem-vindo ao IndicaJur!")
-                        st.markdown(f'<div class="info-box">Perfil: <strong>{pd_} — {desc}</strong></div>',unsafe_allow_html=True)
-                        st.balloons()
+                        st.query_params["p"]="cadastro_sucesso"
+                        st.rerun()
                     except Exception as e:
                         st.error(f"Erro ao salvar cadastro. Tente novamente. ({e})")
 
 # ── PÁGINA: RECRUTADOR ────────────────────────────────────────────────────────
+# -- PAGINA: CADASTRO REALIZADO ------------------------------------------------
+elif pagina == "cadastro_sucesso":
+    email_ok = st.session_state.get("cadastro_sucesso_email", "")
+    nome_ok = st.session_state.get("cadastro_sucesso_nome", "")
+    st.markdown("""<div class="hero-card compact-hero">
+        <h1 class="page-title">Cadastro realizado<br><em>com sucesso.</em></h1>
+        <p class="page-sub">Seu perfil foi criado. O proximo passo e entrar na Area do Candidato para acompanhar Seletivos e atualizar suas informacoes quando quiser.</p>
+    </div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="profile-section-card">
+        <p class="profile-section-title">Confirmacao</p>
+        <div class="profile-list-item"><strong>{html_texto(nome_ok or "Candidato")}</strong></div>
+        <div class="profile-list-item">{html_texto(email_ok or "E-mail cadastrado")}</div>
+        <div class="info-box" style="margin-top:14px">Em uma proxima etapa, este fluxo podera enviar link de confirmacao por e-mail antes da liberacao completa do perfil.</div>
+    </div>""", unsafe_allow_html=True)
+    c1,c2=st.columns(2)
+    with c1:
+        if st.button("Entrar na Area do Candidato",key="cad_sucesso_login"):
+            ir("inicio")
+    with c2:
+        if st.button("Ver Seletivos disponiveis",key="cad_sucesso_chamadas"):
+            ir("chamadas")
+
 elif pagina == "recrutador":
     if rec_logado():
         rec=st.session_state.rec_logado
