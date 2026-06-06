@@ -450,6 +450,13 @@ aba_tokens = abas["tokens"]
 
 CAND_COL_SENHA = 19
 CAND_COL_FOTO = 20
+CH_COL_RESULTADO_TIPO = 18
+CH_COL_SELECIONADOS = 19
+CH_COL_MSG_APROVADOS = 20
+CH_COL_MSG_REPROVADOS = 21
+CH_COL_MOTIVO_ENCERRAMENTO = 22
+CH_COL_ENCERRADO_EM = 23
+CH_COL_COMUNICACAO_RESULTADO = 24
 
 def garantir_coluna(aba, nome, posicao):
     try:
@@ -461,6 +468,13 @@ def garantir_coluna(aba, nome, posicao):
 
 garantir_coluna(aba_candidatos, "senha", CAND_COL_SENHA)
 garantir_coluna(aba_candidatos, "foto", CAND_COL_FOTO)
+garantir_coluna(aba_chamadas, "resultado_tipo", CH_COL_RESULTADO_TIPO)
+garantir_coluna(aba_chamadas, "selecionados", CH_COL_SELECIONADOS)
+garantir_coluna(aba_chamadas, "mensagem_aprovados", CH_COL_MSG_APROVADOS)
+garantir_coluna(aba_chamadas, "mensagem_reprovados", CH_COL_MSG_REPROVADOS)
+garantir_coluna(aba_chamadas, "motivo_encerramento", CH_COL_MOTIVO_ENCERRAMENTO)
+garantir_coluna(aba_chamadas, "encerrado_em", CH_COL_ENCERRADO_EM)
+garantir_coluna(aba_chamadas, "comunicacao_resultado", CH_COL_COMUNICACAO_RESULTADO)
 
 # ── Navegação por URL ─────────────────────────────────────────────────────────
 params = st.query_params
@@ -542,6 +556,35 @@ def iniciais(n):
 def hash_senha(s): return hashlib.sha256(s.encode()).hexdigest()
 def rec_logado(): return "rec_logado" in st.session_state and st.session_state.rec_logado
 def cand_logado(): return "cand_logado" in st.session_state and st.session_state.cand_logado
+def auth_salt():
+    try:
+        return st.secrets.get("auth", {}).get("salt", "indicajur-session")
+    except Exception:
+        return "indicajur-session"
+def token_recrutador(rec):
+    email = str(rec.get("email","") or "").strip().lower()
+    senha = str(rec.get("senha","") or "")
+    assinatura = hashlib.sha256(f"{email}|{senha}|{auth_salt()}".encode()).hexdigest()
+    bruto = f"{email}|{assinatura}".encode("utf-8")
+    return base64.urlsafe_b64encode(bruto).decode("utf-8").rstrip("=")
+def validar_token_recrutador(token):
+    token = str(token or "").strip()
+    if not token:
+        return None
+    try:
+        padding = "=" * (-len(token) % 4)
+        email, assinatura = base64.urlsafe_b64decode((token + padding).encode("utf-8")).decode("utf-8").split("|", 1)
+    except Exception:
+        return None
+    for rec in aba_recrutadores.get_all_records():
+        if str(rec.get("email","")).strip().lower() == email and str(rec.get("status","")).lower() == "ativo":
+            esperado = token_recrutador(rec)
+            if esperado == token:
+                return rec
+    return None
+def auth_rec_query():
+    token = st.session_state.get("rec_auth_token", "")
+    return f"&auth={urllib.parse.quote(token)}" if token else ""
 def gerar_id(): return f"ch_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 def anos_num(v):
     m = re.search(r"\d+", str(v or ""))
@@ -639,12 +682,23 @@ def restaurar_candidato_da_sessao():
         st.session_state.cand_logado = cand
 
 def restaurar_recrutador_da_sessao():
+    auth_param = st.query_params.get("auth", "")
+    if isinstance(auth_param, list):
+        auth_param = auth_param[0]
+    if not rec_logado() and auth_param:
+        rec_token = validar_token_recrutador(auth_param)
+        if rec_token:
+            st.session_state.rec_logado = rec_token
+            st.session_state.rec_email_logado = rec_token.get("email", "")
+            st.session_state.rec_auth_token = auth_param
+            return
     email = str(st.session_state.get("rec_email_logado", "") or "").strip().lower()
     if rec_logado() or not email:
         return
     for rec in aba_recrutadores.get_all_records():
         if str(rec.get("email", "")).strip().lower() == email:
             st.session_state.rec_logado = rec
+            st.session_state.rec_auth_token = token_recrutador(rec)
             return
 
 def carregar_lista_json(valor):
@@ -898,6 +952,53 @@ def salvar_recrutador_batch(aba, linha, dados: dict):
         aba.batch_update(updates, value_input_option="RAW")
 
 
+def salvar_resultado_seletivo(aba, linha, dados: dict):
+    MAPA = {
+        "status": 14,
+        "resultado_tipo": CH_COL_RESULTADO_TIPO,
+        "selecionados": CH_COL_SELECIONADOS,
+        "mensagem_aprovados": CH_COL_MSG_APROVADOS,
+        "mensagem_reprovados": CH_COL_MSG_REPROVADOS,
+        "motivo_encerramento": CH_COL_MOTIVO_ENCERRAMENTO,
+        "encerrado_em": CH_COL_ENCERRADO_EM,
+        "comunicacao_resultado": CH_COL_COMUNICACAO_RESULTADO,
+    }
+    updates = []
+    for campo, col in MAPA.items():
+        if campo in dados:
+            cell = gspread.utils.rowcol_to_a1(linha, col)
+            updates.append({"range": cell, "values": [[dados[campo]]]})
+    if updates:
+        aba.batch_update(updates, value_input_option="RAW")
+
+
+def email_resultado_seletivo(destinatario, nome_candidato, titulo, orgao, situacao, mensagem):
+    assunto = f"IndicaJur — Resultado do Seletivo: {titulo}"
+    corpo = f"""
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:640px;margin:0 auto;background:#ffffff;color:#071D49">
+        <div style="background:#071D49;padding:28px;border-radius:14px 14px 0 0">
+            <h1 style="color:#ffffff;font-size:22px;margin:0">IndicaJur</h1>
+            <p style="color:#E7D28A;font-size:13px;margin:6px 0 0">Comunicação de resultado de Seletivo</p>
+        </div>
+        <div style="border:1px solid #D9D2C3;border-top:0;padding:26px;border-radius:0 0 14px 14px">
+            <p style="font-size:15px;line-height:1.7;margin:0 0 14px">Olá, <strong>{html_lib.escape(nome_candidato or 'candidato')}</strong>.</p>
+            <p style="font-size:15px;line-height:1.7;margin:0 0 14px">
+                O recrutador registrou uma atualização no Seletivo <strong>{html_lib.escape(titulo)}</strong>, vinculado a <strong>{html_lib.escape(orgao)}</strong>.
+            </p>
+            <div style="background:#F4F0E6;border:1px solid #D9D2C3;border-radius:10px;padding:14px 16px;margin:18px 0">
+                <strong style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#5E6675">Situação</strong>
+                <p style="font-size:16px;font-weight:700;margin:6px 0 0;color:#071D49">{html_lib.escape(situacao)}</p>
+            </div>
+            <p style="font-size:15px;line-height:1.7;margin:0 0 18px">{html_lib.escape(mensagem or '').replace(chr(10), '<br>')}</p>
+            <p style="font-size:12px;line-height:1.6;color:#5E6675;margin:22px 0 0;border-top:1px solid #D9D2C3;padding-top:14px">
+                Esta mensagem é informativa. A decisão final e a condução do procedimento são de responsabilidade do recrutador.
+            </p>
+        </div>
+    </div>
+    """
+    return enviar_email(destinatario, assunto, corpo)
+
+
 def email_ja_cadastrado(aba, email):
     """Verifica duplicidade de e-mail antes de cadastrar."""
     try:
@@ -1123,6 +1224,7 @@ if rec_logado() and pagina == "recrutador":
     if sair_param == "1":
         del st.session_state.rec_logado
         st.session_state.pop("rec_email_logado", None)
+        st.session_state.pop("rec_auth_token", None)
         ir("recrutador")
 
 if cand_logado() and pagina in PAGINAS_CANDIDATO:
@@ -1161,10 +1263,11 @@ for pg, lb in nav_pages:
 
 if rec_logado():
     dash_atual = st.session_state.get("rec_dashboard","perfil")
+    auth_qs = auth_rec_query()
     for dash, lb in [("perfil","Perfil"),("editar_rec","Editar Perfil"),("seletivos","Seletivos"),("banco","Banco de Candidatos")]:
         active = "active" if pagina == "recrutador" and dash_atual == dash else ""
-        nav_html += f'<a href="?p=recrutador&dash={dash}" class="{active}">{lb}</a>'
-    nav_html += '<a href="?p=recrutador&sair=1" class="btn-rec">Sair</a>'
+        nav_html += f'<a href="?p=recrutador&dash={dash}{auth_qs}" class="{active}">{lb}</a>'
+    nav_html += f'<a href="?p=recrutador&sair=1{auth_qs}" class="btn-rec">Sair</a>'
 elif cand_logado() and pagina in PAGINAS_CANDIDATO:
     nav_html += '<a href="?p=inicio&sair_cand=1" class="btn-rec">Sair</a>'
 
@@ -1994,12 +2097,13 @@ elif pagina == "recrutador":
                 <div class="profile-section-card"><p class="profile-section-title">Responsável</p><div class="profile-list-item">{html_lib.escape(rec.get('nome','—'))}</div></div>
                 <div class="profile-section-card"><p class="profile-section-title">E-mail</p><div class="profile-list-item">{html_lib.escape(rec.get('email','—'))}</div></div>
             </div>""",unsafe_allow_html=True)
-            st.markdown("""<div class="rec-action-row">
-                <a class="rec-action-card primary" href="?p=recrutador&dash=novo_seletivo">
+            auth_qs_rec = auth_rec_query()
+            st.markdown(f"""<div class="rec-action-row">
+                <a class="rec-action-card primary" href="?p=recrutador&dash=novo_seletivo{auth_qs_rec}">
                     <span class="rec-action-title">Novo Seletivo</span>
                     <span class="rec-action-text">Publicar oportunidade, etapas e prazos.</span>
                 </a>
-                <a class="rec-action-card" href="?p=recrutador&dash=seletivos">
+                <a class="rec-action-card" href="?p=recrutador&dash=seletivos{auth_qs_rec}">
                     <span class="rec-action-title">Meus Seletivos</span>
                     <span class="rec-action-text">Acompanhar inscritos, editar e encerrar.</span>
                 </a>
@@ -2035,6 +2139,7 @@ elif pagina == "recrutador":
                         salvar_recrutador_batch(aba_recrutadores, idx_r+2, payload_rec)
                         st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
                         st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
+                        st.session_state.rec_auth_token=token_recrutador(st.session_state.rec_logado)
                         st.success("Perfil do recrutador atualizado.")
                         st.rerun()
                     except Exception as e:
@@ -2126,6 +2231,7 @@ elif pagina == "recrutador":
                             aba_recrutadores.update_cell(idx_r+2,12,", ".join(favs))
                             st.session_state.rec_logado=aba_recrutadores.get_all_records()[idx_r]
                             st.session_state.rec_email_logado=st.session_state.rec_logado.get("email","")
+                            st.session_state.rec_auth_token=token_recrutador(st.session_state.rec_logado)
                             st.rerun()
                     with cc:
                         if st.button("Ver →",key=f"rb{i}"):
@@ -2232,15 +2338,26 @@ elif pagina == "recrutador":
                 for i,ch in enumerate(mch):
                     ch_key = re.sub(r"[^a-zA-Z0-9_]+", "_", str(ch.get("id") or i))
                     painel_inscritos_key = f"painel_inscritos_{ch_key}"
-                    painel_editar_key = f"painel_editar_{ch_key}"
+                    painel_resultado_key = f"painel_resultado_{ch_key}"
                     ab=ch_aberta(ch); ins_=inscritos(ch); n=len(ins_)
-                    sb='<span class="badge-aberta">● Aberta</span>' if ab else '<span class="badge-encerrada">● Encerrada</span>'
+                    status_ch = str(ch.get("status","")).strip().lower()
+                    if ab:
+                        sb='<span class="badge-aberta">Aberta</span>'
+                    elif status_ch == "deserto":
+                        sb='<span class="badge-encerrada">Deserto</span>'
+                    elif status_ch == "interrompido":
+                        sb='<span class="badge-encerrada">Interrompido</span>'
+                    else:
+                        sb='<span class="badge-encerrada">Encerrada</span>'
+                    resultado_resumo = str(ch.get("resultado_tipo","") or "").strip()
+                    resultado_html = f'<span style="font-size:11px;color:#5E6675;font-weight:700">Resultado: {html_texto(resultado_resumo)}</span>' if resultado_resumo else ''
                     st.markdown(f"""<div class="chamada-card">
                         <div style="display:flex;justify-content:space-between;align-items:center">
                             <div>
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">{sb}<span style="font-size:11px;color:#5E6675;font-weight:600">📅 {ch.get('prazo','—')}</span></div>
                                 <p style="font-size:15px;font-weight:700;color:#071D49;margin:0 0 2px">{ch.get('titulo','—')}</p>
                                 <p style="font-size:12px;color:#5E6675;font-weight:500;margin:0">{ch.get('municipio','—')}/{ch.get('estado','—')} · {ch.get('area','—')}</p>
+                                {resultado_html}
                             </div>
                             <div style="text-align:right">
                                 <p style="font-size:26px;font-weight:800;color:#C49A2C;margin:0">{n}</p>
@@ -2248,49 +2365,160 @@ elif pagina == "recrutador":
                             </div>
                         </div>
                     </div>""",unsafe_allow_html=True)
-                    cv,ced,ce=st.columns([6,2,2])
+                    cv,crs=st.columns([6,3])
                     with cv:
                         if st.button("Ver inscritos",key=f"btn_vi_{ch_key}"):
                             st.session_state[painel_inscritos_key]=not st.session_state.get(painel_inscritos_key,False); st.rerun()
-                    with ced:
-                        if st.button("Editar",key=f"btn_edch_{ch_key}"):
-                            st.session_state[painel_editar_key]=not st.session_state.get(painel_editar_key,False); st.rerun()
-                    with ce:
-                        if ab:
-                            if st.button("Encerrar",key=f"enc{i}"):
-                                tc=aba_chamadas.get_all_records()
-                                idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
-                                try:
-                                    if idx is not None: aba_chamadas.update_cell(idx+2,14,"encerrado")
-                                    st.success("Encerrada."); st.rerun()
-                                except Exception as e:
-                                    st.error(f"Erro ao encerrar Seletivo. ({e})")
-                    if st.session_state.get(painel_editar_key):
-                        with st.expander("Editar Seletivo",expanded=True):
-                            with st.form(f"form_editar_chamada_{i}"):
-                                etitulo=st.text_input("Título",value=ch.get("titulo",""),key=f"edit_ch_tit_{i}")
-                                earea=st.multiselect("Áreas",AREAS,default=[a.strip() for a in str(ch.get("area","")).split(",") if a.strip() in AREAS],key=f"edit_ch_area_{i}")
-                                ereq=st.text_area("Requisitos e organização das etapas",value=ch.get("requisitos",""),height=130,key=f"edit_ch_req_{i}")
-                                c1,c2,c3=st.columns(3)
-                                with c1: erem=st.text_input("Remuneração",value=ch.get("remuneracao",""),key=f"edit_ch_rem_{i}")
-                                with c2: ereg=st.selectbox("Regime",REGIMES,index=REGIMES.index(ch.get("regime","Presencial")) if ch.get("regime","") in REGIMES else 0,key=f"edit_ch_reg_{i}")
-                                with c3: eforma=st.selectbox("Forma de seleção",FORMAS_SELECAO,index=FORMAS_SELECAO.index(ch.get("forma_selecao","Análise curricular")) if ch.get("forma_selecao","") in FORMAS_SELECAO else 0,key=f"edit_ch_forma_{i}")
-                                salvar_ed=st.form_submit_button("Salvar alterações")
-                            if salvar_ed:
-                                tc=aba_chamadas.get_all_records()
-                                idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
-                                if idx is None:
-                                    st.error("Não encontrei este Seletivo na planilha.")
+                    with crs:
+                        if st.button("Resultado / Encerrar",key=f"btn_res_{ch_key}"):
+                            st.session_state[painel_resultado_key]=not st.session_state.get(painel_resultado_key,False); st.rerun()
+                    with st.expander("Editar Seletivo",expanded=False):
+                        with st.form(f"form_editar_chamada_{i}"):
+                            etitulo=st.text_input("Título",value=ch.get("titulo",""),key=f"edit_ch_tit_{i}")
+                            earea=st.multiselect("Áreas",AREAS,default=[a.strip() for a in str(ch.get("area","")).split(",") if a.strip() in AREAS],key=f"edit_ch_area_{i}")
+                            ereq=st.text_area("Requisitos e organização das etapas",value=ch.get("requisitos",""),height=130,key=f"edit_ch_req_{i}")
+                            c1,c2,c3=st.columns(3)
+                            with c1: erem=st.text_input("Remuneração",value=ch.get("remuneracao",""),key=f"edit_ch_rem_{i}")
+                            with c2: ereg=st.selectbox("Regime",REGIMES,index=REGIMES.index(ch.get("regime","Presencial")) if ch.get("regime","") in REGIMES else 0,key=f"edit_ch_reg_{i}")
+                            with c3: eforma=st.selectbox("Forma de seleção",FORMAS_SELECAO,index=FORMAS_SELECAO.index(ch.get("forma_selecao","Análise curricular")) if ch.get("forma_selecao","") in FORMAS_SELECAO else 0,key=f"edit_ch_forma_{i}")
+                            salvar_ed=st.form_submit_button("Salvar alterações")
+                        if salvar_ed:
+                            tc=aba_chamadas.get_all_records()
+                            idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
+                            if idx is None:
+                                st.error("Não encontrei este Seletivo na planilha.")
+                            else:
+                                linha=idx+2
+                                aba_chamadas.update_cell(linha,2,etitulo)
+                                aba_chamadas.update_cell(linha,5,", ".join(earea))
+                                aba_chamadas.update_cell(linha,8,ereq)
+                                aba_chamadas.update_cell(linha,9,erem)
+                                aba_chamadas.update_cell(linha,10,ereg)
+                                aba_chamadas.update_cell(linha,11,eforma)
+                                st.success("Seletivo atualizado.")
+                                st.rerun()
+                    if st.session_state.get(painel_resultado_key):
+                        with st.expander("Resultado e encerramento do Seletivo", expanded=True):
+                            todos_cands_resultado = aba_candidatos.get_all_records()
+                            inscritos_cands = [c for c in todos_cands_resultado if c.get("email","") in ins_]
+                            opcoes_candidatos = [
+                                f"{c.get('nome','Sem nome')} <{c.get('email','')}>"
+                                for c in inscritos_cands
+                            ]
+                            mapa_opcao_email = {
+                                f"{c.get('nome','Sem nome')} <{c.get('email','')}>": c.get("email","")
+                                for c in inscritos_cands
+                            }
+                            mapa_email_nome = {c.get("email",""): c.get("nome","") for c in inscritos_cands}
+                            st.markdown("""<div class="info-box">
+                                Registre o desfecho do Seletivo e, se desejar, envie comunicação aos candidatos inscritos.
+                                Use uma mensagem objetiva: resultado, próximos passos e contato do órgão.
+                            </div>""", unsafe_allow_html=True)
+                            with st.form(f"form_resultado_chamada_{i}"):
+                                tipo_resultado = st.selectbox(
+                                    "Desfecho do Seletivo",
+                                    [
+                                        "Selecionado(s) entre candidatos do IndicaJur",
+                                        "Sem selecionados entre os inscritos",
+                                        "Procedimento deserto",
+                                        "Interrompido pelo recrutador",
+                                    ],
+                                    key=f"res_tipo_{ch_key}",
+                                )
+                                selecionados_opcoes = []
+                                if tipo_resultado == "Selecionado(s) entre candidatos do IndicaJur":
+                                    selecionados_opcoes = st.multiselect(
+                                        "Candidato(s) selecionado(s)",
+                                        opcoes_candidatos,
+                                        key=f"res_sel_{ch_key}",
+                                    )
+                                motivo_resultado = st.text_area(
+                                    "Registro interno do encerramento",
+                                    height=90,
+                                    placeholder="Ex: candidato escolhido por aderência à experiência exigida; procedimento interrompido por conveniência administrativa; ausência de candidatos compatíveis.",
+                                    key=f"res_motivo_{ch_key}",
+                                )
+                                msg_aprovados = st.text_area(
+                                    "Mensagem para selecionado(s)",
+                                    value="Você foi selecionado neste Seletivo. O recrutador poderá entrar em contato para os próximos encaminhamentos.",
+                                    height=90,
+                                    key=f"res_msg_ap_{ch_key}",
+                                )
+                                msg_reprovados = st.text_area(
+                                    "Mensagem para não selecionado(s) ou demais inscritos",
+                                    value="Agradecemos sua participação. Neste momento, seu perfil não foi selecionado para este Seletivo. Você continuará podendo participar de novas oportunidades compatíveis no IndicaJur.",
+                                    height=110,
+                                    key=f"res_msg_rep_{ch_key}",
+                                )
+                                enviar_comunicacao = st.checkbox(
+                                    "Enviar comunicação por e-mail aos candidatos inscritos",
+                                    value=False,
+                                    key=f"res_email_{ch_key}",
+                                )
+                                confirmar_resultado = st.form_submit_button("Salvar resultado e encerrar")
+                            if confirmar_resultado:
+                                if tipo_resultado == "Selecionado(s) entre candidatos do IndicaJur" and not selecionados_opcoes:
+                                    st.error("Selecione ao menos um candidato aprovado.")
+                                elif tipo_resultado != "Procedimento deserto" and not ins_:
+                                    st.error("Este Seletivo não possui inscritos. Use o desfecho 'Procedimento deserto'.")
                                 else:
-                                    linha=idx+2
-                                    aba_chamadas.update_cell(linha,2,etitulo)
-                                    aba_chamadas.update_cell(linha,5,", ".join(earea))
-                                    aba_chamadas.update_cell(linha,8,ereq)
-                                    aba_chamadas.update_cell(linha,9,erem)
-                                    aba_chamadas.update_cell(linha,10,ereg)
-                                    aba_chamadas.update_cell(linha,11,eforma)
-                                    st.success("Seletivo atualizado.")
-                                    st.rerun()
+                                    selecionados_emails = [mapa_opcao_email[o] for o in selecionados_opcoes if mapa_opcao_email.get(o)]
+                                    if tipo_resultado == "Procedimento deserto":
+                                        status_final = "deserto"
+                                    elif tipo_resultado == "Interrompido pelo recrutador":
+                                        status_final = "interrompido"
+                                    else:
+                                        status_final = "encerrado"
+                                    payload_resultado = {
+                                        "status": status_final,
+                                        "resultado_tipo": tipo_resultado,
+                                        "selecionados": ", ".join(selecionados_emails),
+                                        "mensagem_aprovados": msg_aprovados,
+                                        "mensagem_reprovados": msg_reprovados,
+                                        "motivo_encerramento": motivo_resultado,
+                                        "encerrado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                                        "comunicacao_resultado": "enviada" if enviar_comunicacao else "não enviada",
+                                    }
+                                    tc=aba_chamadas.get_all_records()
+                                    idx=next((j for j,c in enumerate(tc) if c.get("id")==ch.get("id")),None)
+                                    if idx is None:
+                                        st.error("Não encontrei este Seletivo na planilha.")
+                                    else:
+                                        try:
+                                            salvar_resultado_seletivo(aba_chamadas, idx+2, payload_resultado)
+                                            falhas_email = []
+                                            if enviar_comunicacao:
+                                                for email_inscrito in ins_:
+                                                    if tipo_resultado == "Procedimento deserto":
+                                                        situacao_email = "Procedimento deserto"
+                                                        mensagem_email = msg_reprovados
+                                                    elif tipo_resultado == "Interrompido pelo recrutador":
+                                                        situacao_email = "Seletivo interrompido pelo recrutador"
+                                                        mensagem_email = msg_reprovados
+                                                    elif email_inscrito in selecionados_emails:
+                                                        situacao_email = "Selecionado"
+                                                        mensagem_email = msg_aprovados
+                                                    else:
+                                                        situacao_email = "Não selecionado"
+                                                        mensagem_email = msg_reprovados
+                                                    ok_email = email_resultado_seletivo(
+                                                        email_inscrito,
+                                                        mapa_email_nome.get(email_inscrito, ""),
+                                                        ch.get("titulo","Seletivo"),
+                                                        ch.get("orgao",""),
+                                                        situacao_email,
+                                                        mensagem_email,
+                                                    )
+                                                    if not ok_email:
+                                                        falhas_email.append(email_inscrito)
+                                            st.session_state[painel_resultado_key] = False
+                                            if falhas_email:
+                                                st.warning("Resultado salvo, mas houve falha no envio para: " + ", ".join(falhas_email))
+                                            else:
+                                                st.success("Resultado registrado e Seletivo encerrado.")
+                                            st.rerun()
+                                        except Exception as e:
+                                            st.error(f"Erro ao salvar resultado. ({e})")
                     if st.session_state.get(painel_inscritos_key):
                         with st.expander("Painel de inscritos",expanded=True):
                             if not ins_: st.info("Nenhum inscrito.")
@@ -2344,6 +2572,9 @@ elif pagina == "recrutador":
                     if enc:
                         st.session_state.rec_logado=enc
                         st.session_state.rec_email_logado=enc.get("email","")
+                        st.session_state.rec_auth_token=token_recrutador(enc)
+                        st.query_params["p"]="recrutador"
+                        st.query_params["auth"]=st.session_state.rec_auth_token
                         st.rerun()
                     else: st.error("E-mail ou senha incorretos, ou conta ainda não aprovada.")
                 else: st.error("Preencha e-mail e senha.")
